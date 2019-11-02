@@ -2,7 +2,9 @@
 
 import curses
 import math
+import sys
 from curses.textpad import Textbox, rectangle
+from curses import wrapper
 
 # §§§§§  
 
@@ -141,143 +143,46 @@ class Box:
         self.window.refresh()
 
 
-
+class StdOutWrapper:
+    text = ""
+    def write(self,txt):
+        self.text += txt
+        self.text = '\n'.join(self.text.split('\n')[-30:])
+    def get_text(self,beg=0,end=-1):
+        return '\n'.join(self.text.split('\n')[beg:end])
 
 def main(stdscr):
+    mystdout = StdOutWrapper()
+    sys.stdout = mystdout
+    sys.stderr = mystdout
 
-    screen = curses.initscr()
-    curses.curs_set(0)
+    try:
+        screen = curses.initscr()
+        curses.curs_set(0)
 
-    screen.clear()
-    box = Box(screen,15,26,3,10)
+        screen.clear()
+        box = Box(screen,15,26,3,10)
 
-    while True:
-        for deg in range(0,360,1):
-            box.move(8+int(8*math.sin(math.radians(deg))),40+int(40*math.cos(math.radians(deg))))
-            curses.napms(5)
+        for x in range(0,30):
+            for y in range(0,20):
+                print(str(screen.inch(y,x))+" ")
+            print()
 
-    #box.move(5,11)
-    curses.napms(2000)
-    #screen.getkey()
-    #drawIt()
-    ## The `screen` is a window that acts as the master window
-    ## that takes up the whole screen. Other windows created
-    ## later will get painted on to the `screen` window.
-    #screen = curses.initscr()
+        #while True:
+        #    for deg in range(0,360,1):
+        #        box.move(8+int(8*math.sin(math.radians(deg))),40+int(40*math.cos(math.radians(deg))))
+        #        curses.napms(5)
 
-    #screen.clear()
-    ##box = Box(curses,0,0,20,15)
-    ##box.draw()
-    ##box.refresh()
-    ##screen.refresh()
+        print("!!!!!!!!!!!!!")
+        curses.napms(2000)
 
-    ## lines, columns, start line, start column
-    #my_window = curses.newwin(15, 20, 0, 0)
+        curses.endwin()
+    finally:
 
-    ## Long strings will wrap to the next line automatically
-    ## to stay within the window
-    #my_window.addstr(4, 4, "Hello from 4,4")
-    #my_window.addstr(5, 15, "Hello from 5,15 with a long string")
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        sys.stdout.write(mystdout.get_text())
+        sys.stdout.write("\n")
 
-    ### Print the window to the screen
-    #my_window.refresh()
-    #curses.napms(2000)
-
-    ## Clear the screen, clearing my_window contents that were printed to screen
-    ## my_window will retain its contents until my_window.clear() is called.
-    #screen.clear()
-    #screen.refresh()
-
-    ## Move the window and put it back on screen
-    ## If we didn't clear the screen before doing this,
-    ## the original window contents would remain on the screen
-    ## and we would see the window text twice.
-    #my_window.mvwin(10, 10)
-    #my_window.refresh()
-    #curses.napms(1000)
-
-    ## Clear the window and redraw over the current window space
-    ## This does not require clearing the whole screen, because the window
-    ## has not moved position.
-    #my_window.clear()
-    #my_window.refresh()
-    #curses.napms(1000)
-
-    curses.endwin()
-
-#    # The `screen` is a window that acts as the master window
-#    # that takes up the whole screen. Other windows created
-#    # later will get painted on to the `screen` window.
-#    screen = curses.initscr()
-#    
-#    # lines, columns, start line, start column
-#    my_window = curses.newwin(15, 20, 0, 0)
-#    
-#    # Long strings will wrap to the next line automatically
-#    # to stay within the window
-#    my_window.addstr(4, 4, "Hello from 4,4")
-#    my_window.addstr(5, 15, "Hello from 5,15 with a long string")
-#    
-#    # Print the window to the screen
-#    my_window.refresh()
-#    curses.napms(2000)
-#    
-#    # Clear the screen, clearing my_window contents that were printed to screen
-#    # my_window will retain its contents until my_window.clear() is called.
-#    screen.clear()
-#    screen.refresh()
-#    
-#    # Move the window and put it back on screen
-#    # If we didn't clear the screen before doing this,
-#    # the original window contents would remain on the screen
-#    # and we would see the window text twice.
-#    my_window.mvwin(10, 10)
-#    my_window.refresh()
-#    curses.napms(1000)
-#    
-#    # Clear the window and redraw over the current window space
-#    # This does not require clearing the whole screen, because the window
-#    # has not moved position.
-#    my_window.clear()
-#    my_window.refresh()
-#    curses.napms(1000)
-#    
-#    curses.endwin()
-##def main(stdscr):
-##    stdscr.addstr(0, 0, "Enter IM message: (hit Ctrl-G to send)")
-##
-##    editwin = curses.newwin(5,30, 2,1)
-##    rectangle(stdscr, 1,0, 1+5+1, 1+30+1)
-##    stdscr.refresh()
-##
-##    box = Textbox(editwin)
-##
-##    # Let the user edit until Ctrl-G is struck.
-##    box.edit()
-##
-##    # Get resulting contents
-##    message = box.gather()
-#
-##import curses
-
-from curses import wrapper
-#
-#def main(stdscr):
-#    # Clear screen
-#    stdscr.clear()
-#
-#    stdscr = curses.initscr()
-#
-#    stdscr.addstr(0, 0, "Current mode: Typing mode", curses.A_REVERSE)
-#    curses.noecho()
-#    curses.cbreak()
-#
-#    #begin_x = 20; begin_y = 7
-#    #height = 5; width = 40
-#    #win = curses.newwin(height, width, begin_y, begin_x)
-#
-#    stdscr.refresh()
-#    stdscr.getkey()
-#
 wrapper(main)
 
