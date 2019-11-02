@@ -89,12 +89,22 @@ class Connector(Element):
 
 def testTextBox():
     textBox = TextBox()
+
     lineOfText = LineOfText()
     lineOfText.text = "Howdy"
+    lineOfText.justification = Justification.CENTER
     textBox.lines.append(lineOfText)
+
     lineOfText = LineOfText()
-    lineOfText.text = "How is life?"
+    lineOfText.text = "How is life??"
+    lineOfText.justification = Justification.LEFT
     textBox.lines.append(lineOfText)
+
+    lineOfText = LineOfText()
+    lineOfText.text = "blah"
+    lineOfText.justification = Justification.RIGHT
+    textBox.lines.append(lineOfText)
+
     textBox.autoFit()
 
     print("textBox = " + str(textBox) )

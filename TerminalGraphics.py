@@ -160,7 +160,9 @@ def main(stdscr):
         screen = curses.initscr()
         curses.curs_set(0)
 
-        screen.clear()
+        #screen.clear()
+        #screen.addstr("Howdy there!!!")
+        #screen.refresh()
         box = Box(screen,15,26,3,10)
 
         for x in range(0,30):
