@@ -39,6 +39,14 @@ class Component:
         self.element = element
 
 class BoxComponent(Component):
+    # These maps are so that when a box is drawn on top of other things, it doesn't look bad
+    #
+    # So like this:    │        Not this:    │
+    #               ┌──┴──┐               ┌─────┐
+    #             ──┤ box ├──           ──│ box │──
+    #               └──┬──┘               └─────┘
+    #                  │                     │
+    #
     #                  ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
     topMap    =      {         "│":"┴",                   "└":"┴", "┘":"┴", "├":"┴", "┤":"┴",          "┴":"┴", "┼":"┴"}
     bottomMap =      {         "│":"┬", "┌":"┬", "┐":"┬",                   "├":"┬", "┤":"┬", "┬":"┬",          "┼":"┬"}
@@ -126,10 +134,10 @@ class Editor:
         context = Context(screen)
 
         #context.drawVerticalLine(20)
-        context.drawVerticalLine(25)
+        #context.drawVerticalLine(25)
         #context.drawVerticalLine(34)
         #context.drawHorizontalLine(10)
-        #context.drawHorizontalLine(12)
+        context.drawHorizontalLine(12)
         #context.drawHorizontalLine(15)
         textBoxElement = testTextBox()
         textBoxElement.x = 20
