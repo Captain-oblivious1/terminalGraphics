@@ -24,16 +24,30 @@ class Context:
         for i in range(0,maxY-1):
             self.addString(x,i,"│")
 
+    def drawHorizontalLine(self,y):
+        _,maxX = self.window.getmaxyx()
+        for i in range(0,maxX-1):
+            self.addString(i,y,"─")
+
 
 class Component:
     def __init__(self, element):
         self.element = element
 
-class TextBoxComponent(Component):
-    topMap = {"│":"┴"}
-    bottomMap = {"│":"┬"}
-    def __init__(self,textBoxElement):
-        Component.__init__(self,textBoxElement)
+class BoxComponent(Component):
+                     # ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
+    topMap    =      {         "│":"┴",                   "└":"┴", "┘":"┴", "├":"┴", "┤":"┴",          "┴":"┴", "┼":"┴"}
+    bottomMap =      {         "│":"┬", "┌":"┬", "┐":"┬",                   "├":"┬", "┤":"┬", "┬":"┬",          "┼":"┬"}
+    leftMap   =      {"─":"┤",                   "┐":"┤",          "┘":"┤",          "┤":"┤", "┬":"┤", "┴":"┤", "┼":"┤"}
+    rightMap  =      {"─":"├",          "┌":"├",          "└":"├",          "├":"├",          "┬":"├", "┴":"├", "┼":"├"}
+
+    topLeftMap     = {"─":"┬", "│":"├",          "┐":"┬", "└":"├", "┘":"┼", "├":"├", "┤":"┼", "┬":"┬", "┴":"┼", "┼":"┼"}
+    topRightMap    = {"─":"┬", "│":"┤", "┌":"┬",          "└":"┤", "┘":"┤", "├":"┼", "┤":"┤", "┬":"┬", "┴":"┼", "┼":"┼"}
+    bottomLeftMap  = {"─":"┴", "│":"├",          "┐":"┼",          "┘":"┴", "├":"├", "┤":"┼", "┬":"┼", "┴":"┴", "┼":"┼"}
+    bottomRightMap = {"─":"┴", "│":"┤", "┌":"┼",          "└":"┴", "┘":"┘", "├":"┼", "┤":"┤", "┬":"┼", "┴":"┴", "┼":"┼"}
+
+    def __init__(self,boxElement):
+        Component.__init__(self,boxElement)
 
     def _drawBorderChar(self,context,x,y,mapping,default):
         existing = context.readChar(x,y)
@@ -55,23 +69,32 @@ class TextBoxComponent(Component):
 
         for i in range(1,width):
             self._drawBorderChar(context,x+i,y,TextBoxComponent.topMap,"─")
-            #context.addString(x+i,y,"─")
             self._drawBorderChar(context,x+i,bottom,TextBoxComponent.bottomMap,"─")
-            #context.addString(x+i,bottom,"─")
 
         for i in range(1,height):
-            context.addString(x,y+i,"│")
-            context.addString(right,y+i,"│")
+            self._drawBorderChar(context,x,y+i,TextBoxComponent.leftMap,"│")
+            self._drawBorderChar(context,right,y+i,TextBoxComponent.rightMap,"│")
 
-        context.addString(x,y,"┌")
-        context.addString(right,y,"┐")
-        context.addString(x,bottom,"└")
-        context.addString(right,bottom,"┘")
+        self._drawBorderChar(context,x,y,TextBoxComponent.topLeftMap,"┌")
+        self._drawBorderChar(context,right,y,TextBoxComponent.topRightMap,"┐")
+        self._drawBorderChar(context,x,bottom,TextBoxComponent.bottomLeftMap,"└")
+        self._drawBorderChar(context,right,bottom,TextBoxComponent.bottomRightMap,"┘")
 
-        context.addString(x,y,"┌")
         context.fillChar(x+1,y+1,width-1,height-1," ")
 
-        width -= 1
+class TextBoxComponent(BoxComponent):
+    def __init__(self,textBoxElement):
+        BoxComponent.__init__(self,textBoxElement)
+
+    def draw(self,context):
+        BoxComponent.draw(self,context)
+        x = self.element.x
+        y = self.element.y
+        width = self.element.width
+        height = self.element.height
+        height -= 1
+        width -= 2
+
         row = y+1
         for line in self.element.lines:
             lineLength = len(line.text)
@@ -85,8 +108,6 @@ class TextBoxComponent(Component):
             context.addString(col,row,line.text)
             row += 1
 
-        #print("readChar='" + str(context.readChar(x,y)) + "'")
-
 class Editor:
     def __init__(self):
         pass
@@ -99,6 +120,11 @@ class Editor:
         context = Context(screen)
 
         context.drawVerticalLine(25)
+        context.drawVerticalLine(20)
+        context.drawVerticalLine(34)
+        #context.drawHorizontalLine(10)
+        #context.drawHorizontalLine(12)
+        #context.drawHorizontalLine(15)
         textBoxElement = testTextBox()
         textBoxElement.x = 20
         textBoxElement.y = 10
