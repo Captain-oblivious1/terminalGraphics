@@ -91,7 +91,7 @@ def testTextBox():
     textBox = TextBox()
 
     lineOfText = LineOfText()
-    lineOfText.text = "Howdy"
+    lineOfText.text = "center"
     lineOfText.justification = Justification.CENTER
     textBox.lines.append(lineOfText)
 
@@ -101,8 +101,13 @@ def testTextBox():
     textBox.lines.append(lineOfText)
 
     lineOfText = LineOfText()
-    lineOfText.text = "blah"
+    lineOfText.text = "right"
     lineOfText.justification = Justification.RIGHT
+    textBox.lines.append(lineOfText)
+
+    lineOfText = LineOfText()
+    lineOfText.text = "left"
+    lineOfText.justification = Justification.LEFT
     textBox.lines.append(lineOfText)
 
     textBox.autoFit()
