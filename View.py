@@ -7,12 +7,14 @@ class Context:
     def __init__(self,window):
         self.window = window
 
-    def addString(self,x,y,text):
-        self.window.addstr(y,x,text)
+    def addString(self,x,y,text,bold=False):
+        if bold:
+            self.window.addstr(y,x,text,curses.color_pair(1)|curses.A_BOLD)
+        else:
+            self.window.addstr(y,x,text)
 
     def readChar(self,x,y):
-        return chr(self.window.inch(y,x))
-        #return self.window.inch(y,x)
+        return chr(0xFFFF & self.window.inch(y,x))
 
     def fillChar(self,x,y,width,height,char):
         for i in range(0,width):
@@ -20,11 +22,13 @@ class Context:
                 self.addString(x+i,y+j,char)
 
     def drawVerticalLine(self,x):
+        pass
         maxY,_ = self.window.getmaxyx()
         for i in range(0,maxY-1):
             self.addString(x,i,"│")
 
     def drawHorizontalLine(self,y):
+        pass
         _,maxX = self.window.getmaxyx()
         for i in range(0,maxX-1):
             self.addString(i,y,"─")
@@ -35,7 +39,7 @@ class Component:
         self.element = element
 
 class BoxComponent(Component):
-                     # ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
+    #                  ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
     topMap    =      {         "│":"┴",                   "└":"┴", "┘":"┴", "├":"┴", "┤":"┴",          "┴":"┴", "┼":"┴"}
     bottomMap =      {         "│":"┬", "┌":"┬", "┐":"┬",                   "├":"┬", "┤":"┬", "┬":"┬",          "┼":"┬"}
     leftMap   =      {"─":"┤",                   "┐":"┤",          "┘":"┤",          "┤":"┤", "┬":"┤", "┴":"┤", "┼":"┤"}
@@ -55,7 +59,7 @@ class BoxComponent(Component):
             char = mapping[existing]
         else:
             char = default
-        context.addString(x,y,char)
+        context.addString(x,y,char,self.element.isBold)
 
     def draw(self,context):
         x = self.element.x
@@ -105,7 +109,7 @@ class TextBoxComponent(BoxComponent):
             elif line.justification == Justification.RIGHT:
                 col = x + width - lineLength + 1
 
-            context.addString(col,row,line.text)
+            context.addString(col,row,line.text,self.element.isBold)
             row += 1
 
 class Editor:
@@ -115,13 +119,15 @@ class Editor:
     def run(self):
         screen = curses.initscr()
         curses.curs_set(0)
+        curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
         screen.clear()
+        #screen.addstr(0,0,"Hello",curses.color_pair(1)|curses.A_BOLD)
 
         context = Context(screen)
 
+        #context.drawVerticalLine(20)
         context.drawVerticalLine(25)
-        context.drawVerticalLine(20)
-        context.drawVerticalLine(34)
+        #context.drawVerticalLine(34)
         #context.drawHorizontalLine(10)
         #context.drawHorizontalLine(12)
         #context.drawHorizontalLine(15)

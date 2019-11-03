@@ -7,6 +7,7 @@ class Element:
         self.y = 0
         self.width = 0
         self.height = 0
+        self.isBold = False
 
     def _attrToStr(self):
         return "x=" + str(self.x) + ",y=" + str(self.y) + ",width=" + str(self.width) + ",height=" + str(self.height)
@@ -110,6 +111,7 @@ def testTextBox():
     lineOfText.justification = Justification.LEFT
     textBox.lines.append(lineOfText)
 
+    #textBox.isBold = True
     textBox.autoFit()
 
     print("textBox = " + str(textBox) )
