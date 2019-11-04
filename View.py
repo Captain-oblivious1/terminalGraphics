@@ -3,6 +3,9 @@ import curses
 from Model import *
 from curses import wrapper
 
+def isHorizontal(side):
+    return side == Side.LEFT or side == Side.RIGHT
+
 class Context:
     def __init__(self,window):
         self.window = window
@@ -21,18 +24,37 @@ class Context:
             for j in range(0,height):
                 self.addString(x+i,y+j,char)
 
-    def drawVerticalLine(self,x):
-        pass
-        maxY,_ = self.window.getmaxyx()
-        for i in range(0,maxY-1):
-            self.addString(x,i,"│")
+    def drawChar(self,x,y,mapping,default,isBold=False):
+        existing = self.readChar(x,y)
+        if existing in mapping:
+            char = mapping[existing]
+        else:
+            char = default
+        self.addString(x,y,char,isBold)
 
-    def drawHorizontalLine(self,y):
-        pass
-        _,maxX = self.window.getmaxyx()
-        for i in range(0,maxX-1):
-            self.addString(i,y,"─")
+    #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
+    verticalMap   = {"─":"┼",          "┌":"├", "┐":"┤", "└":"├", "┘":"┤", "├":"├", "┤":"┤", "┬":"┼", "┴":"┼", "┼":"┼"}
 
+    def drawVerticalLine(self,x,fro=0,to=None,isBold=False):
+        if to==None:
+            to,_ = self.window.getmaxyx()
+            to -= 1
+        maxY = max(fro,to)
+        minY = min(fro,to)
+        for i in range(minY,maxY+1):
+            self.drawChar(x,i,Context.verticalMap,"│",isBold)
+
+    #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
+    horizontalMap = {         "│":"┼", "┌":"┬", "┐":"┬", "└":"┴", "┘":"┴", "├":"┼", "┤":"┼", "┬":"┬", "┴":"┴", "┼":"┼"}
+
+    def drawHorizontalLine(self,y,fro=0,to=None,isBold=False):
+        if to==None:
+            _,to = self.window.getmaxyx()
+            to -= 1
+        maxX = max(fro,to)
+        minX = min(fro,to)
+        for i in range(minX,maxX+1):
+            self.drawChar(i,y,Context.horizontalMap,"─",isBold)
 
 class Component:
     def __init__(self, element):
@@ -46,6 +68,9 @@ class BoxComponent(Component):
     #             ──┤ box ├──           ──│ box │──
     #               └──┬──┘               └─────┘
     #                  │                     │
+    #
+    # So for example, when drawing the top part of a box, and it's about to draw over an existing "│" with "─", it
+    # will first check the topMap and find the "│" as a key and will draw the corresponding "┴" value instead.
     #
     #                  ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
     topMap    =      {         "│":"┴",                   "└":"┴", "┘":"┴", "├":"┴", "┤":"┴",          "┴":"┴", "┼":"┴"}
@@ -62,12 +87,7 @@ class BoxComponent(Component):
         Component.__init__(self,boxElement)
 
     def _drawBorderChar(self,context,x,y,mapping,default):
-        existing = context.readChar(x,y)
-        if existing in mapping:
-            char = mapping[existing]
-        else:
-            char = default
-        context.addString(x,y,char,self.element.isBold)
+        context.drawChar(x,y,mapping,default,self.element.isBold)
 
     def draw(self,context):
         x = self.element.x
@@ -120,6 +140,104 @@ class TextBoxComponent(BoxComponent):
             context.addString(col,row,line.text,self.element.isBold)
             row += 1
 
+class ConnectorComponent(Component):
+    # I wish there were arrows and triangles that lined up with blocks
+    noneMap =     { Side.TOP:"┴", Side.LEFT:"┤", Side.RIGHT:"├", Side.BOTTOM:"┬" }
+    arrowMap =    { Side.TOP:"∨", Side.LEFT:">", Side.RIGHT:"<", Side.BOTTOM:"∧" }
+    triangleMap = { Side.TOP:"▽", Side.LEFT:"▷", Side.RIGHT:"◁", Side.BOTTOM:"△" }
+
+    offsetMap = { Side.TOP:(0,-1), Side.LEFT:(-1,0), Side.RIGHT:(1,0), Side.BOTTOM:(0,1) }
+
+    def __init__(self,connectorElement):
+        Component.__init__(self,connectorElement)
+
+    def drawConnector(self,context,connection):
+        element = connection.element
+        if connection.side == Side.TOP:
+            x = int(element.x + element.width * connection.where)
+            y = element.y
+        elif connection.side == Side.LEFT:
+            x = element.x
+            y = int(element.y + element.height * connection.where)
+        elif connection.side == Side.RIGHT:
+            x = element.x + element.width - 1
+            y = int(element.y + element.height * connection.where)
+        elif connection.side == Side.BOTTOM:
+            x = int(element.x + element.width * connection.where)
+            y = element.y + element.height - 1
+        else:
+            raise "invalid side"
+
+        offX, offY = ConnectorComponent.offsetMap[ connection.side ]
+
+        if connection.end == End.NONE:
+            context.addString(x,y,ConnectorComponent.noneMap[ connection.side ])
+            return (x + offX, y + offY)
+        else:
+            x += offX
+            y += offY
+
+            if connection.end == End.ARROW:
+                theMap = ConnectorComponent.arrowMap
+            else:
+                theMap = ConnectorComponent.triangleMap
+
+            context.addString(x,y,theMap[ connection.side ])
+
+            return (x + offX, y + offY)
+
+    turnSymbol = \
+          [ ["X","╮","X","╯"], \
+            ["╰","X","╯","X"], \
+            ["X","╭","X","╰"], \
+            ["╭","X","╮","X"] ]
+
+    def draw(self,context):
+        fromConnection = self.element.fromConnection
+        toConnection = self.element.toConnection
+        isBold = self.element.isBold
+
+        x,y = self.drawConnector(context,fromConnection)
+        endX,endY = self.drawConnector(context,toConnection)
+
+        controlPoints = self.element.controlPoints.copy()
+        if isHorizontal(toConnection.side):
+            controlPoints.append(endY)
+            controlPoints.append(endX)
+        else:
+            controlPoints.append(endX)
+            controlPoints.append(endY)
+
+        horizontalOrienation = isHorizontal(fromConnection.side)
+        if fromConnection.side==Side.RIGHT:
+            direction = 0
+        elif fromConnection.side==Side.BOTTOM:
+            direction = 1
+        elif fromConnection.side==Side.LEFT:
+            direction = 2
+        elif fromConnection.side==Side.TOP:
+            direction = 3
+
+        for controlPoint in controlPoints:
+            if horizontalOrienation:
+                if controlPoint>x:
+                    newDirection = 0
+                else:
+                    newDirection = 2
+                context.drawHorizontalLine(y,x,controlPoint,isBold)
+                x=controlPoint
+            else:
+                if controlPoint>y:
+                    newDirection = 1
+                else:
+                    newDirection = 3
+                context.drawVerticalLine(x,y,controlPoint,isBold)
+                y=controlPoint
+            context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
+            direction = newDirection
+            horizontalOrienation = 1 - horizontalOrienation
+
+
 class Editor:
     def __init__(self):
         pass
@@ -139,15 +257,50 @@ class Editor:
         #context.drawHorizontalLine(10)
         context.drawHorizontalLine(12)
         #context.drawHorizontalLine(15)
-        textBoxElement = testTextBox()
-        textBoxElement.x = 20
-        textBoxElement.y = 10
-        textBoxComponent = TextBoxComponent(textBoxElement)
-        textBoxComponent.draw(context)
+        textBoxElement1 = testTextBox()
+        textBoxElement1.x = 20
+        textBoxElement1.y = 10
+        textBoxComponent1 = TextBoxComponent(textBoxElement1)
+        textBoxComponent1.draw(context)
+
+        textBoxElement2 = testTextBox()
+        textBoxElement2.x = 60
+        textBoxElement2.y = 20
+        textBoxComponent2 = TextBoxComponent(textBoxElement2)
+        textBoxComponent2.draw(context)
+
+        fromConnectionPoint = ConnectionPoint()
+        fromConnectionPoint.element = textBoxElement1
+        fromConnectionPoint.side = Side.RIGHT
+        fromConnectionPoint.where = 0.5
+        fromConnectionPoint.end = End.ARROW
+
+        toConnectionPoint = ConnectionPoint()
+        toConnectionPoint.element = textBoxElement2
+        toConnectionPoint.side = Side.LEFT
+        toConnectionPoint.where = 0.25
+        toConnectionPoint.end = End.TRIANGLE
+
+        connectorElement = ConnectorElement()
+        connectorElement.fromConnection = fromConnectionPoint
+        connectorElement.toConnection = toConnectionPoint
+        connectorElement.controlPoints.append(50)
+
+        connectorComponent = ConnectorComponent(connectorElement)
+        connectorComponent.draw(context)
+
         screen.refresh()
 
-        screen.getch()
-        #curses.napms(2000)
+        screen.timeout(100)
+        curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
+        while(True):
+            event = screen.getch()
+            ch = 'N'
+            if event == ord('q'): break
+            elif event == curses.KEY_MOUSE:
+                ch = 'Y'
+                _, mx, my, _, _ = curses.getmouse()
+                screen.addstr(my, mx,ch)
 
         curses.endwin()
 

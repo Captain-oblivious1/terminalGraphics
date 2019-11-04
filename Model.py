@@ -3,17 +3,27 @@ from enum import Enum
 class Element:
     def __init__(self):
         self.parent = None
+        self.isBold = False
+
+    def _attrToStr(self):
+        return "isBold=" + str(self.isBold)
+
+    def __str__(self):
+        return "Element:{" + self._attrToStr() + "}"
+
+class BoxElement(Element):
+    def __init__(self):
+        Element.__init__(self)
         self.x = 0
         self.y = 0
         self.width = 0
         self.height = 0
-        self.isBold = False
 
     def _attrToStr(self):
-        return "x=" + str(self.x) + ",y=" + str(self.y) + ",width=" + str(self.width) + ",height=" + str(self.height)
+        return Element._attrToStr() + ",x=" + str(self.x) + ",y=" + str(self.y) + ",width=" + str(self.width) + ",height=" + str(self.height)
 
     def __str__(self):
-        return "Element:{" + self._attrToStr() + "}"
+        return "BoxElement:{" + self._attrToStr() + "}"
 
 class Diagram(Element):
     def __init__(self):
@@ -52,9 +62,9 @@ class LineOfText:
         return "LineOfText:{" + self._attrToStr() + "}"
 
 
-class TextBox(Element):
+class TextBox(BoxElement):
     def __init__(self):
-        Element.__init__(self)
+        BoxElement.__init__(self)
         self.lines = []
 
     def autoFit(self):
@@ -79,14 +89,34 @@ class TextBox(Element):
         retMe += "]"
         return retMe
 
-
     def __str__(self):
         return "TextBox:{" + self._attrToStr() + "}"
 
+class Side(Enum):
+    TOP = 0
+    LEFT = 1
+    RIGHT = 2
+    BOTTOM = 3
 
-class Connector(Element):
+class End(Enum):
+    NONE = 0
+    ARROW = 1
+    TRIANGLE = 2
+
+class ConnectionPoint:
+    def __init__(self):
+        self.element = None
+        self.side = None
+        self.where = None # 0.0 means left/top-most 1.0 is right/bottom most
+        self.end = End.NONE
+
+
+class ConnectorElement(Element):
     def __init__(self):
         Element.__init__(self)
+        self.fromConnection = None
+        self.toConnection = None
+        self.controlPoints = [] # ints not actual points.
 
 def testTextBox():
     textBox = TextBox()
@@ -126,5 +156,6 @@ def testDiagram():
     diagram.elements.append( testTextBox() )
 
     print("diagram = " + str(diagram) )
+
 
 testDiagram()
