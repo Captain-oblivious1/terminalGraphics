@@ -249,7 +249,17 @@ class ConnectorComponent(Component):
 
         context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
 
-def drawStuff(context):
+class DiagramComponent(Component):
+    def __init__(self,diagramElement):
+        Component.__init__(self,diagramElement)
+        self.components = []
+
+    def draw(self,context):
+        for component in self.components:
+            component.draw(context)
+
+def createTestDiagram():
+    diagramElement = Diagram()
     #context.drawVerticalLine(20)
     #context.drawVerticalLine(25)
     #context.drawVerticalLine(34)
@@ -259,20 +269,19 @@ def drawStuff(context):
     textBoxElement1 = testTextBox()
     textBoxElement1.x = 20
     textBoxElement1.y = 10
-    textBoxComponent1 = TextBoxComponent(textBoxElement1)
-    textBoxComponent1.draw(context)
+    diagramElement.elements.append(textBoxElement1)
 
     textBoxElement2 = testTextBox()
     textBoxElement2.x = 60
     textBoxElement2.y = 20
-    textBoxComponent2 = TextBoxComponent(textBoxElement2)
-    textBoxComponent2.draw(context)
+    diagramElement.elements.append(textBoxElement2)
+
 
     fromConnectionPoint1 = ConnectionPoint()
     fromConnectionPoint1.element = textBoxElement1
     fromConnectionPoint1.side = Side.RIGHT
     fromConnectionPoint1.where = 0.5
-    fromConnectionPoint1.end = End.ARROW
+    fromConnectionPoint1.end = End.NONE
 
     toConnectionPoint1 = ConnectionPoint()
     toConnectionPoint1.element = textBoxElement2
@@ -284,9 +293,7 @@ def drawStuff(context):
     connectorElement1.fromConnection = fromConnectionPoint1
     connectorElement1.toConnection = toConnectionPoint1
     connectorElement1.controlPoints.append(45)
-
-    connectorComponent1 = ConnectorComponent(connectorElement1)
-    connectorComponent1.draw(context)
+    diagramElement.elements.append(connectorElement1)
 
     fromConnectionPoint2 = ConnectionPoint()
     fromConnectionPoint2.element = textBoxElement1
@@ -298,7 +305,7 @@ def drawStuff(context):
     toConnectionPoint2.element = textBoxElement2
     toConnectionPoint2.side = Side.TOP
     toConnectionPoint2.where = 0.5
-    toConnectionPoint2.end = End.TRIANGLE
+    toConnectionPoint2.end = End.NONE
 
     connectorElement2 = ConnectorElement()
     connectorElement2.fromConnection = fromConnectionPoint2
@@ -306,11 +313,22 @@ def drawStuff(context):
     connectorElement2.controlPoints.append(19)
     connectorElement2.controlPoints.append(51)
     connectorElement2.controlPoints.append(15)
+    diagramElement.elements.append(connectorElement2)
 
-    connectorComponent2 = ConnectorComponent(connectorElement2)
-    connectorComponent2.draw(context)
+    return diagramElement
 
+def createDiagramComponent(diagramElement):
+    diagramComponent = DiagramComponent(diagramElement)
 
+    for element in diagramElement.elements:
+        if type(element) is TextBoxElement:
+            component = TextBoxComponent(element)
+        elif type(element) is ConnectorElement:
+            component = ConnectorComponent(element)
+
+        diagramComponent.components.append(component)
+
+    return diagramComponent
 
 
 class Editor:
@@ -324,8 +342,11 @@ class Editor:
         screen.clear()
         #screen.addstr(0,0,"Hello",curses.color_pair(1)|curses.A_BOLD)
 
+        diagram = createTestDiagram()
+        diagramComponent = createDiagramComponent(diagram)
+
         context = Context(screen)
-        drawStuff(context)
+        diagramComponent.draw(context)
         screen.refresh()
 
         screen.timeout(100)

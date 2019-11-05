@@ -62,7 +62,7 @@ class LineOfText:
         return "LineOfText:{" + self._attrToStr() + "}"
 
 
-class TextBox(BoxElement):
+class TextBoxElement(BoxElement):
     def __init__(self):
         BoxElement.__init__(self)
         self.lines = []
@@ -119,7 +119,7 @@ class ConnectorElement(Element):
         self.controlPoints = [] # ints not actual points.
 
 def testTextBox():
-    textBox = TextBox()
+    textBox = TextBoxElement()
 
     lineOfText = LineOfText()
     lineOfText.text = "center"
