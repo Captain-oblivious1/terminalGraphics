@@ -35,24 +35,30 @@ class Context:
     #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
     verticalMap   = {"─":"┼",          "┌":"├", "┐":"┤", "└":"├", "┘":"┤", "├":"├", "┤":"┤", "┬":"┼", "┴":"┼", "┼":"┼"}
 
-    def drawVerticalLine(self,x,fro=0,to=None,isBold=False):
+    def drawVerticalLine(self,x,fro=0,to=None,inclusive=True,isBold=False):
         if to==None:
             to,_ = self.window.getmaxyx()
             to -= 1
         maxY = max(fro,to)
         minY = min(fro,to)
+        if not inclusive:
+            minY += 1
+            maxY -= 1
         for i in range(minY,maxY+1):
             self.drawChar(x,i,Context.verticalMap,"│",isBold)
 
     #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
     horizontalMap = {         "│":"┼", "┌":"┬", "┐":"┬", "└":"┴", "┘":"┴", "├":"┼", "┤":"┼", "┬":"┬", "┴":"┴", "┼":"┼"}
 
-    def drawHorizontalLine(self,y,fro=0,to=None,isBold=False):
+    def drawHorizontalLine(self,y,fro=0,to=None,inclusive=True,isBold=False):
         if to==None:
             _,to = self.window.getmaxyx()
             to -= 1
         maxX = max(fro,to)
         minX = min(fro,to)
+        if not inclusive:
+            minX += 1
+            maxX -= 1
         for i in range(minX,maxX+1):
             self.drawChar(i,y,Context.horizontalMap,"─",isBold)
 
@@ -187,7 +193,7 @@ class ConnectorComponent(Component):
             return (x + offX, y + offY)
 
     turnSymbol = \
-          [ ["X","╮","X","╯"], \
+          [ ["─","╮","X","╯"], \
             ["╰","X","╯","X"], \
             ["X","╭","X","╰"], \
             ["╭","X","╮","X"] ]
@@ -219,24 +225,31 @@ class ConnectorComponent(Component):
             direction = 3
 
         for controlPoint in controlPoints:
+            print("x="+str(x)+" y="+str(y)+" controlPoint="+str(controlPoint))
             if horizontalOrienation:
                 if controlPoint>x:
                     newDirection = 0
                 else:
                     newDirection = 2
-                context.drawHorizontalLine(y,x,controlPoint,isBold)
-                x=controlPoint
+                context.drawHorizontalLine(y,x,controlPoint,False,isBold)
+                nextX=controlPoint
+                nextY=y
             else:
                 if controlPoint>y:
                     newDirection = 1
                 else:
                     newDirection = 3
-                context.drawVerticalLine(x,y,controlPoint,isBold)
-                y=controlPoint
+                context.drawVerticalLine(x,y,controlPoint,False,isBold)
+                nextX=x
+                nextY=controlPoint
             context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
+            x=nextX
+            y=nextY
+            print("oldDirection="+str(direction)+" newDirection="+str(newDirection))
             direction = newDirection
             horizontalOrienation = 1 - horizontalOrienation
 
+        context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
 
 class Editor:
     def __init__(self):
