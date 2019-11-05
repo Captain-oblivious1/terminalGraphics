@@ -194,9 +194,9 @@ class ConnectorComponent(Component):
 
     turnSymbol = \
           [ ["─","╮","X","╯"], \
-            ["╰","X","╯","X"], \
-            ["X","╭","X","╰"], \
-            ["╭","X","╮","X"] ]
+            ["╰","│","╯","X"], \
+            ["X","╭","─","╰"], \
+            ["╭","X","╮","│"] ]
 
     def draw(self,context):
         fromConnection = self.element.fromConnection
@@ -225,7 +225,6 @@ class ConnectorComponent(Component):
             direction = 3
 
         for controlPoint in controlPoints:
-            print("x="+str(x)+" y="+str(y)+" controlPoint="+str(controlPoint))
             if horizontalOrienation:
                 if controlPoint>x:
                     newDirection = 0
@@ -245,11 +244,74 @@ class ConnectorComponent(Component):
             context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
             x=nextX
             y=nextY
-            print("oldDirection="+str(direction)+" newDirection="+str(newDirection))
             direction = newDirection
             horizontalOrienation = 1 - horizontalOrienation
 
         context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
+
+def drawStuff(context):
+    #context.drawVerticalLine(20)
+    #context.drawVerticalLine(25)
+    #context.drawVerticalLine(34)
+    #context.drawHorizontalLine(10)
+    #context.drawHorizontalLine(12)
+    #context.drawHorizontalLine(15)
+    textBoxElement1 = testTextBox()
+    textBoxElement1.x = 20
+    textBoxElement1.y = 10
+    textBoxComponent1 = TextBoxComponent(textBoxElement1)
+    textBoxComponent1.draw(context)
+
+    textBoxElement2 = testTextBox()
+    textBoxElement2.x = 60
+    textBoxElement2.y = 20
+    textBoxComponent2 = TextBoxComponent(textBoxElement2)
+    textBoxComponent2.draw(context)
+
+    fromConnectionPoint1 = ConnectionPoint()
+    fromConnectionPoint1.element = textBoxElement1
+    fromConnectionPoint1.side = Side.RIGHT
+    fromConnectionPoint1.where = 0.5
+    fromConnectionPoint1.end = End.ARROW
+
+    toConnectionPoint1 = ConnectionPoint()
+    toConnectionPoint1.element = textBoxElement2
+    toConnectionPoint1.side = Side.LEFT
+    toConnectionPoint1.where = 0.25
+    toConnectionPoint1.end = End.TRIANGLE
+
+    connectorElement1 = ConnectorElement()
+    connectorElement1.fromConnection = fromConnectionPoint1
+    connectorElement1.toConnection = toConnectionPoint1
+    connectorElement1.controlPoints.append(45)
+
+    connectorComponent1 = ConnectorComponent(connectorElement1)
+    connectorComponent1.draw(context)
+
+    fromConnectionPoint2 = ConnectionPoint()
+    fromConnectionPoint2.element = textBoxElement1
+    fromConnectionPoint2.side = Side.BOTTOM
+    fromConnectionPoint2.where = 0.75
+    fromConnectionPoint2.end = End.ARROW
+
+    toConnectionPoint2 = ConnectionPoint()
+    toConnectionPoint2.element = textBoxElement2
+    toConnectionPoint2.side = Side.TOP
+    toConnectionPoint2.where = 0.5
+    toConnectionPoint2.end = End.TRIANGLE
+
+    connectorElement2 = ConnectorElement()
+    connectorElement2.fromConnection = fromConnectionPoint2
+    connectorElement2.toConnection = toConnectionPoint2
+    connectorElement2.controlPoints.append(19)
+    connectorElement2.controlPoints.append(51)
+    connectorElement2.controlPoints.append(15)
+
+    connectorComponent2 = ConnectorComponent(connectorElement2)
+    connectorComponent2.draw(context)
+
+
+
 
 class Editor:
     def __init__(self):
@@ -263,45 +325,7 @@ class Editor:
         #screen.addstr(0,0,"Hello",curses.color_pair(1)|curses.A_BOLD)
 
         context = Context(screen)
-
-        #context.drawVerticalLine(20)
-        #context.drawVerticalLine(25)
-        #context.drawVerticalLine(34)
-        #context.drawHorizontalLine(10)
-        context.drawHorizontalLine(12)
-        #context.drawHorizontalLine(15)
-        textBoxElement1 = testTextBox()
-        textBoxElement1.x = 20
-        textBoxElement1.y = 10
-        textBoxComponent1 = TextBoxComponent(textBoxElement1)
-        textBoxComponent1.draw(context)
-
-        textBoxElement2 = testTextBox()
-        textBoxElement2.x = 60
-        textBoxElement2.y = 20
-        textBoxComponent2 = TextBoxComponent(textBoxElement2)
-        textBoxComponent2.draw(context)
-
-        fromConnectionPoint = ConnectionPoint()
-        fromConnectionPoint.element = textBoxElement1
-        fromConnectionPoint.side = Side.RIGHT
-        fromConnectionPoint.where = 0.5
-        fromConnectionPoint.end = End.ARROW
-
-        toConnectionPoint = ConnectionPoint()
-        toConnectionPoint.element = textBoxElement2
-        toConnectionPoint.side = Side.LEFT
-        toConnectionPoint.where = 0.25
-        toConnectionPoint.end = End.TRIANGLE
-
-        connectorElement = ConnectorElement()
-        connectorElement.fromConnection = fromConnectionPoint
-        connectorElement.toConnection = toConnectionPoint
-        connectorElement.controlPoints.append(50)
-
-        connectorComponent = ConnectorComponent(connectorElement)
-        connectorComponent.draw(context)
-
+        drawStuff(context)
         screen.refresh()
 
         screen.timeout(100)
