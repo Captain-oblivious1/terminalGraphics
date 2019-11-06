@@ -1,3 +1,5 @@
+#!/bin/python
+
 import sys
 import curses
 from Model import *
@@ -86,8 +88,8 @@ class BoxComponent(Component):
 
     topLeftMap     = {"─":"┬", "│":"├",          "┐":"┬", "└":"├", "┘":"┼", "├":"├", "┤":"┼", "┬":"┬", "┴":"┼", "┼":"┼"}
     topRightMap    = {"─":"┬", "│":"┤", "┌":"┬",          "└":"┤", "┘":"┤", "├":"┼", "┤":"┤", "┬":"┬", "┴":"┼", "┼":"┼"}
-    bottomLeftMap  = {"─":"┴", "│":"├",          "┐":"┼",          "┘":"┴", "├":"├", "┤":"┼", "┬":"┼", "┴":"┴", "┼":"┼"}
-    bottomRightMap = {"─":"┴", "│":"┤", "┌":"┼",          "└":"┴", "┘":"┘", "├":"┼", "┤":"┤", "┬":"┼", "┴":"┴", "┼":"┼"}
+    bottomLeftMap  = {"─":"┴", "│":"├", "┌":"├", "┐":"┼",          "┘":"┴", "├":"├", "┤":"┼", "┬":"┼", "┴":"┴", "┼":"┼"}
+    bottomRightMap = {"─":"┴", "│":"┤", "┌":"┼", "┐":"┤", "└":"┴", "┘":"┘", "├":"┼", "┤":"┤", "┬":"┼", "┴":"┴", "┼":"┼"}
 
     def __init__(self,boxElement):
         Component.__init__(self,boxElement)
@@ -349,16 +351,23 @@ class Editor:
         diagramComponent.draw(context)
         screen.refresh()
 
-        screen.timeout(100)
         curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
         while(True):
             event = screen.getch()
-            ch = 'N'
+            #ch = 'N'
             if event == ord('q'): break
             elif event == curses.KEY_MOUSE:
-                ch = 'Y'
+                #ch = 'Y'
                 _, mx, my, _, _ = curses.getmouse()
-                screen.addstr(my, mx,ch)
+                #screen.addstr(my, mx,ch)
+
+                #screen.timeout(100)
+                textBoxElement1 = diagram.elements[0]
+                textBoxElement1.x = mx
+                textBoxElement1.y = my
+                screen.clear()
+                diagramComponent.draw(context)
+                screen.refresh()
 
         curses.endwin()
 
