@@ -2,10 +2,12 @@ from enum import Enum
 
 class Element:
     def __init__(self):
-        self.parent = None
+        pass
+        #self.parent = None
 
     def _attrToStr(self):
-        return "parent=" + str(object.__str__(self.parent))
+        return ""
+        #return "parent=" + str(object.__str__(self.parent))
 
     def __str__(self):
         return "Element:{" + self._attrToStr() + "}"

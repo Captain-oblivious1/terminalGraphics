@@ -7,9 +7,6 @@ from Components import *
 from curses import wrapper
 #import keyboard
 
-def isHorizontal(side):
-    return side == Side.LEFT or side == Side.RIGHT
-
 class Context:
     def __init__(self,window):
         self.window = window
@@ -95,10 +92,8 @@ class SelectingState(State):
         self.diagramComponent = diagramComponent
 
     def mouseClicked(self, x, y):
-        print("In mouseClicked")
         for component in self.diagramComponent.allComponents():
             if component.isOnMe(x,y):
-                print("was selected")
                 component.isSelected = True
             else:
                 component.isSelected = False
@@ -207,7 +202,6 @@ class Editor:
             #ch = 'N'
             if event == ord('q'): break
             elif event == curses.KEY_MOUSE:
-                print("Got mouse event")
                 #ch = 'Y'
                 _ , mx, my, _, bstate = curses.getmouse()
                 if bstate & curses.BUTTON1_CLICKED != 0:

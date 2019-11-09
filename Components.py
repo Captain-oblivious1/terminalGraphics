@@ -66,11 +66,9 @@ class BoxComponent(Component):
         context.fillChar(x+1,y+1,width-1,height-1," ")
 
     def isOnMe(self,x,y):
-        print("HER!!")
         element = self.element
         myX=element.x
         myY=element.y
-        print("x="+str(x)+" y="+str(y)+" myX=" + str(myX)+" myY="+str(myY))
         return x>=myX and y>=myY and x<myX+element.width and y<myY+element.height
 
 class TextBoxComponent(BoxComponent):
