@@ -2,23 +2,27 @@ from Model import *
 import math
 
 class Rect:
-    def __init__(self):
-        self.l = math.inf
-        self.t = math.inf
-        self.r = -math.inf
-        self.b = -math.inf
-
     def __init__(self,x=math.inf,y=math.inf,width=-math.inf,height=-math.inf):
         self.l = x
         self.t = y
         self.r = x+width if width!=-math.inf else -math.inf
-        self.b = x+height if height!=-math.inf else -math.inf
+        self.b = y+height if height!=-math.inf else -math.inf
 
     def unionWith(self,rect):
         self.l = min(self.l,rect.l)
         self.t = min(self.t,rect.t)
         self.r = max(self.r,rect.r)
         self.b = max(self.b,rect.b)
+        return self
+
+    def isNullRect(self):
+        return self.l==math.inf or self.t==math.inf or self.r==-math.inf or self.b==-math.inf
+
+    def x(self):
+        return self.l
+
+    def y(self):
+        return self.t
 
     def width(self):
         return self.r-self.l
@@ -26,17 +30,17 @@ class Rect:
     def height(self):
         return self.b-self.t
 
-    def area(self):
-        return self.width()*self.height()
+    #def area(self):
+    #    return self.width()*self.height()
 
     def __str__(self):
-        return "Rect:{x="+str(self.l)+",y="+str(self.r)+",width="+str(self.width())+",height="+str(self.height())+"}"
+        return "Rect:{x="+str(self.l)+",y="+str(self.t)+",width="+str(self.width())+",height="+str(self.height())+"}"
 
 def testRect():
     print("inf="+str(math.inf-math.inf))
-    print(Rect.union(Rect(5,10,45,30),Rect(20,20,50,25)))
-    print(Rect.union(Rect(25,30,10,10),Rect(20,20,50,25)))
-    print(Rect.union(Rect(),Rect(20,20,50,25)))
+    print(Rect(5,10,45,30).unionWith(Rect(20,20,50,25)))
+    print(Rect(25,30,10,10).unionWith(Rect(20,20,50,25)))
+    print(Rect().unionWith(Rect(20,20,50,25)))
 
 
 def isHorizontal(side):
@@ -106,7 +110,7 @@ class BoxComponent(Component):
         self._drawBorderChar(context,x,bottom,TextBoxComponent.bottomLeftMap,"└")
         self._drawBorderChar(context,right,bottom,TextBoxComponent.bottomRightMap,"┘")
 
-        context.fillChar(x+1,y+1,width-1,height-1," ")
+        context.clear(x+1,y+1,width-1,height-1)
 
     def isOnMe(self,x,y):
         element = self.element
@@ -115,7 +119,7 @@ class BoxComponent(Component):
         return x>=myX and y>=myY and x<myX+element.width and y<myY+element.height
 
     def getRect(self):
-        return Rect(self.x,self.y,self.width,self.height)
+        return Rect(self.element.x,self.element.y,self.element.width,self.element.height)
 
 class TextBoxComponent(BoxComponent):
     def __init__(self,textBoxElement):
@@ -254,11 +258,18 @@ class DiagramComponent(Component):
         Component.__init__(self,diagramElement)
         self.components = []
 
-    def draw(self,context):
+    def invalidateAll(self,context):
         for component in self.components:
+            context.invalidateComponent(component)
+
+    def draw(self,context):
+        invalidatedRect = context.getInvalidatedRect()
+        context.clearRect(invalidatedRect)
+
+        for component in context.allInvalidatedComponents():
             component.draw(context)
 
     def allComponents(self):
         return self.components
 
-testRect()
+#testRect()

@@ -11,8 +11,8 @@ from curses import wrapper
 class Context:
     def __init__(self,window):
         self.window = window
-        self.invalidatedRegion = Rect()
-        self.invalidatedComponents = {}
+        self.invalidatedRect = Rect()
+        self.invalidatedComponents = set()
 
     def addString(self,x,y,text,bold=False):
         if bold:
@@ -23,10 +23,16 @@ class Context:
     def readChar(self,x,y):
         return chr(0xFFFF & self.window.inch(y,x))
 
-    def fillChar(self,x,y,width,height,char):
+    def clearRect(self,rect):
+        if rect.isNullRect() :
+            self.window.clear()
+        else:
+            self.clear(rect.x(),rect.y(),rect.width(),rect.height())
+
+    def clear(self,x,y,width,height):
         for i in range(0,width):
             for j in range(0,height):
-                self.addString(x+i,y+j,char)
+                self.addString(x+i,y+j," ")
 
     def drawChar(self,x,y,mapping,default,isBold=False):
         existing = self.readChar(x,y)
@@ -66,9 +72,19 @@ class Context:
         for i in range(minX,maxX+1):
             self.drawChar(i,y,Context.horizontalMap,"─",isBold)
 
-    def invalidateComponent(self,component)
+    def invalidateComponent(self,component):
         self.invalidatedComponents.add(component)
-        self.invalidatedRegion.unionWith(component.getRect())
+        self.invalidatedRect.unionWith(component.getRect())
+
+    def validateAll(self):
+        self.invalidatedComponents = {}
+        self.invalidatedRect = Rect()
+
+    def getInvalidatedRect(self):
+        return self.invalidatedRect
+
+    def allInvalidatedComponents(self):
+        return self.invalidatedComponents
 
 class State:
     def __init__(self):
@@ -95,15 +111,21 @@ class State:
         #print("Key pressed '"+str(char)+"'")
 
 class SelectingState(State):
-    def __init__(self,diagramComponent):
+    def __init__(self,context,diagramComponent):
+        self.context = context
         self.diagramComponent = diagramComponent
 
     def mouseClicked(self, x, y):
         for component in self.diagramComponent.allComponents():
+            oldSelected = component.isSelected
             if component.isOnMe(x,y):
                 component.isSelected = True
             else:
                 component.isSelected = False
+
+            if oldSelected != component.isSelected:
+                self.context.invalidateComponent(component)
+
 
     def mousePressed(self, x, y):
         self.mouseClicked(x,y)
@@ -194,10 +216,13 @@ class Editor:
         #screen.addstr(0,0,"Hello",curses.color_pair(1)|curses.A_BOLD)
 
         diagram = createTestDiagram()
+        print("============")
         diagramComponent = createDiagramComponent(diagram)
-        self.state = SelectingState(diagramComponent)
 
         context = Context(screen)
+        self.state = SelectingState(context,diagramComponent)
+
+        diagramComponent.invalidateAll(context)
         diagramComponent.draw(context)
         screen.refresh()
         curses.mouseinterval(0)
@@ -228,12 +253,9 @@ class Editor:
             else:
                 self.state.keyPressed(event)
 
-                #textBoxElement1 = diagram.elements[0]
-                #textBoxElement1.x = mx
-                #textBoxElement1.y = my
-                #screen.clear()
-                #diagramComponent.draw(context)
-                #screen.refresh()
+            diagramComponent.draw(context)
+            screen.refresh()
+
 
         curses.endwin()
 
@@ -246,20 +268,19 @@ class StdOutWrapper:
         return '\n'.join(self.text.split('\n')[beg:end])
 
 def myMain(stdscr):
-    mystdout = StdOutWrapper()
-    sys.stdout = mystdout
-    sys.stderr = mystdout
-
-    try:
-        editor = Editor() 
-        editor.run()
-
-    finally:
-
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
-        sys.stdout.write(mystdout.get_text())
-        sys.stdout.write("\n")
+    editor = Editor() 
+    editor.run()
 
 
-wrapper(myMain)
+mystdout = StdOutWrapper()
+sys.stdout = mystdout
+sys.stderr = mystdout
+
+try:
+    wrapper(myMain)
+finally:
+
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
+    sys.stdout.write(mystdout.get_text())
+    sys.stdout.write("\n")

@@ -21,7 +21,7 @@ class BoxElement(Element):
         self.height = 0
 
     def _attrToStr(self):
-        return Element._attrToStr() + ",x=" + str(self.x) + ",y=" + str(self.y) + ",width=" + str(self.width) + ",height=" + str(self.height)
+        return Element._attrToStr(self) + ",x=" + str(self.x) + ",y=" + str(self.y) + ",width=" + str(self.width) + ",height=" + str(self.height)
 
     def __str__(self):
         return "BoxElement:{" + self._attrToStr() + "}"
@@ -79,7 +79,7 @@ class TextBoxElement(BoxElement):
         self.height = len(self.lines) + 2 # for border on top and bottom
 
     def _attrToStr(self):
-        retMe = Element._attrToStr(self) + ",lines=["
+        retMe = BoxElement._attrToStr(self) + ",lines=["
         firstLine = True
         for line in self.lines:
             if firstLine:
@@ -159,4 +159,4 @@ def testDiagram():
     print("diagram = " + str(diagram) )
 
 
-testDiagram()
+#testDiagram()
