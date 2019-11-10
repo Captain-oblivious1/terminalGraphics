@@ -232,20 +232,21 @@ class Editor:
             event = screen.getch()
             #print("event='"+str(curses.keyname(event))+"'")
             #ch = 'N'
-            if event == ord('q'): break
+            if event == ord('q'):
+                break
             elif event == curses.KEY_MOUSE:
                 #ch = 'Y'
                 _ , mx, my, _, bstate = curses.getmouse()
                 if bstate & curses.BUTTON1_CLICKED != 0:
                     self.state.mouseClicked(mx,my)
-                    screen.clear()
-                    diagramComponent.draw(context)
-                    screen.refresh()
+#                    screen.clear()
+#                    diagramComponent.draw(context)
+#                    screen.refresh()
                 elif bstate & curses.BUTTON1_PRESSED != 0:
                     self.state.mousePressed(mx,my)
-                    screen.clear()
-                    diagramComponent.draw(context)
-                    screen.refresh()
+#                    screen.clear()
+#                    diagramComponent.draw(context)
+#                    screen.refresh()
                 elif bstate & curses.BUTTON1_RELEASED != 0:
                     self.state.mouseReleased(mx,my)
                 else:
