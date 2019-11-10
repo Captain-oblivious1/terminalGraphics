@@ -1,4 +1,43 @@
 from Model import *
+import math
+
+class Rect:
+    def __init__(self):
+        self.l = math.inf
+        self.t = math.inf
+        self.r = -math.inf
+        self.b = -math.inf
+
+    def __init__(self,x=math.inf,y=math.inf,width=-math.inf,height=-math.inf):
+        self.l = x
+        self.t = y
+        self.r = x+width if width!=-math.inf else -math.inf
+        self.b = x+height if height!=-math.inf else -math.inf
+
+    def unionWith(self,rect):
+        self.l = min(self.l,rect.l)
+        self.t = min(self.t,rect.t)
+        self.r = max(self.r,rect.r)
+        self.b = max(self.b,rect.b)
+
+    def width(self):
+        return self.r-self.l
+
+    def height(self):
+        return self.b-self.t
+
+    def area(self):
+        return self.width()*self.height()
+
+    def __str__(self):
+        return "Rect:{x="+str(self.l)+",y="+str(self.r)+",width="+str(self.width())+",height="+str(self.height())+"}"
+
+def testRect():
+    print("inf="+str(math.inf-math.inf))
+    print(Rect.union(Rect(5,10,45,30),Rect(20,20,50,25)))
+    print(Rect.union(Rect(25,30,10,10),Rect(20,20,50,25)))
+    print(Rect.union(Rect(),Rect(20,20,50,25)))
+
 
 def isHorizontal(side):
     return side == Side.LEFT or side == Side.RIGHT
@@ -10,6 +49,10 @@ class Component:
 
     def isOnMe(self, x, y):
         print( "Error.. unimplemented isOnMe() in component "+str(self))
+
+    def getRect(self):
+        return Rect()
+
 
 class BoxComponent(Component):
     # These maps are so that when a box is drawn on top of other things, it doesn't look bad
@@ -70,6 +113,9 @@ class BoxComponent(Component):
         myX=element.x
         myY=element.y
         return x>=myX and y>=myY and x<myX+element.width and y<myY+element.height
+
+    def getRect(self):
+        return Rect(self.x,self.y,self.width,self.height)
 
 class TextBoxComponent(BoxComponent):
     def __init__(self,textBoxElement):
@@ -215,4 +261,4 @@ class DiagramComponent(Component):
     def allComponents(self):
         return self.components
 
-
+testRect()

@@ -7,9 +7,12 @@ from Components import *
 from curses import wrapper
 #import keyboard
 
+
 class Context:
     def __init__(self,window):
         self.window = window
+        self.invalidatedRegion = Rect()
+        self.invalidatedComponents = {}
 
     def addString(self,x,y,text,bold=False):
         if bold:
@@ -62,6 +65,10 @@ class Context:
             maxX -= 1
         for i in range(minX,maxX+1):
             self.drawChar(i,y,Context.horizontalMap,"─",isBold)
+
+    def invalidateComponent(self,component)
+        self.invalidatedComponents.add(component)
+        self.invalidatedRegion.unionWith(component.getRect())
 
 class State:
     def __init__(self):
