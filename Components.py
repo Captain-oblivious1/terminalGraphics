@@ -1,6 +1,17 @@
 from Model import *
 import math
 
+class Point:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+
+    def __add__(self,right):
+        return Point(self.x+right.x,self.y+right.y)
+
+    def __sub__(self,right):
+        return Point(self.x-right.x,self.y-right.y)
+
 class Rect:
     def __init__(self,x=math.inf,y=math.inf,width=-math.inf,height=-math.inf):
         self.l = x
@@ -8,12 +19,22 @@ class Rect:
         self.r = x+width if width!=-math.inf else -math.inf
         self.b = y+height if height!=-math.inf else -math.inf
 
+    def makeRectFromPoints(topLeft,bottomRight):
+        return Rect(
+                topLeft.x,
+                topLeft.y,
+                bottomRight.x-topLeft.x+1,
+                bottomRight.y-topLeft.y+1)
+
     def unionWith(self,rect):
         self.l = min(self.l,rect.l)
         self.t = min(self.t,rect.t)
         self.r = max(self.r,rect.r)
         self.b = max(self.b,rect.b)
         return self
+
+    def doesIntersect(self,rect):
+        return self.l < rect.r and self.r > rect.l and self.t < rect.b and self.b > rect.t
 
     def isNullRect(self):
         return self.l==math.inf or self.t==math.inf or self.r==-math.inf or self.b==-math.inf
@@ -29,6 +50,12 @@ class Rect:
 
     def height(self):
         return self.b-self.t
+
+    def topLeft(self):
+        return Point(self.l,self.t)
+
+    def bottomRight(self):
+        return Point(self.r,self.b)
 
     #def area(self):
     #    return self.width()*self.height()
@@ -110,7 +137,7 @@ class BoxComponent(Component):
         self._drawBorderChar(context,x,bottom,TextBoxComponent.bottomLeftMap,"└")
         self._drawBorderChar(context,right,bottom,TextBoxComponent.bottomRightMap,"┘")
 
-        context.clear(x+1,y+1,width-1,height-1)
+        context.clearRect(Rect(x+1,y+1,width-1,height-1))
 
     def isOnMe(self,x,y):
         element = self.element
@@ -257,6 +284,7 @@ class DiagramComponent(Component):
     def __init__(self,diagramElement):
         Component.__init__(self,diagramElement)
         self.components = []
+        self.selectionRect = None
 
     def invalidateAll(self,context):
         for component in self.components:
@@ -266,10 +294,21 @@ class DiagramComponent(Component):
         invalidatedRect = context.getInvalidatedRect()
         context.clearRect(invalidatedRect)
 
-        for component in context.allInvalidatedComponents():
-            component.draw(context)
+        for component in self.components:
+            if component.getRect().doesIntersect(invalidatedRect):
+                component.draw(context)
+
+        if self.selectionRect!=None:
+            for col in range(self.selectionRect.l,self.selectionRect.r):
+                for row in range(self.selectionRect.t,self.selectionRect.b):
+                    char = context.readChar(col,row)
+                    #print("char='"+char+"' ord="+hex(ord(char)))
+                    context.addString(col,row,char,False,True)
 
     def allComponents(self):
         return self.components
+
+    def setSelectionRect(self,rect):
+        self.selectionRect = rect
 
 #testRect()

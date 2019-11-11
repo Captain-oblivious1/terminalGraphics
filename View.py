@@ -12,27 +12,36 @@ class Context:
     def __init__(self,window):
         self.window = window
         self.invalidatedRect = Rect()
-        self.invalidatedComponents = set()
 
-    def addString(self,x,y,text,bold=False):
-        if bold:
-            self.window.addstr(y,x,text,curses.color_pair(1)|curses.A_BOLD)
+    def addString(self,x,y,text,bold=False,reverse=False):
+        if bold or reverse:
+            pair = curses.color_pair(1)
+            if bold:
+                pair |= curses.A_BOLD
+            if reverse:
+                pair |= curses.A_REVERSE
+            self.window.addstr(y,x,text,pair)
         else:
             self.window.addstr(y,x,text)
 
     def readChar(self,x,y):
+        #inch=self.window.inch(y,x)
+        #print("inch="+hex(inch))
         return chr(0xFFFF & self.window.inch(y,x))
 
-    def clearRect(self,rect):
-        if rect.isNullRect() :
+    def clearRect(self,rect=None):
+        if rect == None:
             self.window.clear()
-        else:
-            self.clear(rect.x(),rect.y(),rect.width(),rect.height())
+        elif not rect.isNullRect() :
+            #self.clear(rect.x(),rect.y(),rect.width(),rect.height())
+            for i in range(0,rect.width()):
+                for j in range(0,rect.height()):
+                    self.addString(rect.x()+i,rect.y()+j," ")
 
-    def clear(self,x,y,width,height):
-        for i in range(0,width):
-            for j in range(0,height):
-                self.addString(x+i,y+j," ")
+    #def clear(self,x,y,width,height):
+    #    for i in range(0,width):
+    #        for j in range(0,height):
+    #            self.addString(x+i,y+j," ")
 
     def drawChar(self,x,y,mapping,default,isBold=False):
         existing = self.readChar(x,y)
@@ -73,11 +82,12 @@ class Context:
             self.drawChar(i,y,Context.horizontalMap,"─",isBold)
 
     def invalidateComponent(self,component):
-        self.invalidatedComponents.add(component)
         self.invalidatedRect.unionWith(component.getRect())
 
+    def invalidateRect(self,rect):
+        self.invalidatedRect.unionWith(rect)
+
     def validateAll(self):
-        self.invalidatedComponents = {}
         self.invalidatedRect = Rect()
 
     def getInvalidatedRect(self):
@@ -96,7 +106,7 @@ class State:
 
     def mouseClicked(self, x, y):
         pass
-        #print("Mouse clicked to x="+str(x)+" y="+str(y))
+        print("Mouse clicked to x="+str(x)+" y="+str(y))
 
     def mousePressed(self, x, y):
         pass
@@ -110,25 +120,81 @@ class State:
         pass
         #print("Key pressed '"+str(char)+"'")
 
-class SelectingState(State):
-    def __init__(self,context,diagramComponent):
+class IdleState(State):
+    def __init__(self,editor,context,diagramComponent):
+        self.editor = editor
         self.context = context
         self.diagramComponent = diagramComponent
-
-    def mouseClicked(self, x, y):
-        for component in self.diagramComponent.allComponents():
-            oldSelected = component.isSelected
-            if component.isOnMe(x,y):
-                component.isSelected = True
-            else:
-                component.isSelected = False
-
-            if oldSelected != component.isSelected:
-                self.context.invalidateComponent(component)
-
+        self.startDragPoint = None
+        self.movingComponents = False
 
     def mousePressed(self, x, y):
-        self.mouseClicked(x,y)
+        # Curses does not support testing of shift, ctrl, alt, etc.  So I can't 
+        # pretend I'm powerpoint here
+
+        self.startDragPoint = Point(x,y)
+
+        selectedSet = set()
+        for component in self.diagramComponent.allComponents():
+            if component.isSelected:
+                selectedSet.add(component)
+
+        pressedOnSet = set()
+        for component in self.diagramComponent.allComponents():
+            if component.isOnMe(x,y):
+                pressedOnSet.add(component)
+
+        if len(pressedOnSet)>0:
+            self.movingComponents = True
+
+        if len(selectedSet.intersection(pressedOnSet))==0:
+            for component in selectedSet:
+                component.isSelected = False
+                self.context.invalidateComponent(component)
+
+            for component in pressedOnSet:
+                component.isSelected = True
+                self.context.invalidateComponent(component)
+
+    def mouseReleased(self, x, y):
+        self.startDragPoint = None
+        self.movingComponents = False
+
+    def mouseMoved(self, x, y):
+        if self.startDragPoint!=None:
+            if self.movingComponents:
+                print("Trying to drag")
+            else:
+                self.editor.setState(LassoState(self.editor,self.context,self.diagramComponent,self.startDragPoint))
+
+class LassoState(State):
+    def __init__(self,editor,context,diagramComponent,startDragPoint):
+        self.editor = editor
+        self.context = context
+        self.diagramComponent = diagramComponent
+        self.startDragPoint = startDragPoint
+        self.oldRect = None
+
+    def mousePressed(self, x, y):
+        raise "Not sure how this got called without mouseReleased being called first"
+
+    def mouseReleased(self, x, y):
+        print("rectangle done")
+
+    def mouseMoved(self, x, y):
+        print("In LassoState mouseMoved")
+        startX=self.startDragPoint.x
+        startY=self.startDragPoint.y
+
+        topLeft = Point( min(startX,x), min(startY,y) )
+        bottomRight = Point( max(startX,x), max(startY,y) )
+
+        rect = Rect.makeRectFromPoints(topLeft,bottomRight)
+        self.diagramComponent.setSelectionRect(rect)
+        self.context.invalidateRect(rect)
+        if self.oldRect!=None:
+            self.context.invalidateRect(self.oldRect)
+        self.oldRect = rect
 
 
 def createTestDiagram():
@@ -208,6 +274,9 @@ class Editor:
     def __init__(self):
         self.state = State()
 
+    def setState(self,state):
+        self.state = state
+
     def run(self):
         screen = curses.initscr()
         curses.curs_set(0)
@@ -220,11 +289,13 @@ class Editor:
         diagramComponent = createDiagramComponent(diagram)
 
         context = Context(screen)
-        self.state = SelectingState(context,diagramComponent)
+        self.state = IdleState(self,context,diagramComponent)
 
         diagramComponent.invalidateAll(context)
         diagramComponent.draw(context)
         screen.refresh()
+        context.validateAll()
+
         curses.mouseinterval(0)
 
         curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
@@ -239,14 +310,8 @@ class Editor:
                 _ , mx, my, _, bstate = curses.getmouse()
                 if bstate & curses.BUTTON1_CLICKED != 0:
                     self.state.mouseClicked(mx,my)
-#                    screen.clear()
-#                    diagramComponent.draw(context)
-#                    screen.refresh()
                 elif bstate & curses.BUTTON1_PRESSED != 0:
                     self.state.mousePressed(mx,my)
-#                    screen.clear()
-#                    diagramComponent.draw(context)
-#                    screen.refresh()
                 elif bstate & curses.BUTTON1_RELEASED != 0:
                     self.state.mouseReleased(mx,my)
                 else:
@@ -255,8 +320,8 @@ class Editor:
                 self.state.keyPressed(event)
 
             diagramComponent.draw(context)
+            context.validateAll()
             screen.refresh()
-
 
         curses.endwin()
 
