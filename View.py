@@ -163,7 +163,7 @@ class IdleState(State):
     def mouseMoved(self, x, y):
         if self.startDragPoint!=None:
             if self.movingComponents:
-                print("Trying to drag")
+                self.editor.setState(MovingState(self.editor,self.context,self.diagramComponent,self.startDragPoint))
             else:
                 self.editor.setState(LassoState(self.editor,self.context,self.diagramComponent,self.startDragPoint))
 
@@ -204,6 +204,35 @@ class LassoState(State):
         if self.oldRect!=None:
             self.context.invalidateRect(self.oldRect)
         self.oldRect = rect
+
+class MovingState(State):
+    def __init__(self,editor,context,diagramComponent,startDragPoint):
+        self.editor = editor
+        self.context = context
+        self.diagramComponent = diagramComponent
+        self.lastPoint = startDragPoint
+        self.selectedComponents = set()
+        for component in diagramComponent.allComponents():
+            if component.isSelected:
+                self.selectedComponents.add(component)
+
+    def mousePressed(self, x, y):
+        raise "Not sure how this got called without mouseReleased being called first"
+
+    def mouseReleased(self, x, y):
+        self.editor.setState(IdleState(self.editor,self.context,self.diagramComponent))
+
+    def mouseMoved(self, x, y):
+        newPoint = Point(x,y)
+        offset = newPoint - self.lastPoint
+        for component in self.selectedComponents:
+            self.context.invalidateComponent(component)
+            oldLocation = component.getRect().topLeft()
+            component.move(oldLocation + offset)
+            self.context.invalidateComponent(component)
+
+        self.lastPoint = newPoint
+
 
 
 def createTestDiagram():

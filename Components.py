@@ -151,6 +151,11 @@ class BoxComponent(Component):
     def getRect(self):
         return Rect(self.element.x,self.element.y,self.element.width,self.element.height)
 
+    def move(self,point):
+        element = self.element
+        element.x = point.x
+        element.y = point.y
+
 class TextBoxComponent(BoxComponent):
     def __init__(self,textBoxElement):
         BoxComponent.__init__(self,textBoxElement)
@@ -282,6 +287,9 @@ class ConnectorComponent(Component):
 
     def isOnMe(self,x,y):
         return False
+
+    def move(self,point):
+        pass
 
 class DiagramComponent(Component):
     def __init__(self,diagramElement):
