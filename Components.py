@@ -39,6 +39,9 @@ class Rect:
     def isNullRect(self):
         return self.l==math.inf or self.t==math.inf or self.r==-math.inf or self.b==-math.inf
 
+    def isInside(self,amIInside):
+        return self.l<=amIInside.l and self.r>=amIInside.r and self.t<=amIInside.t and self.b>=amIInside.b
+
     def x(self):
         return self.l
 

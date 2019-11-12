@@ -179,10 +179,19 @@ class LassoState(State):
         raise "Not sure how this got called without mouseReleased being called first"
 
     def mouseReleased(self, x, y):
-        print("rectangle done")
+        if self.oldRect!=None:
+            for component in self.diagramComponent.allComponents():
+                if self.oldRect.isInside(component.getRect()):
+                    component.isSelected = True
+                else:
+                    component.isSelected = False
+
+            self.context.invalidateRect( self.oldRect )
+            self.diagramComponent.setSelectionRect(None)
+
+        self.editor.setState(IdleState(self.editor,self.context,self.diagramComponent))
 
     def mouseMoved(self, x, y):
-        print("In LassoState mouseMoved")
         startX=self.startDragPoint.x
         startY=self.startDragPoint.y
 
