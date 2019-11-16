@@ -1,3 +1,4 @@
+from enum import Enum
 from Model import *
 import math
 
@@ -193,7 +194,37 @@ class ConnectorComponent(Component):
     def __init__(self,connectorElement):
         Component.__init__(self,connectorElement)
 
-    def drawConnector(self,context,connection):
+    class Direction(Enum):
+        HORIZONTAL=0
+        VERTICAL=1
+
+    class ConnectionPoint:
+        pass
+
+    class Segment:
+        def __init__(self,direction,pos,fro,to):
+            self.direction = direction
+            self.pos = pos
+            self.fro = fro
+            self.to = to
+            self.isSelected = False
+
+        def draw(self,context):
+            if self.direction == Direction.HORIZONTAL:
+                function = context.drawHorizontalLine
+            else:
+                function = context.drawVerticalLine
+            function(fro,to,pos,False,self.isSelected)
+
+
+    def getSegments(self):
+        fromConnection = self.element.fromConnection
+        toConnection = self.element.toConnection
+        x,y = self.getConnectorPosition(fromConnection)
+
+        returnMe = []
+
+    def getConnectorPosition(self,connection):
         element = connection.element
         if connection.side == Side.TOP:
             x = int(element.x + element.width * connection.where)
@@ -209,6 +240,12 @@ class ConnectorComponent(Component):
             y = element.y + element.height - 1
         else:
             raise "invalid side"
+
+        return x,y
+
+
+    def drawConnector(self,context,connection):
+        x,y = getConnectorPosition(connection)
 
         offX, offY = ConnectorComponent.offsetMap[ connection.side ]
 

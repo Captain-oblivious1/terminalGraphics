@@ -1,0 +1,4 @@
+#/bin/bash
+
+export TERM=xterm-1003
+python View.py
