@@ -10,6 +10,11 @@ class Point:
     def __add__(self,right):
         return Point(self.x+right.x,self.y+right.y)
 
+    def __iadd__(self,right):
+        self.x += right.x
+        self.y += right.y
+        return self
+
     def __sub__(self,right):
         return Point(self.x-right.x,self.y-right.y)
 
@@ -189,59 +194,131 @@ class ConnectorComponent(Component):
     arrowMap =    { Side.TOP:"∨", Side.LEFT:">", Side.RIGHT:"<", Side.BOTTOM:"∧" }
     triangleMap = { Side.TOP:"▽", Side.LEFT:"▷", Side.RIGHT:"◁", Side.BOTTOM:"△" }
 
-    offsetMap = { Side.TOP:(0,-1), Side.LEFT:(-1,0), Side.RIGHT:(1,0), Side.BOTTOM:(0,1) }
+    offsetMap = { Side.TOP:Point(0,-1), Side.LEFT:Point(-1,0), Side.RIGHT:Point(1,0), Side.BOTTOM:Point(0,1) }
 
     def __init__(self,connectorElement):
         Component.__init__(self,connectorElement)
+        self.connectorCache = None
 
-    class Direction(Enum):
-        HORIZONTAL=0
-        VERTICAL=1
+    class ConnectorCache:
 
-    class ConnectionPoint:
-        pass
+        class Direction(Enum):
+            HORIZONTAL=0
+            VERTICAL=1
 
-    class Segment:
-        def __init__(self,direction,pos,fro,to):
-            self.direction = direction
-            self.pos = pos
-            self.fro = fro
-            self.to = to
-            self.isSelected = False
+        class ConnectionPoint:
+            def __init__(self,connection):
 
-        def draw(self,context):
-            if self.direction == Direction.HORIZONTAL:
-                function = context.drawHorizontalLine
+                self.connectionPosition = self.getConnectorPosition(connection)
+                offset = ConnectorComponent.offsetMap[ connection.side ]
+
+                if connection.end == End.NONE:
+                    charMap = ConnectorComponent.noneMap
+                else:
+                    self.connectionPosition += offset # need to dedicate a char to draw the arrow
+
+                    if connection.end == End.ARROW:
+                        charMap = ConnectorComponent.arrowMap
+                    else:
+                        charMap = ConnectorComponent.triangleMap
+
+                self.char = charMap[ connection.side ]
+                self.linePosition = self.connectionPosition + offset
+
+            def getConnectorPosition(self,connection):
+                element = connection.element
+                if connection.side == Side.TOP:
+                    x = int(element.x + element.width * connection.where)
+                    y = element.y
+                elif connection.side == Side.LEFT:
+                    x = element.x
+                    y = int(element.y + element.height * connection.where)
+                elif connection.side == Side.RIGHT:
+                    x = element.x + element.width - 1
+                    y = int(element.y + element.height * connection.where)
+                elif connection.side == Side.BOTTOM:
+                    x = int(element.x + element.width * connection.where)
+                    y = element.y + element.height - 1
+                else:
+                    raise "invalid side"
+
+                return Point(x,y)
+
+            def draw(self,contex):
+                context.addString(self.x,self.y,self.char)
+
+            def getLinePosition(self):
+                return self.linePosition
+
+        class Segment:
+            def __init__(self,direction,pos,fro,to):
+                self.direction = direction
+                self.pos = pos
+                self.fro = fro
+                self.to = to
+                self.isSelected = False
+
+            def draw(self,context):
+                if self.direction == Direction.HORIZONTAL:
+                    function = context.drawHorizontalLine
+                else:
+                    function = context.drawVerticalLine
+                function(fro,to,pos,False,self.isSelected)
+
+
+        def __init__(self,connectorElement):
+            fromConnection = ConnectorComponent.ConnectorCache.ConnectionPoint(connectorElement.fromConnection)
+            toConnection = ConnectorComponent.ConnectorCache.ConnectionPoint(connectorElement.toConnection)
+
+            endPos = toConnection.getLinePosition()
+
+            controlPoints = self.connectorElement.controlPoints.copy()
+            if isHorizontal(toConnection.side):
+                controlPoints.append(endPos.y)
+                controlPoints.append(endPos.x)
             else:
-                function = context.drawVerticalLine
-            function(fro,to,pos,False,self.isSelected)
+                controlPoints.append(endPos.x)
+                controlPoints.append(endPos.y)
 
+            horizontalOrienation = isHorizontal(connectorElement.fromConnection.side)
+            if fromConnection.side==Side.RIGHT:
+                direction = 0
+            elif fromConnection.side==Side.BOTTOM:
+                direction = 1
+            elif fromConnection.side==Side.LEFT:
+                direction = 2
+            elif fromConnection.side==Side.TOP:
+                direction = 3
 
-    def getSegments(self):
-        fromConnection = self.element.fromConnection
-        toConnection = self.element.toConnection
-        x,y = self.getConnectorPosition(fromConnection)
+            for controlPoint in controlPoints:
+                if horizontalOrienation:
+                    if controlPoint>x:
+                        newDirection = 0
+                    else:
+                        newDirection = 2
+                    context.drawHorizontalLine(y,x,controlPoint,False,isSelected)
+                    nextX=controlPoint
+                    nextY=y
+                else:
+                    if controlPoint>y:
+                        newDirection = 1
+                    else:
+                        newDirection = 3
+                    context.drawVerticalLine(x,y,controlPoint,False,isSelected)
+                    nextX=x
+                    nextY=controlPoint
+                context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
+                x=nextX
+                y=nextY
+                direction = newDirection
+                horizontalOrienation = 1 - horizontalOrienation
 
-        returnMe = []
+            context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
 
-    def getConnectorPosition(self,connection):
-        element = connection.element
-        if connection.side == Side.TOP:
-            x = int(element.x + element.width * connection.where)
-            y = element.y
-        elif connection.side == Side.LEFT:
-            x = element.x
-            y = int(element.y + element.height * connection.where)
-        elif connection.side == Side.RIGHT:
-            x = element.x + element.width - 1
-            y = int(element.y + element.height * connection.where)
-        elif connection.side == Side.BOTTOM:
-            x = int(element.x + element.width * connection.where)
-            y = element.y + element.height - 1
-        else:
-            raise "invalid side"
-
-        return x,y
+    def getConnectorCache(self):
+        if self.connectorCache==None:
+            self.connectorCache = ConnectorComponent.ConnectorCache(self.element)
+        return self.getConnectorCache
 
 
     def drawConnector(self,context,connection):
