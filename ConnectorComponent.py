@@ -90,8 +90,23 @@ class ConnectorComponent(Component):
                 else:
                     return Rect(self.pos,self.fro,1,self.to-self.fro)
 
+        class Elbow:
+            def __init__(self,x,y,char):
+                self.x = x
+                self.y = y
+                self.char = char
+
+            def getRect(self):
+                retMe = Rect()
+                retMe.includePoint( Point(x,y) )
+                return retMe
+
+            def draw(self,context):
+                context.addString(self.x,self.y,self.char)
+
         def __init__(self,connectorElement):
             self.segments = []
+            self.elbows = []
             fromConnection = connectorElement.fromConnection
             toConnection = connectorElement.toConnection
             self.fromConnection = ConnectorComponent.ConnectorCache.ConnectionPoint(fromConnection)
@@ -123,6 +138,7 @@ class ConnectorComponent(Component):
             elif fromConnection.side==Side.TOP:
                 direction = 3
 
+            firstElbow = True
             for controlPoint in controlPoints:
                 if horizontalOrienation:
                     if controlPoint>x:
@@ -143,12 +159,17 @@ class ConnectorComponent(Component):
                     nextX=x
                     nextY=controlPoint
                 #context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
+                if firstElbow:
+                    firstElbow = False
+                else:
+                    self.elbows.append( ConnectorComponent.ConnectorCache.Elbow(x,y,ConnectorComponent.turnSymbol[direction][newDirection]) )
                 x=nextX
                 y=nextY
                 direction = newDirection
                 horizontalOrienation = 1 - horizontalOrienation
 
             #context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
+            #self.elbows.append( Elbow(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
 
         def getRect(self):
             rect = Rect()
@@ -164,6 +185,8 @@ class ConnectorComponent(Component):
             self.toConnection.draw(context)
             for seg in self.segments:
                 seg.draw(context)
+            for elbow in self.elbows:
+                elbow.draw(context)
 
     def getConnectorCache(self):
         if self.connectorCache==None:
