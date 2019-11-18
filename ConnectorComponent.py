@@ -276,8 +276,21 @@ class ConnectorComponent(Component):
     def isOnMe(self,x,y):
         return False
 
-    def move(self,point):
-        pass
+    def move(self,offset):
+        element = self.element
+        if isHorizontal(element.fromConnection.side):
+            xElement = 0
+        else:
+            xElement = 1
+
+        for arrayElement in range(len(element.controlPoints)):
+            if arrayElement%2 == xElement:
+                elementOffset = offset.x
+            else:
+                elementOffset = offset.y
+            element.controlPoints[arrayElement] += elementOffset
+
+        self.connectorCache = None
 
     def getRect(self):
         connectorCache = self.getConnectorCache()

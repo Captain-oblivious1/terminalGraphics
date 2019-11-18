@@ -228,8 +228,7 @@ class MovingState(State):
         offset = newPoint - self.lastPoint
         for component in self.selectedComponents:
             self.context.invalidateComponent(component)
-            oldLocation = component.getRect().topLeft()
-            component.move(oldLocation + offset)
+            component.move(offset)
             self.context.invalidateComponent(component)
 
         self.lastPoint = newPoint

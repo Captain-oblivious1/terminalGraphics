@@ -164,10 +164,10 @@ class BoxComponent(Component):
     def getRect(self):
         return Rect(self.element.x,self.element.y,self.element.width,self.element.height)
 
-    def move(self,point):
+    def move(self,offset):
         element = self.element
-        element.x = point.x
-        element.y = point.y
+        element.x += offset.x
+        element.y += offset.y
 
 class TextBoxComponent(BoxComponent):
     def __init__(self,textBoxElement):
