@@ -4,6 +4,7 @@ import sys
 import curses
 from Model import *
 from Components import *
+from ConnectorComponent import *
 from curses import wrapper
 #import keyboard
 
