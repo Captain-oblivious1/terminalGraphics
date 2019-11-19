@@ -137,7 +137,7 @@ class IdleState(State):
 
         selectedSet = set()
         for component in self.diagramComponent.allComponents():
-            if component.isSelected:
+            if component.getSelected():
                 selectedSet.add(component)
 
         pressedOnSet = set()
@@ -150,11 +150,11 @@ class IdleState(State):
 
         if len(selectedSet.intersection(pressedOnSet))==0:
             for component in selectedSet:
-                component.isSelected = False
+                component.setSelected(False)
                 self.context.invalidateComponent(component)
 
             for component in pressedOnSet:
-                component.isSelected = True
+                component.setSelected(True)
                 self.context.invalidateComponent(component)
 
     def mouseReleased(self, x, y):
@@ -183,9 +183,9 @@ class LassoState(State):
         if self.oldRect!=None:
             for component in self.diagramComponent.allComponents():
                 if self.oldRect.isInside(component.getRect()):
-                    component.isSelected = True
+                    component.setSelected(True)
                 else:
-                    component.isSelected = False
+                    component.setSelected(False)
 
             self.context.invalidateRect( self.oldRect )
             self.diagramComponent.setSelectionRect(None)
@@ -214,7 +214,7 @@ class MovingState(State):
         self.lastPoint = startDragPoint
         self.selectedComponents = set()
         for component in diagramComponent.allComponents():
-            if component.isSelected:
+            if component.getSelected():
                 self.selectedComponents.add(component)
 
     def mousePressed(self, x, y):
@@ -226,10 +226,13 @@ class MovingState(State):
     def mouseMoved(self, x, y):
         newPoint = Point(x,y)
         offset = newPoint - self.lastPoint
+        #print("about to test components to move")
         for component in self.selectedComponents:
+            #print("component="+str(component))
             self.context.invalidateComponent(component)
             component.move(offset)
             self.context.invalidateComponent(component)
+        #print("about to test components to move")
 
         self.lastPoint = newPoint
 

@@ -12,6 +12,10 @@ class ConnectorComponent(Component):
         Component.__init__(self,connectorElement)
         self.connectorCache = None
 
+    def setSelected(self,selected):
+        Component.setSelected(self,selected)
+        self.getConnectorCache().setSelected(selected)
+
     class ConnectorCache:
 
         class Direction(Enum):
@@ -171,6 +175,11 @@ class ConnectorComponent(Component):
             #context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
             #self.elbows.append( Elbow(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
 
+        def setSelected(self,selected):
+            Component.setSelected(self,selected)
+            for segment in self.segments:
+                segment.isSelected = True
+
         def getRect(self):
             rect = Rect()
             for seg in self.segments:
@@ -223,55 +232,6 @@ class ConnectorComponent(Component):
 
     def draw(self,context):
         self.getConnectorCache().draw(context)
-        #fromConnection = self.element.fromConnection
-        #toConnection = self.element.toConnection
-        #isSelected = self.isSelected
-
-        #x,y = self.drawConnector(context,fromConnection)
-        #endX,endY = self.drawConnector(context,toConnection)
-
-        #controlPoints = self.element.controlPoints.copy()
-        #if isHorizontal(toConnection.side):
-        #    controlPoints.append(endY)
-        #    controlPoints.append(endX)
-        #else:
-        #    controlPoints.append(endX)
-        #    controlPoints.append(endY)
-
-        #horizontalOrienation = isHorizontal(fromConnection.side)
-        #if fromConnection.side==Side.RIGHT:
-        #    direction = 0
-        #elif fromConnection.side==Side.BOTTOM:
-        #    direction = 1
-        #elif fromConnection.side==Side.LEFT:
-        #    direction = 2
-        #elif fromConnection.side==Side.TOP:
-        #    direction = 3
-
-        #for controlPoint in controlPoints:
-        #    if horizontalOrienation:
-        #        if controlPoint>x:
-        #            newDirection = 0
-        #        else:
-        #            newDirection = 2
-        #        context.drawHorizontalLine(y,x,controlPoint,False,isSelected)
-        #        nextX=controlPoint
-        #        nextY=y
-        #    else:
-        #        if controlPoint>y:
-        #            newDirection = 1
-        #        else:
-        #            newDirection = 3
-        #        context.drawVerticalLine(x,y,controlPoint,False,isSelected)
-        #        nextX=x
-        #        nextY=controlPoint
-        #    context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
-        #    x=nextX
-        #    y=nextY
-        #    direction = newDirection
-        #    horizontalOrienation = 1 - horizontalOrienation
-
-        #context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
 
     def isOnMe(self,x,y):
         return False

@@ -100,6 +100,12 @@ class Component:
     def getRect(self):
         return Rect()
 
+    def getSelected(self):
+        return self.isSelected
+
+    def setSelected(self,selected):
+        self.isSelected = selected
+
 
 class BoxComponent(Component):
     # These maps are so that when a box is drawn on top of other things, it doesn't look bad
@@ -128,7 +134,7 @@ class BoxComponent(Component):
         Component.__init__(self,boxElement)
 
     def _drawBorderChar(self,context,x,y,mapping,default):
-        context.drawChar(x,y,mapping,default,self.isSelected)
+        context.drawChar(x,y,mapping,default,self.getSelected())
 
     def draw(self,context):
         x = self.element.x
@@ -192,7 +198,7 @@ class TextBoxComponent(BoxComponent):
             elif line.justification == Justification.RIGHT:
                 col = x + width - lineLength + 1
 
-            context.addString(col,row,line.text,self.isSelected)
+            context.addString(col,row,line.text,self.getSelected())
             row += 1
 
 class DiagramComponent(Component):
