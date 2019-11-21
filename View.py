@@ -226,13 +226,10 @@ class MovingState(State):
     def mouseMoved(self, x, y):
         newPoint = Point(x,y)
         offset = newPoint - self.lastPoint
-        #print("about to test components to move")
         for component in self.selectedComponents:
-            #print("component="+str(component))
             self.context.invalidateComponent(component)
             component.move(offset)
             self.context.invalidateComponent(component)
-        #print("about to test components to move")
 
         self.lastPoint = newPoint
 

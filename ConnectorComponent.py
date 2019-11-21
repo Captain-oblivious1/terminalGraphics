@@ -200,6 +200,8 @@ class ConnectorComponent(Component):
     def getConnectorCache(self):
         if self.connectorCache==None:
             self.connectorCache = ConnectorComponent.ConnectorCache(self.element)
+            if self.getSelected():
+                self.connectorCache.setSelected(True)
         return self.connectorCache
 
 
