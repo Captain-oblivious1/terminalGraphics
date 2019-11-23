@@ -16,6 +16,10 @@ class ConnectorComponent(Component):
         Component.setSelected(self,selected)
         self.getConnectorCache().setSelected(selected)
 
+    def invalidateMe(self,context):
+        print("in invalidateMe")
+        self.connectorCache = None
+
     class ConnectorCache:
 
         class Direction(Enum):

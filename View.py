@@ -84,6 +84,8 @@ class Context:
 
     def invalidateComponent(self,component):
         self.invalidatedRect.unionWith(component.getRect())
+        if "invalidateMe" in dir(component):
+            component.invalidateMe(self)
 
     def invalidateRect(self,rect):
         self.invalidatedRect.unionWith(rect)
@@ -212,10 +214,22 @@ class MovingState(State):
         self.context = context
         self.diagramComponent = diagramComponent
         self.lastPoint = startDragPoint
+
         self.selectedComponents = set()
         for component in diagramComponent.allComponents():
             if component.getSelected():
                 self.selectedComponents.add(component)
+
+        selectedElements = set()
+        for component in self.selectedComponents:
+            selectedElements.add(component.element)
+
+        self.affectedConnectors = set()
+        for component in self.diagramComponent.allComponents():
+            if issubclass(type(component),ConnectorComponent):
+                connectorElement = component.element
+                if connectorElement.fromConnection.element in selectedElements or connectorElement.toConnection.element in selectedElements:
+                    self.affectedConnectors.add(component)
 
     def mousePressed(self, x, y):
         raise "Not sure how this got called without mouseReleased being called first"
@@ -224,6 +238,11 @@ class MovingState(State):
         self.editor.setState(IdleState(self.editor,self.context,self.diagramComponent))
 
     def mouseMoved(self, x, y):
+
+        # Invalidate the location where the connectors were (to erase them if necessary)
+        for component in self.affectedConnectors:
+            self.context.invalidateComponent(component)
+
         newPoint = Point(x,y)
         offset = newPoint - self.lastPoint
         for component in self.selectedComponents:
@@ -233,16 +252,10 @@ class MovingState(State):
 
         self.lastPoint = newPoint
 
-        selectedElements = set()
-        for component in self.selectedComponents:
-            selectedElements.add(component.element)
-
-        for component in self.diagramComponent.allComponents():
-            if issubclass(type(component),ConnectorComponent):
-                component.connectorCache = None
-                connectorElement = component.element
-                if connectorElement.fromConnection.element in selectedElements or connectorElement.toConnection.element in selectedElements:
-                    self.context.invalidateComponent(component)
+        # Invalidate the new location where the connectors are now
+        for component in self.affectedConnectors:
+            self.context.invalidateComponent(component)
+            component.connectorCache = None
 
 def createTestDiagram():
     diagramElement = Diagram()
