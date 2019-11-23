@@ -40,6 +40,7 @@ class ConnectorComponent(Component):
 
                 self.char = charMap[ connection.side ]
                 self.linePosition = self.connectionPosition + offset
+                self.isSelected = False
 
             def getConnectorPosition(self,connection):
                 element = connection.element
@@ -62,7 +63,7 @@ class ConnectorComponent(Component):
 
             def draw(self,context):
                 connectionPosition = self.connectionPosition
-                context.addString(connectionPosition.x,connectionPosition.y,self.char)
+                context.addString(connectionPosition.x,connectionPosition.y,self.char,self.isSelected)
 
             def getLinePosition(self):
                 return self.linePosition
@@ -99,6 +100,7 @@ class ConnectorComponent(Component):
                 self.x = x
                 self.y = y
                 self.char = char
+                self.isSelected = False
 
             def getRect(self):
                 retMe = Rect()
@@ -106,7 +108,7 @@ class ConnectorComponent(Component):
                 return retMe
 
             def draw(self,context):
-                context.addString(self.x,self.y,self.char)
+                context.addString(self.x,self.y,self.char,self.isSelected)
 
         def __init__(self,connectorElement):
             self.segments = []
@@ -179,6 +181,12 @@ class ConnectorComponent(Component):
             Component.setSelected(self,selected)
             for segment in self.segments:
                 segment.isSelected = True
+
+            for elbow in self.elbows:
+                elbow.isSelected = True
+
+            self.fromConnection.isSelected = True
+            self.toConnection.isSelected = True
 
         def getRect(self):
             rect = Rect()
