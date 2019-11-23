@@ -152,7 +152,6 @@ class ConnectorComponent(Component):
                     else:
                         newDirection = 2
                     self.segments.append( ConnectorComponent.ConnectorCache.Segment(ConnectorComponent.ConnectorCache.Direction.HORIZONTAL,y,x,controlPoint) )
-                    #context.drawHorizontalLine(y,x,controlPoint,False,isSelected)
                     nextX=controlPoint
                     nextY=y
                 else:
@@ -161,10 +160,9 @@ class ConnectorComponent(Component):
                     else:
                         newDirection = 3
                     self.segments.append( ConnectorComponent.ConnectorCache.Segment(ConnectorComponent.ConnectorCache.Direction.VERTICAL,x,y,controlPoint) )
-                    #context.drawVerticalLine(x,y,controlPoint,False,isSelected)
                     nextX=x
                     nextY=controlPoint
-                #context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
+
                 if firstElbow:
                     firstElbow = False
                 else:
@@ -173,9 +171,6 @@ class ConnectorComponent(Component):
                 y=nextY
                 direction = newDirection
                 horizontalOrienation = 1 - horizontalOrienation
-
-            #context.addString(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
-            #self.elbows.append( Elbow(x,y,ConnectorComponent.turnSymbol[direction][newDirection])
 
         def setSelected(self,selected):
             Component.setSelected(self,selected)

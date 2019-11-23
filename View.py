@@ -233,7 +233,16 @@ class MovingState(State):
 
         self.lastPoint = newPoint
 
+        selectedElements = set()
+        for component in self.selectedComponents:
+            selectedElements.add(component.element)
 
+        for component in self.diagramComponent.allComponents():
+            if issubclass(type(component),ConnectorComponent):
+                component.connectorCache = None
+                connectorElement = component.element
+                if connectorElement.fromConnection.element in selectedElements or connectorElement.toConnection.element in selectedElements:
+                    self.context.invalidateComponent(component)
 
 def createTestDiagram():
     diagramElement = Diagram()
