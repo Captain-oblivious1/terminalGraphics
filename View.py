@@ -255,16 +255,9 @@ class MovingState(State):
         # Invalidate the new location where the connectors are now
         for component in self.affectedConnectors:
             self.context.invalidateComponent(component)
-            component.connectorCache = None
 
 def createTestDiagram():
     diagramElement = Diagram()
-    #context.drawVerticalLine(20)
-    #context.drawVerticalLine(25)
-    #context.drawVerticalLine(34)
-    #context.drawHorizontalLine(10)
-    #context.drawHorizontalLine(12)
-    #context.drawHorizontalLine(15)
     textBoxElement1 = testTextBox()
     textBoxElement1.x = 20
     textBoxElement1.y = 10
