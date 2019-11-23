@@ -12,9 +12,12 @@ class ConnectorComponent(Component):
         Component.__init__(self,connectorElement)
         self.connectorCache = None
 
-    def setSelected(self,selected):
-        Component.setSelected(self,selected)
-        self.getConnectorCache().setSelected(selected)
+    def setSelected(self,newSelected):
+        Component.setSelected(self,newSelected)
+        self.getConnectorCache().setSelected(newSelected)
+
+    #def allSelected(self):
+    #    return self.getConnectorCache().allSelected()
 
     def invalidateMe(self,context):
         self.connectorCache = None
@@ -25,8 +28,9 @@ class ConnectorComponent(Component):
             HORIZONTAL=0
             VERTICAL=1
 
-        class ConnectionPoint:
+        class ConnectionPoint(Component):
             def __init__(self,connection):
+                Component.__init__(self,connection)
 
                 self.connectionPosition = self.getConnectorPosition(connection)
                 offset = ConnectorComponent.offsetMap[ connection.side ]
@@ -43,7 +47,6 @@ class ConnectorComponent(Component):
 
                 self.char = charMap[ connection.side ]
                 self.linePosition = self.connectionPosition + offset
-                self.isSelected = False
 
             def getConnectorPosition(self,connection):
                 element = connection.element
@@ -66,7 +69,7 @@ class ConnectorComponent(Component):
 
             def draw(self,context):
                 connectionPosition = self.connectionPosition
-                context.addString(connectionPosition.x,connectionPosition.y,self.char,self.isSelected)
+                context.addString(connectionPosition.x,connectionPosition.y,self.char,self.selected)
 
             def getLinePosition(self):
                 return self.linePosition
@@ -77,20 +80,20 @@ class ConnectorComponent(Component):
                 rect.includePoint(self.linePosition)
                 return rect
 
-        class Segment:
+        class Segment(Component):
             def __init__(self,direction,pos,fro,to):
+                Component.__init__(self,None)
                 self.direction = direction
                 self.pos = pos
                 self.fro = fro
                 self.to = to
-                self.isSelected = False
 
             def draw(self,context):
                 if self.direction == ConnectorComponent.ConnectorCache.Direction.HORIZONTAL:
                     function = context.drawHorizontalLine
                 else:
                     function = context.drawVerticalLine
-                function(self.pos,self.fro,self.to,False,self.isSelected)
+                function(self.pos,self.fro,self.to,False,self.selected)
 
             def getRect(self):
                 if self.direction==ConnectorComponent.ConnectorCache.Direction.HORIZONTAL:
@@ -98,12 +101,12 @@ class ConnectorComponent(Component):
                 else:
                     return Rect(self.pos,self.fro,1,self.to-self.fro)
 
-        class Elbow:
+        class Elbow(Component):
             def __init__(self,x,y,char):
+                Component.__init__(self,None)
                 self.x = x
                 self.y = y
                 self.char = char
-                self.isSelected = False
 
             def getRect(self):
                 retMe = Rect()
@@ -111,7 +114,7 @@ class ConnectorComponent(Component):
                 return retMe
 
             def draw(self,context):
-                context.addString(self.x,self.y,self.char,self.isSelected)
+                context.addString(self.x,self.y,self.char,self.selected)
 
         def __init__(self,connectorElement):
             self.segments = []
@@ -175,16 +178,26 @@ class ConnectorComponent(Component):
                 direction = newDirection
                 horizontalOrienation = 1 - horizontalOrienation
 
-        def setSelected(self,selected):
-            Component.setSelected(self,selected)
+        def setSelected(self,newSelected):
+            Component.setSelected(self,newSelected)
             for segment in self.segments:
-                segment.isSelected = True
+                segment.selected = True
 
             for elbow in self.elbows:
-                elbow.isSelected = True
+                elbow.selected = True
 
-            self.fromConnection.isSelected = True
-            self.toConnection.isSelected = True
+            self.fromConnection.selected = True
+            self.toConnection.selected = True
+
+        def allSelected(self):
+            returnMe = set()
+            for segment in self.segments:
+                returnMe = returnMe.union(segment.allSelected())
+            for elbow in self.elbows:
+                returnMe = returnMe.union(elbow.allSelected())
+            returnMe = returnMe.union(self.fromConnection)
+            returnMe = returnMe.union(self.toConnection)
+            return returnMe
 
         def getRect(self):
             rect = Rect()
@@ -206,7 +219,7 @@ class ConnectorComponent(Component):
     def getConnectorCache(self):
         if self.connectorCache==None:
             self.connectorCache = ConnectorComponent.ConnectorCache(self.element)
-            if self.getSelected():
+            if self.isSelected():
                 self.connectorCache.setSelected(True)
         return self.connectorCache
 

@@ -137,10 +137,11 @@ class IdleState(State):
 
         self.startDragPoint = Point(x,y)
 
-        selectedSet = set()
-        for component in self.diagramComponent.allComponents():
-            if component.getSelected():
-                selectedSet.add(component)
+        selectedSet = self.diagramComponent.allSelected()
+        #selectedSet = set()
+        #for component in self.diagramComponent.allComponents():
+        #    if component.isSelected():
+        #        selectedSet.add(component)
 
         pressedOnSet = set()
         for component in self.diagramComponent.allComponents():
@@ -215,10 +216,11 @@ class MovingState(State):
         self.diagramComponent = diagramComponent
         self.lastPoint = startDragPoint
 
-        self.selectedComponents = set()
-        for component in diagramComponent.allComponents():
-            if component.getSelected():
-                self.selectedComponents.add(component)
+        self.selectedComponents = diagramComponent.allSelected()
+        #self.selectedComponents = set()
+        #for component in diagramComponent.allComponents():
+        #    if component.isSelected():
+        #        self.selectedComponents.add(component)
 
         selectedElements = set()
         for component in self.selectedComponents:

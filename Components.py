@@ -92,7 +92,7 @@ def isHorizontal(side):
 class Component:
     def __init__(self, element):
         self.element = element
-        self.isSelected = False
+        self.selected = False
 
     def isOnMe(self, x, y):
         print( "Error.. unimplemented isOnMe() in component "+str(self))
@@ -100,12 +100,17 @@ class Component:
     def getRect(self):
         return Rect()
 
-    def getSelected(self):
-        return self.isSelected
+    def isSelected(self):
+        return self.selected
 
-    def setSelected(self,selected):
-        self.isSelected = selected
+    def setSelected(self,newSelected):
+        self.selected = newSelected
 
+    def allSelected(self):
+        returnMe = set()
+        if self.isSelected():
+            returnMe.add(self)
+        return returnMe
 
 class BoxComponent(Component):
     # These maps are so that when a box is drawn on top of other things, it doesn't look bad
@@ -134,7 +139,7 @@ class BoxComponent(Component):
         Component.__init__(self,boxElement)
 
     def _drawBorderChar(self,context,x,y,mapping,default):
-        context.drawChar(x,y,mapping,default,self.getSelected())
+        context.drawChar(x,y,mapping,default,self.isSelected())
 
     def draw(self,context):
         x = self.element.x
@@ -198,7 +203,7 @@ class TextBoxComponent(BoxComponent):
             elif line.justification == Justification.RIGHT:
                 col = x + width - lineLength + 1
 
-            context.addString(col,row,line.text,self.getSelected())
+            context.addString(col,row,line.text,self.isSelected())
             row += 1
 
 class DiagramComponent(Component):
@@ -231,5 +236,11 @@ class DiagramComponent(Component):
 
     def setSelectionRect(self,rect):
         self.selectionRect = rect
+
+    def allSelected(self):
+        returnMe = set()
+        for component in self.components:
+            returnMe = returnMe.union(component.allSelected())
+        return returnMe
 
 #testRect()
