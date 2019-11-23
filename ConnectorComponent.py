@@ -17,7 +17,6 @@ class ConnectorComponent(Component):
         self.getConnectorCache().setSelected(selected)
 
     def invalidateMe(self,context):
-        print("in invalidateMe")
         self.connectorCache = None
 
     class ConnectorCache:
