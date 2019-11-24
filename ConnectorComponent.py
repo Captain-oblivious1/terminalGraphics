@@ -16,6 +16,12 @@ class ConnectorComponent(Component):
         Component.setSelected(self,newSelected)
         self.getConnectorCache().setSelected(newSelected)
 
+    def children(self):
+        return self.getConnectorCache().children()
+
+    def isOnMe(self,point):
+        return False
+
     #def allSelected(self):
     #    return self.getConnectorCache().allSelected()
 
@@ -110,7 +116,7 @@ class ConnectorComponent(Component):
 
             def getRect(self):
                 retMe = Rect()
-                retMe.includePoint( Point(x,y) )
+                retMe.includePoint( Point(self.x,self.y) )
                 return retMe
 
             def draw(self,context):
@@ -189,15 +195,15 @@ class ConnectorComponent(Component):
             self.fromConnection.selected = True
             self.toConnection.selected = True
 
-        def allSelected(self):
-            returnMe = set()
-            for segment in self.segments:
-                returnMe = returnMe.union(segment.allSelected())
-            for elbow in self.elbows:
-                returnMe = returnMe.union(elbow.allSelected())
-            returnMe = returnMe.union(self.fromConnection)
-            returnMe = returnMe.union(self.toConnection)
-            return returnMe
+        #def allSelected(self):
+        #    returnMe = set()
+        #    for segment in self.segments:
+        #        returnMe = returnMe.union(segment.allSelected())
+        #    for elbow in self.elbows:
+        #        returnMe = returnMe.union(elbow.allSelected())
+        #    returnMe = returnMe.union(self.fromConnection)
+        #    returnMe = returnMe.union(self.toConnection)
+        #    return returnMe
 
         def getRect(self):
             rect = Rect()
@@ -215,6 +221,16 @@ class ConnectorComponent(Component):
                 seg.draw(context)
             for elbow in self.elbows:
                 elbow.draw(context)
+
+        def children(self):
+            returnMe = set()
+            for segment in self.segments:
+                returnMe.add(segment)
+            for elbow in self.elbows:
+                returnMe.add(elbow)
+            returnMe.add(self.fromConnection)
+            returnMe.add(self.toConnection)
+            return returnMe
 
     def getConnectorCache(self):
         if self.connectorCache==None:
@@ -254,7 +270,7 @@ class ConnectorComponent(Component):
     def draw(self,context):
         self.getConnectorCache().draw(context)
 
-    def isOnMe(self,x,y):
+    def isOnMe(self,point):
         return False
 
     def move(self,offset):

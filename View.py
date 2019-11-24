@@ -138,27 +138,18 @@ class IdleState(State):
         self.startDragPoint = Point(x,y)
 
         selectedSet = self.diagramComponent.allSelected()
-        #selectedSet = set()
-        #for component in self.diagramComponent.allComponents():
-        #    if component.isSelected():
-        #        selectedSet.add(component)
 
-        pressedOnSet = set()
-        for component in self.diagramComponent.allComponents():
-            if component.isOnMe(x,y):
-                pressedOnSet.add(component)
+        clickedOn = self.diagramComponent.componentAt(self.startDragPoint)
 
-        if len(pressedOnSet)>0:
-            self.movingComponents = True
-
-        if len(selectedSet.intersection(pressedOnSet))==0:
+        if clickedOn==None or not clickedOn in selectedSet:
             for component in selectedSet:
                 component.setSelected(False)
                 self.context.invalidateComponent(component)
 
-            for component in pressedOnSet:
-                component.setSelected(True)
-                self.context.invalidateComponent(component)
+        if clickedOn!=None:
+            self.movingComponents = True
+            clickedOn.setSelected(True)
+            self.context.invalidateComponent(clickedOn)
 
     def mouseReleased(self, x, y):
         self.startDragPoint = None
@@ -184,8 +175,8 @@ class LassoState(State):
 
     def mouseReleased(self, x, y):
         if self.oldRect!=None:
-            for component in self.diagramComponent.allComponents():
-                if self.oldRect.isInside(component.getRect()):
+            for component in self.diagramComponent.children():
+                if self.oldRect.isInsideRect(component.getRect()):
                     component.setSelected(True)
                 else:
                     component.setSelected(False)
@@ -217,17 +208,13 @@ class MovingState(State):
         self.lastPoint = startDragPoint
 
         self.selectedComponents = diagramComponent.allSelected()
-        #self.selectedComponents = set()
-        #for component in diagramComponent.allComponents():
-        #    if component.isSelected():
-        #        self.selectedComponents.add(component)
 
         selectedElements = set()
         for component in self.selectedComponents:
             selectedElements.add(component.element)
 
         self.affectedConnectors = set()
-        for component in self.diagramComponent.allComponents():
+        for component in self.diagramComponent.children():
             if issubclass(type(component),ConnectorComponent):
                 connectorElement = component.element
                 if connectorElement.fromConnection.element in selectedElements or connectorElement.toConnection.element in selectedElements:

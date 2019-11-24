@@ -52,8 +52,11 @@ class Rect:
     def isNullRect(self):
         return self.l==math.inf or self.t==math.inf or self.r==-math.inf or self.b==-math.inf
 
-    def isInside(self,amIInside):
+    def isInsideRect(self,amIInside):
         return self.l<=amIInside.l and self.r>=amIInside.r and self.t<=amIInside.t and self.b>=amIInside.b
+
+    def isInsidePoint(self,amIInside):
+        return self.l<=amIInside.x and self.r>=amIInside.x and self.t<=amIInside.y and self.b>=amIInside.y
 
     def x(self):
         return self.l
@@ -94,9 +97,6 @@ class Component:
         self.element = element
         self.selected = False
 
-    def isOnMe(self, x, y):
-        print( "Error.. unimplemented isOnMe() in component "+str(self))
-
     def getRect(self):
         return Rect()
 
@@ -106,11 +106,17 @@ class Component:
     def setSelected(self,newSelected):
         self.selected = newSelected
 
-    def allSelected(self):
-        returnMe = set()
-        if self.isSelected():
-            returnMe.add(self)
-        return returnMe
+    #def allSelected(self):
+    #    returnMe = set()
+    #    if self.isSelected():
+    #        returnMe.add(self)
+    #    return returnMe
+
+    def children(self):
+        return set()
+
+    def isOnMe(self,point):
+        return self.getRect().isInsidePoint(point)
 
 class BoxComponent(Component):
     # These maps are so that when a box is drawn on top of other things, it doesn't look bad
@@ -166,11 +172,13 @@ class BoxComponent(Component):
 
         context.clearRect(Rect(x+1,y+1,width-1,height-1))
 
-    def isOnMe(self,x,y):
-        element = self.element
-        myX=element.x
-        myY=element.y
-        return x>=myX and y>=myY and x<myX+element.width and y<myY+element.height
+    #def isOnMe(self,point):
+    #    x = point.x
+    #    y = point.y
+    #    element = self.element
+    #    myX=element.x
+    #    myY=element.y
+    #    return x>=myX and y>=myY and x<myX+element.width and y<myY+element.height
 
     def getRect(self):
         return Rect(self.element.x,self.element.y,self.element.width,self.element.height)
@@ -231,16 +239,33 @@ class DiagramComponent(Component):
                     #print("char='"+char+"' ord="+hex(ord(char)))
                     context.addString(col,row,char,False,True)
 
-    def allComponents(self):
+    def children(self):
         return self.components
 
     def setSelectionRect(self,rect):
         self.selectionRect = rect
 
+    def allSelectedComponent(component,theSet):
+        if component.isSelected():
+            theSet.add(component)
+        for child in component.children():
+            DiagramComponent.allSelectedComponent(child,theSet)
+
     def allSelected(self):
         returnMe = set()
-        for component in self.components:
-            returnMe = returnMe.union(component.allSelected())
+        DiagramComponent.allSelectedComponent(self,returnMe)
         return returnMe
 
-#testRect()
+    def componentAt(component,point):
+        for child in component.children():
+            found = DiagramComponent.componentAt(child,point)
+            if found!=None:
+                return found
+
+        if component.isOnMe(point):
+            return component
+        else:
+            return None
+
+    def isOnMe(self, point):
+        return False
