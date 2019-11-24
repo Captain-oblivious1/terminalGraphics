@@ -52,7 +52,6 @@ class ConnectorComponent(Component):
                         charMap = ConnectorComponent.triangleMap
 
                 self.char = charMap[ connection.side ]
-                self.linePosition = self.connectionPosition + offset
 
             def getConnectorPosition(self,connection):
                 element = connection.element
@@ -77,13 +76,13 @@ class ConnectorComponent(Component):
                 connectionPosition = self.connectionPosition
                 context.addString(connectionPosition.x,connectionPosition.y,self.char,self.selected)
 
-            def getLinePosition(self):
-                return self.linePosition
+            #def getLinePosition(self):
+            #    return self.linePosition
 
             def getRect(self):
                 rect = Rect()
                 rect.includePoint(self.connectionPosition)
-                rect.includePoint(self.linePosition)
+                #rect.includePoint(self.linePosition)
                 return rect
 
         class Segment(Component):
@@ -91,21 +90,22 @@ class ConnectorComponent(Component):
                 Component.__init__(self,None)
                 self.direction = direction
                 self.pos = pos
-                self.fro = fro
-                self.to = to
+                self.fro = min(fro,to)+1
+                self.to = max(fro,to)-1
+                #print("Created segment dir="+str(direction)+" pos="+str(pos)+" from="+str(self.fro)+" to="+str(self.to))
 
             def draw(self,context):
                 if self.direction == ConnectorComponent.ConnectorCache.Direction.HORIZONTAL:
                     function = context.drawHorizontalLine
                 else:
                     function = context.drawVerticalLine
-                function(self.pos,self.fro,self.to,False,self.selected)
+                function(self.pos,self.fro,self.to,self.selected)
 
             def getRect(self):
                 if self.direction==ConnectorComponent.ConnectorCache.Direction.HORIZONTAL:
-                    return Rect(self.fro,self.pos,self.to-self.fro,1)
+                    return Rect(self.fro,self.pos,self.to-self.fro+1,1)
                 else:
-                    return Rect(self.pos,self.fro,1,self.to-self.fro)
+                    return Rect(self.pos,self.fro,1,self.to-self.fro+1)
 
         class Elbow(Component):
             def __init__(self,x,y,char):
@@ -113,6 +113,7 @@ class ConnectorComponent(Component):
                 self.x = x
                 self.y = y
                 self.char = char
+                #print("Created elbow x="+str(x)+" y="+str(y)+" char='"+char+"'")
 
             def getRect(self):
                 retMe = Rect()
@@ -123,6 +124,7 @@ class ConnectorComponent(Component):
                 context.addString(self.x,self.y,self.char,self.selected)
 
         def __init__(self,connectorElement):
+            #print("Creating CACHE")
             self.segments = []
             self.elbows = []
             fromConnection = connectorElement.fromConnection
@@ -158,20 +160,28 @@ class ConnectorComponent(Component):
 
             firstElbow = True
             for controlPoint in controlPoints:
+                skip = False
+                newDirection = direction
                 if horizontalOrienation:
                     if controlPoint>x:
                         newDirection = 0
-                    else:
+                    elif controlPoint<x:
                         newDirection = 2
-                    self.segments.append( ConnectorComponent.ConnectorCache.Segment(ConnectorComponent.ConnectorCache.Direction.HORIZONTAL,y,x,controlPoint) )
+                    else:
+                        skip = True
+                    if not skip:
+                        self.segments.append( ConnectorComponent.ConnectorCache.Segment(ConnectorComponent.ConnectorCache.Direction.HORIZONTAL,y,x,controlPoint) )
                     nextX=controlPoint
                     nextY=y
                 else:
                     if controlPoint>y:
                         newDirection = 1
-                    else:
+                    elif controlPoint<y:
                         newDirection = 3
-                    self.segments.append( ConnectorComponent.ConnectorCache.Segment(ConnectorComponent.ConnectorCache.Direction.VERTICAL,x,y,controlPoint) )
+                    else:
+                        skip = True
+                    if not skip:
+                        self.segments.append( ConnectorComponent.ConnectorCache.Segment(ConnectorComponent.ConnectorCache.Direction.VERTICAL,x,y,controlPoint) )
                     nextX=x
                     nextY=controlPoint
 
@@ -194,16 +204,6 @@ class ConnectorComponent(Component):
 
             self.fromConnection.selected = True
             self.toConnection.selected = True
-
-        #def allSelected(self):
-        #    returnMe = set()
-        #    for segment in self.segments:
-        #        returnMe = returnMe.union(segment.allSelected())
-        #    for elbow in self.elbows:
-        #        returnMe = returnMe.union(elbow.allSelected())
-        #    returnMe = returnMe.union(self.fromConnection)
-        #    returnMe = returnMe.union(self.toConnection)
-        #    return returnMe
 
         def getRect(self):
             rect = Rect()
@@ -262,10 +262,10 @@ class ConnectorComponent(Component):
             return (x + offX, y + offY)
 
     turnSymbol = \
-          [ ["─","╮","X","╯"], \
-            ["╰","│","╯","X"], \
-            ["X","╭","─","╰"], \
-            ["╭","X","╮","│"] ]
+          [ ["─","╮"," ","╯"], \
+            ["╰","│","╯"," "], \
+            [" ","╭","─","╰"], \
+            ["╭"," ","╮","│"] ]
 
     def draw(self,context):
         self.getConnectorCache().draw(context)

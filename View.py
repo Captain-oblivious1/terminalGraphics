@@ -55,35 +55,38 @@ class Context:
     #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
     verticalMap   = {"─":"┼",          "┌":"├", "┐":"┤", "└":"├", "┘":"┤", "├":"├", "┤":"┤", "┬":"┼", "┴":"┼", "┼":"┼"}
 
-    def drawVerticalLine(self,x,fro=0,to=None,inclusive=True,isBold=False):
+    def drawVerticalLine(self,x,fro=0,to=None,isBold=False):
         if to==None:
             to,_ = self.window.getmaxyx()
             to -= 1
         maxY = max(fro,to)
         minY = min(fro,to)
-        if not inclusive:
-            minY += 1
-            maxY -= 1
+        #if not inclusive:
+        #    minY += 1
+        #    maxY -= 1
         for i in range(minY,maxY+1):
             self.drawChar(x,i,Context.verticalMap,"│",isBold)
 
     #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
     horizontalMap = {         "│":"┼", "┌":"┬", "┐":"┬", "└":"┴", "┘":"┴", "├":"┼", "┤":"┼", "┬":"┬", "┴":"┴", "┼":"┼"}
 
-    def drawHorizontalLine(self,y,fro=0,to=None,inclusive=True,isBold=False):
+    def drawHorizontalLine(self,y,fro=0,to=None,isBold=False):
         if to==None:
             _,to = self.window.getmaxyx()
             to -= 1
         maxX = max(fro,to)
         minX = min(fro,to)
-        if not inclusive:
-            minX += 1
-            maxX -= 1
+        #if not inclusive:
+        #    minX += 1
+        #    maxX -= 1
         for i in range(minX,maxX+1):
             self.drawChar(i,y,Context.horizontalMap,"─",isBold)
 
     def invalidateComponent(self,component):
+        #print("component rect="+str(component.getRect()))
+        #print("invalidateRect before="+str(self.invalidatedRect))
         self.invalidatedRect.unionWith(component.getRect())
+        #print("invalidateRect after="+str(self.invalidatedRect))
         if "invalidateMe" in dir(component):
             component.invalidateMe(self)
 
@@ -109,7 +112,7 @@ class State:
 
     def mouseClicked(self, x, y):
         pass
-        print("Mouse clicked to x="+str(x)+" y="+str(y))
+        #print("Mouse clicked to x="+str(x)+" y="+str(y))
 
     def mousePressed(self, x, y):
         pass
@@ -140,6 +143,7 @@ class IdleState(State):
         selectedSet = self.diagramComponent.allSelected()
 
         clickedOn = self.diagramComponent.componentAt(self.startDragPoint)
+        #print("clickedOn="+str(clickedOn)+" point="+str(self.startDragPoint))
 
         if clickedOn==None or not clickedOn in selectedSet:
             for component in selectedSet:
@@ -149,6 +153,7 @@ class IdleState(State):
         if clickedOn!=None:
             self.movingComponents = True
             clickedOn.setSelected(True)
+            #print("Invalidating clicked on")
             self.context.invalidateComponent(clickedOn)
 
     def mouseReleased(self, x, y):
@@ -258,23 +263,23 @@ def createTestDiagram():
     diagramElement.elements.append(textBoxElement2)
 
 
-    fromConnectionPoint1 = ConnectionPoint()
-    fromConnectionPoint1.element = textBoxElement1
-    fromConnectionPoint1.side = Side.RIGHT
-    fromConnectionPoint1.where = 0.5
-    fromConnectionPoint1.end = End.NONE
+    #fromConnectionPoint1 = ConnectionPoint()
+    #fromConnectionPoint1.element = textBoxElement1
+    #fromConnectionPoint1.side = Side.RIGHT
+    #fromConnectionPoint1.where = 0.5
+    #fromConnectionPoint1.end = End.NONE
 
-    toConnectionPoint1 = ConnectionPoint()
-    toConnectionPoint1.element = textBoxElement2
-    toConnectionPoint1.side = Side.LEFT
-    toConnectionPoint1.where = 0.25
-    toConnectionPoint1.end = End.TRIANGLE
+    #toConnectionPoint1 = ConnectionPoint()
+    #toConnectionPoint1.element = textBoxElement2
+    #toConnectionPoint1.side = Side.LEFT
+    #toConnectionPoint1.where = 0.25
+    #toConnectionPoint1.end = End.TRIANGLE
 
-    connectorElement1 = ConnectorElement()
-    connectorElement1.fromConnection = fromConnectionPoint1
-    connectorElement1.toConnection = toConnectionPoint1
-    connectorElement1.controlPoints.append(45)
-    diagramElement.elements.append(connectorElement1)
+    #connectorElement1 = ConnectorElement()
+    #connectorElement1.fromConnection = fromConnectionPoint1
+    #connectorElement1.toConnection = toConnectionPoint1
+    #connectorElement1.controlPoints.append(45)
+    #diagramElement.elements.append(connectorElement1)
 
     fromConnectionPoint2 = ConnectionPoint()
     fromConnectionPoint2.element = textBoxElement1

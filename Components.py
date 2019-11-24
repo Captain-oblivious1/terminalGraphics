@@ -23,10 +23,16 @@ class Point:
 
 class Rect:
     def __init__(self,x=math.inf,y=math.inf,width=-math.inf,height=-math.inf):
-        self.l = x
-        self.t = y
-        self.r = x+width if width!=-math.inf else -math.inf
-        self.b = y+height if height!=-math.inf else -math.inf
+        self.l,self.r = Rect._initDim(x,width)
+        self.t,self.b = Rect._initDim(y,height)
+
+    def _initDim(pos,length):
+        if length==-math.inf:
+            return pos,-math.inf  #cannot do ∞-∞.  So returning max of -∞
+        elif length<0:
+            return pos+length, pos  #always want min to be less than max (i.e. no negative width allowed)
+        else:
+            return pos, pos+length
 
     def makeRectFromPoints(topLeft,bottomRight):
         return Rect(
@@ -47,16 +53,16 @@ class Rect:
         return self
 
     def doesIntersect(self,rect):
-        return self.l < rect.r and self.r > rect.l and self.t < rect.b and self.b > rect.t
+        return self.l <= rect.r and self.r > rect.l and self.t <= rect.b and self.b > rect.t
 
     def isNullRect(self):
         return self.l==math.inf or self.t==math.inf or self.r==-math.inf or self.b==-math.inf
 
     def isInsideRect(self,amIInside):
-        return self.l<=amIInside.l and self.r>=amIInside.r and self.t<=amIInside.t and self.b>=amIInside.b
+        return self.l<=amIInside.l and self.r>amIInside.r and self.t<=amIInside.t and self.b>amIInside.b
 
     def isInsidePoint(self,amIInside):
-        return self.l<=amIInside.x and self.r>=amIInside.x and self.t<=amIInside.y and self.b>=amIInside.y
+        return self.l<=amIInside.x and self.r>amIInside.x and self.t<=amIInside.y and self.b>amIInside.y
 
     def x(self):
         return self.l
@@ -105,12 +111,6 @@ class Component:
 
     def setSelected(self,newSelected):
         self.selected = newSelected
-
-    #def allSelected(self):
-    #    returnMe = set()
-    #    if self.isSelected():
-    #        returnMe.add(self)
-    #    return returnMe
 
     def children(self):
         return set()
@@ -172,14 +172,6 @@ class BoxComponent(Component):
 
         context.clearRect(Rect(x+1,y+1,width-1,height-1))
 
-    #def isOnMe(self,point):
-    #    x = point.x
-    #    y = point.y
-    #    element = self.element
-    #    myX=element.x
-    #    myY=element.y
-    #    return x>=myX and y>=myY and x<myX+element.width and y<myY+element.height
-
     def getRect(self):
         return Rect(self.element.x,self.element.y,self.element.width,self.element.height)
 
@@ -226,10 +218,13 @@ class DiagramComponent(Component):
 
     def draw(self,context):
         invalidatedRect = context.getInvalidatedRect()
+        #print("invalidatedRect="+str(invalidatedRect))
         context.clearRect(invalidatedRect)
 
         for component in self.components:
+            #print("testing intesection of "+str(component.getRect())+" and "+str(invalidatedRect))
             if component.getRect().doesIntersect(invalidatedRect):
+                #print("Found intersection")
                 component.draw(context)
 
         if self.selectionRect!=None:
@@ -257,8 +252,10 @@ class DiagramComponent(Component):
         return returnMe
 
     def componentAt(component,point):
+        #print("testing at point="+str(point))  (51,17)
         for child in component.children():
             found = DiagramComponent.componentAt(child,point)
+            #print("testing child="+str(child)+" found="+str(found))
             if found!=None:
                 return found
 
