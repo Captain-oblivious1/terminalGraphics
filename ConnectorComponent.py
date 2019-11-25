@@ -1,4 +1,5 @@
 from Components import *
+from Util import *
 
 class ConnectorComponent(Component):
     # I wish there were arrows and triangles that lined up with blocks
@@ -27,6 +28,42 @@ class ConnectorComponent(Component):
 
     def invalidateMe(self,context):
         self.connectorCache = None
+
+    class WhereReference:
+        def __init__(self,connection):
+            self.connection = connection
+
+        def get(self):
+            connection = self.connection
+            element = connection.element
+            if isHorizontal(connection.side):
+                return element.x + element.width * connection.where
+            else:
+                return element.y + element.height * connection.where
+
+        def set(self,val):
+            pass
+
+    class EdgeReference:
+        def __init__(self,connection):
+            self.connection = connection
+
+        def get(self):
+            connection = self.connection
+            element = connection.element
+            if connection.side == Side.TOP:
+                return element.y
+            elif connection.side == Side.LEFT:
+                return element.x
+            elif connection.side == Side.RIGHT:
+                return element.x + element.width
+            elif connection.side == Side.BOTTOM:
+                return element.y + element.height
+            else:
+                raise "WTF"
+
+        def set(self,val):
+            pass
 
     class ConnectorCache:
 
@@ -86,12 +123,16 @@ class ConnectorComponent(Component):
                 return rect
 
         class Segment(Component):
-            def __init__(self,direction,pos,fro,to):
+
+            def __init__(self,posRef,fromRef,toRef,direction):
                 Component.__init__(self,None)
+                self.posRef = posRef
+                self.fromRef = fromRef
+                self.toRef = toRef
                 self.direction = direction
-                self.pos = pos
-                self.fro = min(fro,to)+1
-                self.to = max(fro,to)-1
+                #self.pos = pos
+                #self.fro = min(fro,to)+1
+                #self.to = max(fro,to)-1
                 #print("Created segment dir="+str(direction)+" pos="+str(pos)+" from="+str(self.fro)+" to="+str(self.to))
 
             def draw(self,context):
@@ -99,13 +140,21 @@ class ConnectorComponent(Component):
                     function = context.drawHorizontalLine
                 else:
                     function = context.drawVerticalLine
-                function(self.pos,self.fro,self.to,self.selected)
+                #function(self.pos,self.fro,self.to,self.selected)
+                function(self.posRef.get(),self.fromRef.get(),self.toRef.get(),self.selected)
 
             def getRect(self):
-                if self.direction==ConnectorComponent.ConnectorCache.Direction.HORIZONTAL:
-                    return Rect(self.fro,self.pos,self.to-self.fro+1,1)
+                fro = self.fromRef.get()
+                to = self.toRef.get()
+                pos = self.posRef.get()
+
+                if self.direction == ConnectorComponent.ConnectorCache.Direction.HORIZONTAL:
+                    return Rect(fro,pos,to-fro+1,1)
                 else:
-                    return Rect(self.pos,self.fro,1,self.to-self.fro+1)
+                    return Rect(pos,fro,1,to-fro+1)
+
+            def move(self,offset):
+                pass
 
         class Elbow(Component):
             def __init__(self,x,y,char):
@@ -124,6 +173,20 @@ class ConnectorComponent(Component):
                 context.addString(self.x,self.y,self.char,self.selected)
 
         def __init__(self,connectorElement):
+            self.segments = []
+            self.elbows = []
+            fromConnection = connectorElement.fromConnection
+            toConnection = connectorElement.toConnection
+            self.fromConnection = ConnectorComponent.ConnectorCache.ConnectionPoint(fromConnection)
+            self.toConnection = ConnectorComponent.ConnectorCache.ConnectionPoint(toConnection)
+
+            startEdgeRef = EdgeReference(fromConnection)
+            startWhereRef = WhereReference(fromConnection)
+            if isHorizontal(toConnection.side):
+
+
+
+        def __initDelMe__(self,connectorElement):
             #print("Creating CACHE")
             self.segments = []
             self.elbows = []
@@ -134,8 +197,6 @@ class ConnectorComponent(Component):
 
             startPos = self.fromConnection.connectionPosition
             endPos = self.toConnection.connectionPosition
-            #startPos = self.fromConnection.getLinePosition()
-            #endPos = self.toConnection.getLinePosition()
 
             x = startPos.x
             y = startPos.y
@@ -170,7 +231,7 @@ class ConnectorComponent(Component):
                     else:
                         skip = True
                     if not skip:
-                        self.segments.append( ConnectorComponent.ConnectorCache.Segment(ConnectorComponent.ConnectorCache.Direction.HORIZONTAL,y,x,controlPoint) )
+                        self.segments.append( ConnectorComponent.ConnectorCache.Segment(connectorElement,ConnectorComponent.ConnectorCache.Direction.HORIZONTAL,y,x,controlPoint) )
                     nextX=controlPoint
                     nextY=y
                 else:
@@ -181,14 +242,14 @@ class ConnectorComponent(Component):
                     else:
                         skip = True
                     if not skip:
-                        self.segments.append( ConnectorComponent.ConnectorCache.Segment(ConnectorComponent.ConnectorCache.Direction.VERTICAL,x,y,controlPoint) )
+                        self.segments.append( ConnectorComponent.ConnectorCache.Segment(connectorElement,ConnectorComponent.ConnectorCache.Direction.VERTICAL,x,y,controlPoint) )
                     nextX=x
                     nextY=controlPoint
 
-                if firstElbow:
-                    firstElbow = False
-                else:
-                    self.elbows.append( ConnectorComponent.ConnectorCache.Elbow(x,y,ConnectorComponent.turnSymbol[direction][newDirection]) )
+                #if firstElbow:
+                #    firstElbow = False
+                #else:
+                #    self.elbows.append( ConnectorComponent.ConnectorCache.Elbow(x,y,ConnectorComponent.turnSymbol[direction][newDirection]) )
                 x=nextX
                 y=nextY
                 direction = newDirection
