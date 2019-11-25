@@ -37,9 +37,9 @@ class ConnectorComponent(Component):
             connection = self.connection
             element = connection.element
             if isHorizontal(connection.side):
-                return element.x + element.width * connection.where
+                return element.y + int(element.height * connection.where)
             else:
-                return element.y + element.height * connection.where
+                return element.x + int(element.width * connection.where)
 
         def set(self,val):
             pass
@@ -113,9 +113,6 @@ class ConnectorComponent(Component):
                 connectionPosition = self.connectionPosition
                 context.addString(connectionPosition.x,connectionPosition.y,self.char,self.selected)
 
-            #def getLinePosition(self):
-            #    return self.linePosition
-
             def getRect(self):
                 rect = Rect()
                 rect.includePoint(self.connectionPosition)
@@ -124,16 +121,12 @@ class ConnectorComponent(Component):
 
         class Segment(Component):
 
-            def __init__(self,posRef,fromRef,toRef,direction):
+            def __init__(self,fromRef,posRef,toRef,direction):
                 Component.__init__(self,None)
-                self.posRef = posRef
                 self.fromRef = fromRef
+                self.posRef = posRef
                 self.toRef = toRef
                 self.direction = direction
-                #self.pos = pos
-                #self.fro = min(fro,to)+1
-                #self.to = max(fro,to)-1
-                #print("Created segment dir="+str(direction)+" pos="+str(pos)+" from="+str(self.fro)+" to="+str(self.to))
 
             def draw(self,context):
                 if self.direction == ConnectorComponent.ConnectorCache.Direction.HORIZONTAL:
@@ -141,17 +134,26 @@ class ConnectorComponent(Component):
                 else:
                     function = context.drawVerticalLine
                 #function(self.pos,self.fro,self.to,self.selected)
-                function(self.posRef.get(),self.fromRef.get(),self.toRef.get(),self.selected)
+                pos = self.posRef.get()
+                rawFrom = self.fromRef.get()
+                rawTo = self.toRef.get()
+                fro = min(rawFrom,rawTo)
+                to = max(rawFrom,rawTo)
+                if to-fro>1:
+                    function(pos,fro+1,to-1,self.selected)
 
             def getRect(self):
-                fro = self.fromRef.get()
-                to = self.toRef.get()
                 pos = self.posRef.get()
-
-                if self.direction == ConnectorComponent.ConnectorCache.Direction.HORIZONTAL:
-                    return Rect(fro,pos,to-fro+1,1)
+                rawFrom = self.fromRef.get()
+                rawTo = self.toRef.get()
+                fro = min(rawFrom,rawTo)
+                to = max(rawFrom,rawTo)
+                if to-fro<=1:
+                    return Rect()
+                elif self.direction == ConnectorComponent.ConnectorCache.Direction.HORIZONTAL:
+                    return Rect(fro+1,pos,to-fro-1,1)
                 else:
-                    return Rect(pos,fro,1,to-fro+1)
+                    return Rect(pos,fro+1,1,to-fro-1)
 
             def move(self,offset):
                 pass
@@ -180,9 +182,21 @@ class ConnectorComponent(Component):
             self.fromConnection = ConnectorComponent.ConnectorCache.ConnectionPoint(fromConnection)
             self.toConnection = ConnectorComponent.ConnectorCache.ConnectionPoint(toConnection)
 
-            startEdgeRef = EdgeReference(fromConnection)
-            startWhereRef = WhereReference(fromConnection)
-            if isHorizontal(toConnection.side):
+            refs = []
+            refs.append( ConnectorComponent.EdgeReference(fromConnection) )
+            refs.append( ConnectorComponent.WhereReference(fromConnection) )
+            for index in range(len(connectorElement.controlPoints)):
+                refs.append( ArrayElementReference(connectorElement.controlPoints,index) )
+            refs.append( ConnectorComponent.WhereReference(toConnection) )
+            refs.append( ConnectorComponent.EdgeReference(toConnection) )
+
+            horizontalOrienation = isHorizontal(fromConnection.side)
+            directionMap = { True:ConnectorComponent.ConnectorCache.Direction.HORIZONTAL, False:ConnectorComponent.ConnectorCache.Direction.VERTICAL }
+
+            for index in range(len(refs)-2):
+                self.segments.append( ConnectorComponent.ConnectorCache.Segment(refs[index],refs[index+1],refs[index+2],directionMap[horizontalOrienation]) )
+                horizontalOrienation = 1 - horizontalOrienation
+
 
 
 

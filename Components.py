@@ -218,7 +218,6 @@ class DiagramComponent(Component):
 
     def draw(self,context):
         invalidatedRect = context.getInvalidatedRect()
-        #print("invalidatedRect="+str(invalidatedRect))
         context.clearRect(invalidatedRect)
 
         for component in self.components:
