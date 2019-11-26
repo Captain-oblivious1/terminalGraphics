@@ -96,7 +96,7 @@ def testRect():
 
 
 def isHorizontal(side):
-    return side == Side.LEFT or side == Side.RIGHT
+    return side == Direction.LEFT or side == Direction.RIGHT
 
 class Component:
     def __init__(self, element):

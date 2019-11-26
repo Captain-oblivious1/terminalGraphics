@@ -3,11 +3,11 @@ from Util import *
 
 class ConnectorComponent(Component):
     # I wish there were arrows and triangles that lined up with blocks
-    noneMap =     { Side.TOP:"┴", Side.LEFT:"┤", Side.RIGHT:"├", Side.BOTTOM:"┬" }
-    arrowMap =    { Side.TOP:"∨", Side.LEFT:">", Side.RIGHT:"<", Side.BOTTOM:"∧" }
-    triangleMap = { Side.TOP:"▽", Side.LEFT:"▷", Side.RIGHT:"◁", Side.BOTTOM:"△" }
+    noneMap =     { Direction.TOP:"┴", Direction.LEFT:"┤", Direction.RIGHT:"├", Direction.BOTTOM:"┬" }
+    arrowMap =    { Direction.TOP:"∨", Direction.LEFT:">", Direction.RIGHT:"<", Direction.BOTTOM:"∧" }
+    triangleMap = { Direction.TOP:"▽", Direction.LEFT:"▷", Direction.RIGHT:"◁", Direction.BOTTOM:"△" }
 
-    offsetMap = { Side.TOP:Point(0,-1), Side.LEFT:Point(-1,0), Side.RIGHT:Point(1,0), Side.BOTTOM:Point(0,1) }
+    offsetMap = { Direction.TOP:Point(0,-1), Direction.LEFT:Point(-1,0), Direction.RIGHT:Point(1,0), Direction.BOTTOM:Point(0,1) }
 
     def __init__(self,connectorElement):
         self.connectorCache = None
@@ -47,13 +47,13 @@ class ConnectorComponent(Component):
         def get(self):
             connection = self.connection
             element = connection.element
-            if connection.side == Side.TOP:
+            if connection.side == Direction.TOP:
                 return element.y
-            elif connection.side == Side.LEFT:
+            elif connection.side == Direction.LEFT:
                 return element.x
-            elif connection.side == Side.RIGHT:
+            elif connection.side == Direction.RIGHT:
                 return element.x + element.width
-            elif connection.side == Side.BOTTOM:
+            elif connection.side == Direction.BOTTOM:
                 return element.y + element.height
             else:
                 raise "WTF"
@@ -61,7 +61,7 @@ class ConnectorComponent(Component):
         def set(self,val):
             pass
 
-    class Direction(Enum):
+    class Orientation(Enum):
         HORIZONTAL=0
         VERTICAL=1
 
@@ -86,16 +86,16 @@ class ConnectorComponent(Component):
 
         def getConnectorPosition(self,connection):
             element = connection.element
-            if connection.side == Side.TOP:
+            if connection.side == Direction.TOP:
                 x = int(element.x + element.width * connection.where)
                 y = element.y
-            elif connection.side == Side.LEFT:
+            elif connection.side == Direction.LEFT:
                 x = element.x
                 y = int(element.y + element.height * connection.where)
-            elif connection.side == Side.RIGHT:
+            elif connection.side == Direction.RIGHT:
                 x = element.x + element.width - 1
                 y = int(element.y + element.height * connection.where)
-            elif connection.side == Side.BOTTOM:
+            elif connection.side == Direction.BOTTOM:
                 x = int(element.x + element.width * connection.where)
                 y = element.y + element.height - 1
             else:
@@ -115,15 +115,15 @@ class ConnectorComponent(Component):
 
     class Segment(Component):
 
-        def __init__(self,fromRef,posRef,toRef,direction):
+        def __init__(self,fromRef,posRef,toRef,orientation):
             Component.__init__(self,None)
             self.fromRef = fromRef
             self.posRef = posRef
             self.toRef = toRef
-            self.direction = direction
+            self.orientation = orientation
 
         def draw(self,context):
-            if self.direction == ConnectorComponent.Direction.HORIZONTAL:
+            if self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
                 function = context.drawHorizontalLine
             else:
                 function = context.drawVerticalLine
@@ -144,7 +144,7 @@ class ConnectorComponent(Component):
             to = max(rawFrom,rawTo)
             if to-fro<=1:
                 return Rect()
-            elif self.direction == ConnectorComponent.Direction.HORIZONTAL:
+            elif self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
                 return Rect(fro+1,pos,to-fro-1,1)
             else:
                 return Rect(pos,fro+1,1,to-fro-1)
@@ -160,19 +160,72 @@ class ConnectorComponent(Component):
                 [" ","╭","─","╰"], \
                 ["╭"," ","╮","│"] ]
 
-        def __init__(self,startDirection,xRef,yRef):
+        def __init__(self,beforeSegment,afterSegment):
             Component.__init__(self,None)
-            self.startDirection = startDirection
-            self.xRef = xRef
-            self.yRef = yRef
+            self.beforeSegment = beforeSegment
+            self.afterSegment = afterSegment
+
+        def getPoint(self):
+
+            beforePos = beforeSegment.posRef.get()
+            afterPos = afterSegment.posRef.get()
+
+            if beforeSegment.orientation==Orientation.VERTICAL:
+                x = beforePos
+            else:
+                y = beforePos
+
+            if afterSegment.orientation==Orientation.VERTICAL:
+                x = afterPos
+            else:
+                y = afterPos
+
+            return Point(x,y)
+
+        def getInfo(self):
+            point = self.getPoint()
+
+            beforeSum = beforeSegment.fromRef.get() + beforeSegment.toRef.get()
+            afterSum = afterSegment.fromRef.get() + afterSegment.toRef.get()
+
+            if beforeSegment.orientation==Orientation.VERTICAL:
+                if beforeSum < 2*point.y:
+                    beforeDirection = Direction.DOWN
+                elif beforeSum > 2*point.y:
+                    beforeDirection = Direction.UP
+                else:
+                    beforeDirection = Direction.RIGHT if beforeSum<afterSum else Direction.LEFT
+            else:
+                if beforeSum < 2*point.x:
+                    beforeDirection = Direction.RIGHT
+                elif beforeSum > 2*point.x:
+                    beforeDirection = Direction.LEFT
+                else:
+                    beforeDirection = Direction.DOWN if beforeSum<afterSum else Direction.UP
+
+            if afterSegment.orientation==Orientation.VERTICAL:
+                if afterSum < 2*point.y:
+                    afterDirection = Direction.UP
+                elif afterSum > 2*point.y:
+                    afterDirection = Direction.DOWN
+                else:
+                    afterDirection = Direction.RIGHT if beforeSum<afterSum else Direction.LEFT
+            else:
+                if afterSum < 2*point.x:
+                    afterDirection = Direction.LEFT
+                elif afterSum > 2*point.x:
+                    afterDirection = Direction.RIGHT
+                else:
+                    afterDirection = Direction.DOWN if beforeSum<afterSum else Direction.UP
+
+            return point,turnSymbol[beforeDirection][afterDirection]
 
         def getRect(self):
-            retMe = Rect()
-            retMe.includePoint( Point(self.xRef.get(),self.yRef.get()) )
-            return retMe
+            return Rect().includePoint( self.getPoint() )
 
         def draw(self,context):
-            context.addString(self.xRef.get(),self.yRef.get(),self.char,self.selected)
+            point,char = self.getInfo()
+            context.addString(point.x,point.y,char,self.selected)
 
     def __init__(self,connectorElement):
         Component.__init__(self,connectorElement)
@@ -195,7 +248,7 @@ class ConnectorComponent(Component):
         refs.append( ConnectorComponent.EdgeReference(toConnection) )
 
         horizontalOrienation = isHorizontal(fromConnection.side)
-        directionMap = { True:ConnectorComponent.Direction.HORIZONTAL, False:ConnectorComponent.Direction.VERTICAL }
+        directionMap = { True:ConnectorComponent.Orientation.HORIZONTAL, False:ConnectorComponent.Orientation.VERTICAL }
 
         for index in range(len(refs)-2):
             self.segments.append( ConnectorComponent.Segment(refs[index],refs[index+1],refs[index+2],directionMap[horizontalOrienation]) )
@@ -230,49 +283,49 @@ class ConnectorComponent(Component):
             controlPoints.append(endPos.y)
 
         horizontalOrienation = isHorizontal(connectorElement.fromConnection.side)
-        if fromConnection.side==Side.RIGHT:
+        if fromConnection.side==Direction.RIGHT:
             direction = 0
-        elif fromConnection.side==Side.BOTTOM:
+        elif fromConnection.side==Direction.BOTTOM:
             direction = 1
-        elif fromConnection.side==Side.LEFT:
+        elif fromConnection.side==Direction.LEFT:
             direction = 2
-        elif fromConnection.side==Side.TOP:
+        elif fromConnection.side==Direction.TOP:
             direction = 3
 
         firstElbow = True
         for controlPoint in controlPoints:
             skip = False
-            newDirection = direction
+            newOrientation = direction
             if horizontalOrienation:
                 if controlPoint>x:
-                    newDirection = 0
+                    newOrientation = 0
                 elif controlPoint<x:
-                    newDirection = 2
+                    newOrientation = 2
                 else:
                     skip = True
                 if not skip:
-                    self.segments.append( ConnectorComponent.ConnectorCache.Segment(connectorElement,ConnectorComponent.ConnectorCache.Direction.HORIZONTAL,y,x,controlPoint) )
+                    self.segments.append( ConnectorComponent.ConnectorCache.Segment(connectorElement,ConnectorComponent.ConnectorCache.Orientation.HORIZONTAL,y,x,controlPoint) )
                 nextX=controlPoint
                 nextY=y
             else:
                 if controlPoint>y:
-                    newDirection = 1
+                    newOrientation = 1
                 elif controlPoint<y:
-                    newDirection = 3
+                    newOrientation = 3
                 else:
                     skip = True
                 if not skip:
-                    self.segments.append( ConnectorComponent.ConnectorCache.Segment(connectorElement,ConnectorComponent.ConnectorCache.Direction.VERTICAL,x,y,controlPoint) )
+                    self.segments.append( ConnectorComponent.ConnectorCache.Segment(connectorElement,ConnectorComponent.ConnectorCache.Orientation.VERTICAL,x,y,controlPoint) )
                 nextX=x
                 nextY=controlPoint
 
             #if firstElbow:
             #    firstElbow = False
             #else:
-            #    self.elbows.append( ConnectorComponent.ConnectorCache.Elbow(x,y,ConnectorComponent.turnSymbol[direction][newDirection]) )
+            #    self.elbows.append( ConnectorComponent.ConnectorCache.Elbow(x,y,ConnectorComponent.turnSymbol[direction][newOrientation]) )
             x=nextX
             y=nextY
-            direction = newDirection
+            direction = newOrientation
             horizontalOrienation = 1 - horizontalOrienation
 
     def setSelected(self,newSelected):

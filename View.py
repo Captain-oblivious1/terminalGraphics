@@ -265,13 +265,13 @@ def createTestDiagram():
 
     #fromConnectionPoint1 = ConnectionPoint()
     #fromConnectionPoint1.element = textBoxElement1
-    #fromConnectionPoint1.side = Side.RIGHT
+    #fromConnectionPoint1.side = Direction.RIGHT
     #fromConnectionPoint1.where = 0.5
     #fromConnectionPoint1.end = End.NONE
 
     #toConnectionPoint1 = ConnectionPoint()
     #toConnectionPoint1.element = textBoxElement2
-    #toConnectionPoint1.side = Side.LEFT
+    #toConnectionPoint1.side = Direction.LEFT
     #toConnectionPoint1.where = 0.25
     #toConnectionPoint1.end = End.TRIANGLE
 
@@ -283,13 +283,13 @@ def createTestDiagram():
 
     fromConnectionPoint2 = ConnectionPoint()
     fromConnectionPoint2.element = textBoxElement1
-    fromConnectionPoint2.side = Side.BOTTOM
+    fromConnectionPoint2.side = Direction.BOTTOM
     fromConnectionPoint2.where = 0.75
     fromConnectionPoint2.end = End.ARROW
 
     toConnectionPoint2 = ConnectionPoint()
     toConnectionPoint2.element = textBoxElement2
-    toConnectionPoint2.side = Side.TOP
+    toConnectionPoint2.side = Direction.TOP
     toConnectionPoint2.where = 0.5
     toConnectionPoint2.end = End.NONE
 

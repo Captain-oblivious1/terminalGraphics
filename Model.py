@@ -93,11 +93,11 @@ class TextBoxElement(BoxElement):
     def __str__(self):
         return "TextBox:{" + self._attrToStr() + "}"
 
-class Side(Enum):
-    TOP = 0
-    LEFT = 1
-    RIGHT = 2
-    BOTTOM = 3
+class Direction(Enum):
+    RIGHT = 0
+    BOTTOM = 1
+    LEFT = 2
+    TOP = 3
 
 class End(Enum):
     NONE = 0
