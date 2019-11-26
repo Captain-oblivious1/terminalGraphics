@@ -153,20 +153,26 @@ class ConnectorComponent(Component):
             pass
 
     class Elbow(Component):
-        def __init__(self,x,y,char):
+
+        turnSymbol = \
+              [ ["─","╮"," ","╯"], \
+                ["╰","│","╯"," "], \
+                [" ","╭","─","╰"], \
+                ["╭"," ","╮","│"] ]
+
+        def __init__(self,startDirection,xRef,yRef):
             Component.__init__(self,None)
-            self.x = x
-            self.y = y
-            self.char = char
-            #print("Created elbow x="+str(x)+" y="+str(y)+" char='"+char+"'")
+            self.startDirection = startDirection
+            self.xRef = xRef
+            self.yRef = yRef
 
         def getRect(self):
             retMe = Rect()
-            retMe.includePoint( Point(self.x,self.y) )
+            retMe.includePoint( Point(self.xRef.get(),self.yRef.get()) )
             return retMe
 
         def draw(self,context):
-            context.addString(self.x,self.y,self.char,self.selected)
+            context.addString(self.xRef.get(),self.yRef.get(),self.char,self.selected)
 
     def __init__(self,connectorElement):
         Component.__init__(self,connectorElement)
@@ -195,6 +201,8 @@ class ConnectorComponent(Component):
             self.segments.append( ConnectorComponent.Segment(refs[index],refs[index+1],refs[index+2],directionMap[horizontalOrienation]) )
             horizontalOrienation = 1 - horizontalOrienation
 
+        #for index in range(len(refs)-3):
+        #    self.elbows.append( ConnectorComponent.Elbow())
 
 
 
@@ -325,12 +333,6 @@ class ConnectorComponent(Component):
             context.addString(x,y,theMap[ connection.side ])
 
             return (x + offX, y + offY)
-
-    turnSymbol = \
-          [ ["─","╮"," ","╯"], \
-            ["╰","│","╯"," "], \
-            [" ","╭","─","╰"], \
-            ["╭"," ","╮","│"] ]
 
     #def draw(self,context):
     #    self.getConnectorCache().draw(context)
