@@ -44,6 +44,7 @@ class Rect:
     def includePoint(self,point):
         rect = Rect(point.x,point.y,1,1)
         self.unionWith(rect)
+        return self
 
     def unionWith(self,rect):
         self.l = min(self.l,rect.l)
