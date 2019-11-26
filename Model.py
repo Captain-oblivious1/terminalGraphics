@@ -95,9 +95,9 @@ class TextBoxElement(BoxElement):
 
 class Direction(Enum):
     RIGHT = 0
-    BOTTOM = 1
+    DOWN = 1
     LEFT = 2
-    TOP = 3
+    UP = 3
 
 class End(Enum):
     NONE = 0

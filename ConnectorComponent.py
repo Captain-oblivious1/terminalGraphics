@@ -3,11 +3,11 @@ from Util import *
 
 class ConnectorComponent(Component):
     # I wish there were arrows and triangles that lined up with blocks
-    noneMap =     { Direction.TOP:"┴", Direction.LEFT:"┤", Direction.RIGHT:"├", Direction.BOTTOM:"┬" }
-    arrowMap =    { Direction.TOP:"∨", Direction.LEFT:">", Direction.RIGHT:"<", Direction.BOTTOM:"∧" }
-    triangleMap = { Direction.TOP:"▽", Direction.LEFT:"▷", Direction.RIGHT:"◁", Direction.BOTTOM:"△" }
+    noneMap =     { Direction.UP:"┴", Direction.LEFT:"┤", Direction.RIGHT:"├", Direction.DOWN:"┬" }
+    arrowMap =    { Direction.UP:"∨", Direction.LEFT:">", Direction.RIGHT:"<", Direction.DOWN:"∧" }
+    triangleMap = { Direction.UP:"▽", Direction.LEFT:"▷", Direction.RIGHT:"◁", Direction.DOWN:"△" }
 
-    offsetMap = { Direction.TOP:Point(0,-1), Direction.LEFT:Point(-1,0), Direction.RIGHT:Point(1,0), Direction.BOTTOM:Point(0,1) }
+    offsetMap = { Direction.UP:Point(0,-1), Direction.LEFT:Point(-1,0), Direction.RIGHT:Point(1,0), Direction.DOWN:Point(0,1) }
 
     def __init__(self,connectorElement):
         self.connectorCache = None
@@ -47,13 +47,13 @@ class ConnectorComponent(Component):
         def get(self):
             connection = self.connection
             element = connection.element
-            if connection.side == Direction.TOP:
+            if connection.side == Direction.UP:
                 return element.y
             elif connection.side == Direction.LEFT:
                 return element.x
             elif connection.side == Direction.RIGHT:
                 return element.x + element.width
-            elif connection.side == Direction.BOTTOM:
+            elif connection.side == Direction.DOWN:
                 return element.y + element.height
             else:
                 raise "WTF"
@@ -86,7 +86,7 @@ class ConnectorComponent(Component):
 
         def getConnectorPosition(self,connection):
             element = connection.element
-            if connection.side == Direction.TOP:
+            if connection.side == Direction.UP:
                 x = int(element.x + element.width * connection.where)
                 y = element.y
             elif connection.side == Direction.LEFT:
@@ -95,7 +95,7 @@ class ConnectorComponent(Component):
             elif connection.side == Direction.RIGHT:
                 x = element.x + element.width - 1
                 y = int(element.y + element.height * connection.where)
-            elif connection.side == Direction.BOTTOM:
+            elif connection.side == Direction.DOWN:
                 x = int(element.x + element.width * connection.where)
                 y = element.y + element.height - 1
             else:
@@ -167,15 +167,15 @@ class ConnectorComponent(Component):
 
         def getPoint(self):
 
-            beforePos = beforeSegment.posRef.get()
-            afterPos = afterSegment.posRef.get()
+            beforePos = self.beforeSegment.posRef.get()
+            afterPos = self.afterSegment.posRef.get()
 
-            if beforeSegment.orientation==Orientation.VERTICAL:
+            if self.beforeSegment.orientation==ConnectorComponent.Orientation.VERTICAL:
                 x = beforePos
             else:
                 y = beforePos
 
-            if afterSegment.orientation==Orientation.VERTICAL:
+            if self.afterSegment.orientation==ConnectorComponent.Orientation.VERTICAL:
                 x = afterPos
             else:
                 y = afterPos
@@ -185,10 +185,10 @@ class ConnectorComponent(Component):
         def getInfo(self):
             point = self.getPoint()
 
-            beforeSum = beforeSegment.fromRef.get() + beforeSegment.toRef.get()
-            afterSum = afterSegment.fromRef.get() + afterSegment.toRef.get()
+            beforeSum = self.beforeSegment.fromRef.get() + self.beforeSegment.toRef.get()
+            afterSum = self.afterSegment.fromRef.get() + self.afterSegment.toRef.get()
 
-            if beforeSegment.orientation==Orientation.VERTICAL:
+            if self.beforeSegment.orientation==ConnectorComponent.Orientation.VERTICAL:
                 if beforeSum < 2*point.y:
                     beforeDirection = Direction.DOWN
                 elif beforeSum > 2*point.y:
@@ -203,7 +203,7 @@ class ConnectorComponent(Component):
                 else:
                     beforeDirection = Direction.DOWN if beforeSum<afterSum else Direction.UP
 
-            if afterSegment.orientation==Orientation.VERTICAL:
+            if self.afterSegment.orientation==ConnectorComponent.Orientation.VERTICAL:
                 if afterSum < 2*point.y:
                     afterDirection = Direction.UP
                 elif afterSum > 2*point.y:
@@ -218,7 +218,7 @@ class ConnectorComponent(Component):
                 else:
                     afterDirection = Direction.DOWN if beforeSum<afterSum else Direction.UP
 
-            return point,turnSymbol[beforeDirection][afterDirection]
+            return point,ConnectorComponent.Elbow.turnSymbol[beforeDirection.value][afterDirection.value]
 
         def getRect(self):
             return Rect().includePoint( self.getPoint() )
@@ -254,9 +254,11 @@ class ConnectorComponent(Component):
             self.segments.append( ConnectorComponent.Segment(refs[index],refs[index+1],refs[index+2],directionMap[horizontalOrienation]) )
             horizontalOrienation = 1 - horizontalOrienation
 
-        #for index in range(len(refs)-3):
-        #    self.elbows.append( ConnectorComponent.Elbow())
-
+        prevSegment = None
+        for segment in self.segments:
+            if prevSegment:
+                self.elbows.append( ConnectorComponent.Elbow(prevSegment,segment) )
+            prevSegment = segment
 
 
     def __initDelMe__(self,connectorElement):
@@ -285,11 +287,11 @@ class ConnectorComponent(Component):
         horizontalOrienation = isHorizontal(connectorElement.fromConnection.side)
         if fromConnection.side==Direction.RIGHT:
             direction = 0
-        elif fromConnection.side==Direction.BOTTOM:
+        elif fromConnection.side==Direction.DOWN:
             direction = 1
         elif fromConnection.side==Direction.LEFT:
             direction = 2
-        elif fromConnection.side==Direction.TOP:
+        elif fromConnection.side==Direction.UP:
             direction = 3
 
         firstElbow = True
