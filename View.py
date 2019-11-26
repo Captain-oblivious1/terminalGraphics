@@ -1,5 +1,6 @@
 #!/bin/python
 
+import os
 import sys
 import curses
 from Model import *
@@ -176,7 +177,8 @@ class LassoState(State):
         self.oldRect = None
 
     def mousePressed(self, x, y):
-        raise "Not sure how this got called without mouseReleased being called first"
+        pass
+        #raise "Not sure how this got called without mouseReleased being called first"
 
     def mouseReleased(self, x, y):
         if self.oldRect!=None:
@@ -226,7 +228,8 @@ class MovingState(State):
                     self.affectedConnectors.add(component)
 
     def mousePressed(self, x, y):
-        raise "Not sure how this got called without mouseReleased being called first"
+        pass
+        #raise "Not sure how this got called without mouseReleased being called first"
 
     def mouseReleased(self, x, y):
         self.editor.setState(IdleState(self.editor,self.context,self.diagramComponent))
@@ -263,23 +266,23 @@ def createTestDiagram():
     diagramElement.elements.append(textBoxElement2)
 
 
-    #fromConnectionPoint1 = ConnectionPoint()
-    #fromConnectionPoint1.element = textBoxElement1
-    #fromConnectionPoint1.side = Direction.RIGHT
-    #fromConnectionPoint1.where = 0.5
-    #fromConnectionPoint1.end = End.NONE
+    fromConnectionPoint1 = ConnectionPoint()
+    fromConnectionPoint1.element = textBoxElement1
+    fromConnectionPoint1.side = Direction.RIGHT
+    fromConnectionPoint1.where = 0.5
+    fromConnectionPoint1.end = End.NONE
 
-    #toConnectionPoint1 = ConnectionPoint()
-    #toConnectionPoint1.element = textBoxElement2
-    #toConnectionPoint1.side = Direction.LEFT
-    #toConnectionPoint1.where = 0.25
-    #toConnectionPoint1.end = End.TRIANGLE
+    toConnectionPoint1 = ConnectionPoint()
+    toConnectionPoint1.element = textBoxElement2
+    toConnectionPoint1.side = Direction.LEFT
+    toConnectionPoint1.where = 0.25
+    toConnectionPoint1.end = End.TRIANGLE
 
-    #connectorElement1 = ConnectorElement()
-    #connectorElement1.fromConnection = fromConnectionPoint1
-    #connectorElement1.toConnection = toConnectionPoint1
-    #connectorElement1.controlPoints.append(45)
-    #diagramElement.elements.append(connectorElement1)
+    connectorElement1 = ConnectorElement()
+    connectorElement1.fromConnection = fromConnectionPoint1
+    connectorElement1.toConnection = toConnectionPoint1
+    connectorElement1.controlPoints.append(45)
+    diagramElement.elements.append(connectorElement1)
 
     fromConnectionPoint2 = ConnectionPoint()
     fromConnectionPoint2.element = textBoxElement1
@@ -350,8 +353,14 @@ class Editor:
             event = screen.getch()
             #print("event='"+str(curses.keyname(event))+"'")
             #ch = 'N'
-            if event == ord('q'):
-                break
+            if event == 27:
+                screen.nodelay(True)
+                nextKey = screen.getch()
+                screen.nodelay(False)
+                if nextKey==-1:
+                    break;
+            #elif event == ord('q'):
+            #    break
             elif event == curses.KEY_MOUSE:
                 #ch = 'Y'
                 _ , mx, my, _, bstate = curses.getmouse()
@@ -384,12 +393,15 @@ def myMain(stdscr):
     editor = Editor() 
     editor.run()
 
+def setShorterEscDelayInOs():
+        os.environ.setdefault('ESCDELAY', '25')
 
 mystdout = StdOutWrapper()
 sys.stdout = mystdout
 sys.stderr = mystdout
 
 try:
+    setShorterEscDelayInOs()
     wrapper(myMain)
 finally:
 

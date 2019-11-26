@@ -47,14 +47,20 @@ class ConnectorComponent(Component):
         def get(self):
             connection = self.connection
             element = connection.element
+
+            if connection.end == End.NONE:
+                offset = 1
+            else:
+                offset = 0
+
             if connection.side == Direction.UP:
-                return element.y
+                return element.y+offset
             elif connection.side == Direction.LEFT:
-                return element.x
+                return element.x+offset
             elif connection.side == Direction.RIGHT:
-                return element.x + element.width
+                return element.x + element.width - offset
             elif connection.side == Direction.DOWN:
-                return element.y + element.height
+                return element.y + element.height - offset
             else:
                 raise "WTF"
 
@@ -69,22 +75,8 @@ class ConnectorComponent(Component):
         def __init__(self,connection):
             Component.__init__(self,connection)
 
-            self.connectionPosition = self.getConnectorPosition(connection)
-            offset = ConnectorComponent.offsetMap[ connection.side ]
-
-            if connection.end == End.NONE:
-                charMap = ConnectorComponent.noneMap
-            else:
-                self.connectionPosition += offset # need to dedicate a char to draw the arrow
-
-                if connection.end == End.ARROW:
-                    charMap = ConnectorComponent.arrowMap
-                else:
-                    charMap = ConnectorComponent.triangleMap
-
-            self.char = charMap[ connection.side ]
-
-        def getConnectorPosition(self,connection):
+        def getPoint(self):
+            connection = self.element
             element = connection.element
             if connection.side == Direction.UP:
                 x = int(element.x + element.width * connection.where)
@@ -104,14 +96,29 @@ class ConnectorComponent(Component):
             return Point(x,y)
 
         def draw(self,context):
-            connectionPosition = self.connectionPosition
-            context.addString(connectionPosition.x,connectionPosition.y,self.char,self.selected)
+            connection = self.element
+            connectionPosition = self.getPoint()
+            offset = ConnectorComponent.offsetMap[ connection.side ]
+
+            if connection.end == End.NONE:
+                charMap = ConnectorComponent.noneMap
+            else:
+                connectionPosition += offset # need to dedicate a char to draw the arrow
+
+                if connection.end == End.ARROW:
+                    charMap = ConnectorComponent.arrowMap
+                else:
+                    charMap = ConnectorComponent.triangleMap
+
+            char = charMap[ connection.side ]
+            context.addString(connectionPosition.x,connectionPosition.y,char,self.selected)
 
         def getRect(self):
-            rect = Rect()
-            rect.includePoint(self.connectionPosition)
-            #rect.includePoint(self.linePosition)
-            return rect
+            point = self.getPoint()
+            rect = Rect().includePoint(point)
+            offset = ConnectorComponent.offsetMap[ self.element.side ]
+            rect.includePoint(point+offset)
+            return rect;
 
     class Segment(Component):
 
@@ -150,7 +157,14 @@ class ConnectorComponent(Component):
                 return Rect(pos,fro+1,1,to-fro-1)
 
         def move(self,offset):
-            pass
+            if self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
+                myOffset = offset.y
+            else:
+                myOffset = offset.x
+
+            ref = self.posRef
+            oldPos = ref.get()
+            self.posRef.set(oldPos+myOffset)
 
     class Elbow(Component):
 
@@ -351,12 +365,12 @@ class ConnectorComponent(Component):
         return rect
 
     def draw(self,context):
-        self.fromConnection.draw(context)
-        self.toConnection.draw(context)
         for seg in self.segments:
             seg.draw(context)
         for elbow in self.elbows:
             elbow.draw(context)
+        self.fromConnection.draw(context)
+        self.toConnection.draw(context)
 
     def children(self):
         returnMe = set()
