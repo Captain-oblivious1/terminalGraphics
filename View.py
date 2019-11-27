@@ -244,7 +244,7 @@ class MovingState(State):
         offset = newPoint - self.lastPoint
         for component in self.selectedComponents:
             self.context.invalidateComponent(component)
-            component.move(offset)
+            component.move(offset,self.context)
             self.context.invalidateComponent(component)
 
         self.lastPoint = newPoint

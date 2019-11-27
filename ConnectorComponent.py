@@ -144,6 +144,15 @@ class ConnectorComponent(Component):
                 function(pos,fro+1,to-1,self.selected)
 
         def getRect(self):
+            rect = self.getFullRect()
+            if not rect.isNullRect():
+                if self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
+                    rect = Rect(rect.x()+1,rect.y(),rect.width()-1,1)
+                else:
+                    rect = Rect(rect.x(),rect.y()+1,1,rect.height()-1)
+            return rect
+
+        def getFullRect(self):
             pos = self.posRef.get()
             rawFrom = self.fromRef.get()
             rawTo = self.toRef.get()
@@ -152,11 +161,14 @@ class ConnectorComponent(Component):
             if to-fro<=1:
                 return Rect()
             elif self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
-                return Rect(fro+1,pos,to-fro-1,1)
+                return Rect(fro,pos,to-fro+1,1)
             else:
-                return Rect(pos,fro+1,1,to-fro-1)
+                return Rect(pos,fro,1,to-fro+1)
 
-        def move(self,offset):
+        def move(self,offset,context):
+            rect = self.getFullRect()
+            context.invalidateRect(rect)
+
             if self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
                 myOffset = offset.y
             else:
@@ -409,7 +421,7 @@ class ConnectorComponent(Component):
     def isOnMe(self,point):
         return False
 
-    def move(self,offset):
+    def move(self,offset,context):
         element = self.element
         if isHorizontal(element.fromConnection.side):
             xElement = 0
@@ -422,8 +434,6 @@ class ConnectorComponent(Component):
             else:
                 elementOffset = offset.y
             element.controlPoints[arrayElement] += elementOffset
-
-        self.connectorCache = None
 
     #def getRect(self):
     #    connectorCache = self.getConnectorCache()

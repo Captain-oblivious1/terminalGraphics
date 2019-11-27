@@ -176,7 +176,7 @@ class BoxComponent(Component):
     def getRect(self):
         return Rect(self.element.x,self.element.y,self.element.width,self.element.height)
 
-    def move(self,offset):
+    def move(self,offset,context):
         element = self.element
         element.x += offset.x
         element.y += offset.y
