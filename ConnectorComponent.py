@@ -12,15 +12,8 @@ class ConnectorComponent(Component):
     def __init__(self,connectorElement):
         self.connectorCache = None
 
-    #def setSelected(self,newSelected):
-    #    Component.setSelected(self,newSelected)
-    #    self.getConnectorCache().setSelected(newSelected)
-
     def isOnMe(self,point):
         return False
-
-    #def allSelected(self):
-    #    return self.getConnectorCache().allSelected()
 
     def invalidateMe(self,context):
         self.connectorCache = None
@@ -253,6 +246,10 @@ class ConnectorComponent(Component):
             point,char = self.getInfo()
             context.addString(point.x,point.y,char,self.selected)
 
+        def move(self,offset,context):
+            self.beforeSegment.move(offset,context)
+            self.afterSegment.move(offset,context)
+
     def __init__(self,connectorElement):
         Component.__init__(self,connectorElement)
         self.createChildren(connectorElement)
@@ -285,76 +282,6 @@ class ConnectorComponent(Component):
             if prevSegment:
                 self.elbows.append( ConnectorComponent.Elbow(prevSegment,segment) )
             prevSegment = segment
-
-
-    def __initDelMe__(self,connectorElement):
-        #print("Creating CACHE")
-        self.segments = []
-        self.elbows = []
-        fromConnection = connectorElement.fromConnection
-        toConnection = connectorElement.toConnection
-        self.fromConnection = ConnectorComponent.ConnectorCache.ConnectionPoint(fromConnection)
-        self.toConnection = ConnectorComponent.ConnectorCache.ConnectionPoint(toConnection)
-
-        startPos = self.fromConnection.connectionPosition
-        endPos = self.toConnection.connectionPosition
-
-        x = startPos.x
-        y = startPos.y
-
-        controlPoints = connectorElement.controlPoints.copy()
-        if isHorizontal(toConnection.side):
-            controlPoints.append(endPos.y)
-            controlPoints.append(endPos.x)
-        else:
-            controlPoints.append(endPos.x)
-            controlPoints.append(endPos.y)
-
-        horizontalOrienation = isHorizontal(connectorElement.fromConnection.side)
-        if fromConnection.side==Direction.RIGHT:
-            direction = 0
-        elif fromConnection.side==Direction.DOWN:
-            direction = 1
-        elif fromConnection.side==Direction.LEFT:
-            direction = 2
-        elif fromConnection.side==Direction.UP:
-            direction = 3
-
-        firstElbow = True
-        for controlPoint in controlPoints:
-            skip = False
-            newOrientation = direction
-            if horizontalOrienation:
-                if controlPoint>x:
-                    newOrientation = 0
-                elif controlPoint<x:
-                    newOrientation = 2
-                else:
-                    skip = True
-                if not skip:
-                    self.segments.append( ConnectorComponent.ConnectorCache.Segment(connectorElement,ConnectorComponent.ConnectorCache.Orientation.HORIZONTAL,y,x,controlPoint) )
-                nextX=controlPoint
-                nextY=y
-            else:
-                if controlPoint>y:
-                    newOrientation = 1
-                elif controlPoint<y:
-                    newOrientation = 3
-                else:
-                    skip = True
-                if not skip:
-                    self.segments.append( ConnectorComponent.ConnectorCache.Segment(connectorElement,ConnectorComponent.ConnectorCache.Orientation.VERTICAL,x,y,controlPoint) )
-                nextX=x
-                nextY=controlPoint
-
-            #if firstElbow:
-            #    firstElbow = False
-            #else:
-            #    self.elbows.append( ConnectorComponent.ConnectorCache.Elbow(x,y,ConnectorComponent.turnSymbol[direction][newOrientation]) )
-            x=nextX
-            y=nextY
-            direction = newOrientation
-            horizontalOrienation = 1 - horizontalOrienation
 
     def setSelected(self,newSelected):
         Component.setSelected(self,newSelected)
@@ -415,9 +342,6 @@ class ConnectorComponent(Component):
 
             return (x + offX, y + offY)
 
-    #def draw(self,context):
-    #    self.getConnectorCache().draw(context)
-
     def isOnMe(self,point):
         return False
 
@@ -434,9 +358,5 @@ class ConnectorComponent(Component):
             else:
                 elementOffset = offset.y
             element.controlPoints[arrayElement] += elementOffset
-
-    #def getRect(self):
-    #    connectorCache = self.getConnectorCache()
-    #    return connectorCache.getRect()
 
 
