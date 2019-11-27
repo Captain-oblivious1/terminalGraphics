@@ -287,7 +287,7 @@ def createTestDiagram():
     fromConnectionPoint2 = ConnectionPoint()
     fromConnectionPoint2.element = textBoxElement1
     fromConnectionPoint2.side = Direction.DOWN
-    fromConnectionPoint2.where = 0.75
+    fromConnectionPoint2.where = 1.0
     fromConnectionPoint2.end = End.ARROW
 
     toConnectionPoint2 = ConnectionPoint()

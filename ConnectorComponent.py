@@ -2,12 +2,6 @@ from Components import *
 from Util import *
 
 class ConnectorComponent(Component):
-    # I wish there were arrows and triangles that lined up with blocks
-    noneMap =     { Direction.UP:"┴", Direction.LEFT:"┤", Direction.RIGHT:"├", Direction.DOWN:"┬" }
-    arrowMap =    { Direction.UP:"∨", Direction.LEFT:">", Direction.RIGHT:"<", Direction.DOWN:"∧" }
-    triangleMap = { Direction.UP:"▽", Direction.LEFT:"▷", Direction.RIGHT:"◁", Direction.DOWN:"△" }
-
-    offsetMap = { Direction.UP:Point(0,-1), Direction.LEFT:Point(-1,0), Direction.RIGHT:Point(1,0), Direction.DOWN:Point(0,1) }
 
     def __init__(self,connectorElement):
         self.connectorCache = None
@@ -26,12 +20,23 @@ class ConnectorComponent(Component):
             connection = self.connection
             element = connection.element
             if isHorizontal(connection.side):
-                return element.y + int(element.height * connection.where)
+                return element.y + int((element.height-1) * connection.where)
             else:
-                return element.x + int(element.width * connection.where)
+                return element.x + int((element.width-1) * connection.where)
 
         def set(self,val):
-            pass
+            connection = self.connection
+            element = connection.element
+            if isHorizontal(connection.side):
+                connection.where = ( val - (element.y-1) ) / element.height
+            else:
+                connection.where = ( val - (element.x-1) ) / element.width
+
+            if connection.where > 1.0:
+                connection.where = 1.0
+            elif connection.where < 0.0: 
+                connection.where = 0.0
+
 
     class EdgeReference:
         def __init__(self,connection):
@@ -65,6 +70,13 @@ class ConnectorComponent(Component):
         VERTICAL=1
 
     class ConnectionPoint(Component):
+        # I wish there were arrows and triangles that lined up with blocks
+        noneMap =     { Direction.UP:"┴", Direction.LEFT:"┤", Direction.RIGHT:"├", Direction.DOWN:"┬" }
+        arrowMap =    { Direction.UP:"∨", Direction.LEFT:">", Direction.RIGHT:"<", Direction.DOWN:"∧" }
+        triangleMap = { Direction.UP:"▽", Direction.LEFT:"▷", Direction.RIGHT:"◁", Direction.DOWN:"△" }
+
+        offsetMap = { Direction.UP:Point(0,-1), Direction.LEFT:Point(-1,0), Direction.RIGHT:Point(1,0), Direction.DOWN:Point(0,1) }
+
         def __init__(self,connection):
             Component.__init__(self,connection)
 
@@ -72,16 +84,16 @@ class ConnectorComponent(Component):
             connection = self.element
             element = connection.element
             if connection.side == Direction.UP:
-                x = int(element.x + element.width * connection.where)
+                x = int(element.x + (element.width-1) * connection.where)
                 y = element.y
             elif connection.side == Direction.LEFT:
                 x = element.x
-                y = int(element.y + element.height * connection.where)
+                y = int(element.y + (element.height-1) * connection.where)
             elif connection.side == Direction.RIGHT:
                 x = element.x + element.width - 1
-                y = int(element.y + element.height * connection.where)
+                y = int(element.y + (element.height-1) * connection.where)
             elif connection.side == Direction.DOWN:
-                x = int(element.x + element.width * connection.where)
+                x = int(element.x + (element.width-1) * connection.where)
                 y = element.y + element.height - 1
             else:
                 raise "invalid side"
@@ -91,17 +103,17 @@ class ConnectorComponent(Component):
         def draw(self,context):
             connection = self.element
             connectionPosition = self.getPoint()
-            offset = ConnectorComponent.offsetMap[ connection.side ]
+            offset = ConnectorComponent.ConnectionPoint.offsetMap[ connection.side ]
 
             if connection.end == End.NONE:
-                charMap = ConnectorComponent.noneMap
+                charMap = ConnectorComponent.ConnectionPoint.noneMap
             else:
                 connectionPosition += offset # need to dedicate a char to draw the arrow
 
                 if connection.end == End.ARROW:
-                    charMap = ConnectorComponent.arrowMap
+                    charMap = ConnectorComponent.ConnectionPoint.arrowMap
                 else:
-                    charMap = ConnectorComponent.triangleMap
+                    charMap = ConnectorComponent.ConnectionPoint.triangleMap
 
             char = charMap[ connection.side ]
             context.addString(connectionPosition.x,connectionPosition.y,char,self.selected)
@@ -109,7 +121,7 @@ class ConnectorComponent(Component):
         def getRect(self):
             point = self.getPoint()
             rect = Rect().includePoint(point)
-            offset = ConnectorComponent.offsetMap[ self.element.side ]
+            offset = ConnectorComponent.ConnectionPoint.offsetMap[ self.element.side ]
             rect.includePoint(point+offset)
             return rect;
 
