@@ -7,12 +7,21 @@ from Model import *
 from Components import *
 from ConnectorComponent import *
 from curses import wrapper
-#import keyboard
 
-#            " "   " "   " "   " "
-#            "╴"   "╶"   "╵"   "╷"
-#            "╸"   "╺"   "╹"   "╻"
+# The following is so that I can more easily do more advanced drawing.
+#
+# So like this:    │        Not this:    │
+#               ┌──┴──┐               ┌─────┐
+#             ──┤ box ├──           ──│ box │──
+#               └──┬──┘               └─────┘
+#                  │                     │
+#
+
+# 4D array for all possible box chars
 # boxArray [left][right][top][bottom]
+# None:      " "   " "   " "   " "
+# Thin:      "╴"   "╶"   "╵"   "╷"
+# Thick:     "╸"   "╺"   "╹"   "╻"
 boxArray = [  
   [ [ [ " ", "╷", "╻"], [ "╵", "│", "╽"], [ "╹", "╿", "┃"] ],
     [ [ "╶", "┌", "┎"], [ "└", "├", "┟"], [ "┖", "┞", "┠"] ],
@@ -108,32 +117,6 @@ def orChars(char1,char2):
 def andChars(char1,char2):
     return hexToChar( charToHex(char1) & charToHex(char2) )
 
-#def testOrChars(char1,char2):
-#    print("or-ing '"+char1+"' and '"+char2+"' -> '"+orChars(char1,char2)+"'")
-#
-#orChars("─","│")
-#orChars("┎","┘")
-#
-#print("created Char='"+orChars( andChars("─","▌"), "│")+"'")
-#print("created Char='"+orChars( andChars("┎","▌"), "│")+"'")
-#print("created Char='"+orChars( andChars("━","▌"), "│")+"'")
-#print("created Char='"+orChars( andChars("━","▌"), "─")+"'")
-
-
-# unicode order:
-# "─", "━", "│" "┃",
-# "┌", "┍", "┎", "┏", "┐", "┑", "┒", "┓",
-# "└", "┕", "┖", "┗", "┘", "┙", "┚", "┛",
-# "├", "┝", "┞", "┟", "┠", "┡", "┢", "┣",
-# "┤", "┥", "┦", "┧", "┨", "┩", "┪", "┫",
-# "┬", "┭", "┮", "┯", "┰", "┱", "┲", "┳",
-# "┴", "┵", "┶", "┷", "┸", "┹", "┺", "┻",
-# "┼", "┽", "┾", "┿", "╀", "╁", "╂", "╃",
-# "╄", "╅", "╆", "╇", "╈", "╉", "╊", "╋",
-# "╴", "╵", "╶", "╷", 
-# "╸", "╹", "╺", "╻", 
-# "╼", "╽", "╾", "╿"}
-
 
 class Context:
     def __init__(self,window):
@@ -152,31 +135,15 @@ class Context:
             self.window.addstr(y,x,text)
 
     def readChar(self,x,y):
-        #inch=self.window.inch(y,x)
-        #print("inch="+hex(inch))
         return chr(0xFFFF & self.window.inch(y,x))
 
     def clearRect(self,rect=None):
         if rect == None:
             self.window.clear()
         elif not rect.isNullRect() :
-            #self.clear(rect.x(),rect.y(),rect.width(),rect.height())
             for i in range(0,rect.width()):
                 for j in range(0,rect.height()):
                     self.addString(rect.x()+i,rect.y()+j," ")
-
-    #def clear(self,x,y,width,height):
-    #    for i in range(0,width):
-    #        for j in range(0,height):
-    #            self.addString(x+i,y+j," ")
-
-    def drawChar(self,x,y,mapping,default,isBold=False):
-        existing = self.readChar(x,y)
-        if existing in mapping:
-            char = mapping[existing]
-        else:
-            char = default
-        self.addString(x,y,char,isBold)
 
     def orChar(self,x,y,char,isBold=False):
         existing = self.readChar(x,y)
@@ -188,27 +155,14 @@ class Context:
         writeMe = andChars(existing,char)
         self.addString(x,y,writeMe,isBold)
 
-
-    #def drawBoxChar(self,x,y,
-
-    #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
-    verticalMap   = {"─":"┼",          "┌":"├", "┐":"┤", "└":"├", "┘":"┤", "├":"├", "┤":"┤", "┬":"┼", "┴":"┼", "┼":"┼"}
-
     def drawVerticalLine(self,x,fro=0,to=None,isBold=False):
         if to==None:
             to,_ = self.window.getmaxyx()
             to -= 1
         maxY = max(fro,to)
         minY = min(fro,to)
-        #if not inclusive:
-        #    minY += 1
-        #    maxY -= 1
         for i in range(minY,maxY+1):
-            #self.drawChar(x,i,Context.verticalMap,"│",isBold)
             self.orChar(x,i,"│",isBold)
-
-    #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
-    horizontalMap = {         "│":"┼", "┌":"┬", "┐":"┬", "└":"┴", "┘":"┴", "├":"┼", "┤":"┼", "┬":"┬", "┴":"┴", "┼":"┼"}
 
     def drawHorizontalLine(self,y,fro=0,to=None,isBold=False):
         if to==None:
@@ -216,18 +170,11 @@ class Context:
             to -= 1
         maxX = max(fro,to)
         minX = min(fro,to)
-        #if not inclusive:
-        #    minX += 1
-        #    maxX -= 1
         for i in range(minX,maxX+1):
-            #self.drawChar(i,y,Context.horizontalMap,"─",isBold)
             self.orChar(i,y,"─",isBold)
 
     def invalidateComponent(self,component):
-        #print("component rect="+str(component.getRect()))
-        #print("invalidateRect before="+str(self.invalidatedRect))
         self.invalidatedRect.unionWith(component.getRect())
-        #print("invalidateRect after="+str(self.invalidatedRect))
         if "invalidateMe" in dir(component):
             component.invalidateMe(self)
 
@@ -284,7 +231,6 @@ class IdleState(State):
         selectedSet = self.diagramComponent.allSelected()
 
         clickedOn = self.diagramComponent.componentAt(self.startDragPoint)
-        #print("clickedOn="+str(clickedOn)+" point="+str(self.startDragPoint))
 
         if clickedOn==None or not clickedOn in selectedSet:
             for component in selectedSet:
@@ -318,7 +264,6 @@ class LassoState(State):
 
     def mousePressed(self, x, y):
         pass
-        #raise "Not sure how this got called without mouseReleased being called first"
 
     def mouseReleased(self, x, y):
         if self.oldRect!=None:
@@ -369,7 +314,6 @@ class MovingState(State):
 
     def mousePressed(self, x, y):
         pass
-        #raise "Not sure how this got called without mouseReleased being called first"
 
     def mouseReleased(self, x, y):
         self.editor.setState(IdleState(self.editor,self.context,self.diagramComponent))
