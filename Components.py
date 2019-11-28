@@ -145,8 +145,8 @@ class BoxComponent(Component):
     def __init__(self,boxElement):
         Component.__init__(self,boxElement)
 
-    def _drawBorderChar(self,context,x,y,mapping,default):
-        context.drawChar(x,y,mapping,default,self.isSelected())
+    #def _drawBorderChar(self,context,x,y,mapping,default):
+    #    context.drawChar(x,y,mapping,default,self.isSelected())
 
     def draw(self,context):
         x = self.element.x
@@ -158,18 +158,35 @@ class BoxComponent(Component):
         bottom = y+height
         right = x+width
 
+        selected = self.isSelected()
         for i in range(1,width):
-            self._drawBorderChar(context,x+i,y,TextBoxComponent.topMap,"─")
-            self._drawBorderChar(context,x+i,bottom,TextBoxComponent.bottomMap,"─")
+            context.andChar(x+i,y,"▀")
+            context.orChar(x+i,y,"─",selected)
+            context.andChar(x+i,bottom,"▄")
+            context.orChar(x+i,bottom,"─",selected)
+            #self._drawBorderChar(context,x+i,y,TextBoxComponent.topMap,"─")
+            #self._drawBorderChar(context,x+i,bottom,TextBoxComponent.bottomMap,"─")
 
         for i in range(1,height):
-            self._drawBorderChar(context,x,y+i,TextBoxComponent.leftMap,"│")
-            self._drawBorderChar(context,right,y+i,TextBoxComponent.rightMap,"│")
+            context.andChar(x,y+i,"▌")
+            context.orChar(x,y+i,"│",selected)
+            context.andChar(right,y+i,"▐")
+            context.orChar(right,y+i,"│",selected)
+            #self._drawBorderChar(context,x,y+i,TextBoxComponent.leftMap,"│")
+            #self._drawBorderChar(context,right,y+i,TextBoxComponent.rightMap,"│")
 
-        self._drawBorderChar(context,x,y,TextBoxComponent.topLeftMap,"┌")
-        self._drawBorderChar(context,right,y,TextBoxComponent.topRightMap,"┐")
-        self._drawBorderChar(context,x,bottom,TextBoxComponent.bottomLeftMap,"└")
-        self._drawBorderChar(context,right,bottom,TextBoxComponent.bottomRightMap,"┘")
+        context.andChar(x,y,"▛")
+        context.orChar(x,y,"┌",selected)
+        context.andChar(right,y,"▜")
+        context.orChar(right,y,"┐",selected)
+        context.andChar(x,bottom,"▙")
+        context.orChar(x,bottom,"└",selected)
+        context.andChar(right,bottom,"▟")
+        context.orChar(right,bottom,"┘",selected)
+        #self._drawBorderChar(context,x,y,TextBoxComponent.topLeftMap,"┌")
+        #self._drawBorderChar(context,right,y,TextBoxComponent.topRightMap,"┐")
+        #self._drawBorderChar(context,x,bottom,TextBoxComponent.bottomLeftMap,"└")
+        #self._drawBorderChar(context,right,bottom,TextBoxComponent.bottomRightMap,"┘")
 
         context.clearRect(Rect(x+1,y+1,width-1,height-1))
 

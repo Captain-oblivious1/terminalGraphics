@@ -52,9 +52,9 @@ class ConnectorComponent(Component):
                 offset = 0
 
             if connection.side == Direction.UP:
-                return element.y+offset
+                return element.y+offset - 1
             elif connection.side == Direction.LEFT:
-                return element.x+offset
+                return element.x+offset - 1
             elif connection.side == Direction.RIGHT:
                 return element.x + element.width - offset
             elif connection.side == Direction.DOWN:
@@ -71,7 +71,7 @@ class ConnectorComponent(Component):
 
     class ConnectionPoint(Component):
         # I wish there were arrows and triangles that lined up with blocks
-        noneMap =     { Direction.UP:"┴", Direction.LEFT:"┤", Direction.RIGHT:"├", Direction.DOWN:"┬" }
+        noneMap =     { Direction.UP:"╵", Direction.LEFT:"╴", Direction.RIGHT:"╶", Direction.DOWN:"╷" }
         arrowMap =    { Direction.UP:"∨", Direction.LEFT:">", Direction.RIGHT:"<", Direction.DOWN:"∧" }
         triangleMap = { Direction.UP:"▽", Direction.LEFT:"▷", Direction.RIGHT:"◁", Direction.DOWN:"△" }
 
@@ -107,6 +107,8 @@ class ConnectorComponent(Component):
 
             if connection.end == End.NONE:
                 charMap = ConnectorComponent.ConnectionPoint.noneMap
+                char = charMap[ connection.side ]
+                context.orChar(connectionPosition.x,connectionPosition.y,char,self.selected)
             else:
                 connectionPosition += offset # need to dedicate a char to draw the arrow
 
@@ -115,8 +117,8 @@ class ConnectorComponent(Component):
                 else:
                     charMap = ConnectorComponent.ConnectionPoint.triangleMap
 
-            char = charMap[ connection.side ]
-            context.addString(connectionPosition.x,connectionPosition.y,char,self.selected)
+                char = charMap[ connection.side ]
+                context.addString(connectionPosition.x,connectionPosition.y,char,self.selected)
 
         def getRect(self):
             point = self.getPoint()

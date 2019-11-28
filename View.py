@@ -70,10 +70,23 @@ def intializeMaps():
     charToHexMap["▌"]=0x1B9CE6
     charToHexMap["▐"]=0xCE33B
 
+    charToHexMap["▘"]=0x1B9C00
+    charToHexMap["▝"]=0xCE700
+    charToHexMap["▖"]=0x1CE6
+    charToHexMap["▗"]=0x73B
+
+    charToHexMap["▙"]=0x1B9CFFF
+    charToHexMap["▛"]=0x1FFFE6
+    charToHexMap["▜"]=0x1FFF3B
+    charToHexMap["▟"]=0xCFFFF
+
 intializeMaps()
 
 def charToHex(char):
-    return charToHexMap[char]
+    if char in charToHexMap:
+        return charToHexMap[char]
+    else:
+        return 0
 
 def hexToChar(hex):
     if hex in hexToCharMap:
@@ -165,6 +178,17 @@ class Context:
             char = default
         self.addString(x,y,char,isBold)
 
+    def orChar(self,x,y,char,isBold=False):
+        existing = self.readChar(x,y)
+        writeMe = orChars(existing,char)
+        self.addString(x,y,writeMe,isBold)
+
+    def andChar(self,x,y,char,isBold=False):
+        existing = self.readChar(x,y)
+        writeMe = andChars(existing,char)
+        self.addString(x,y,writeMe,isBold)
+
+
     #def drawBoxChar(self,x,y,
 
     #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
@@ -180,7 +204,8 @@ class Context:
         #    minY += 1
         #    maxY -= 1
         for i in range(minY,maxY+1):
-            self.drawChar(x,i,Context.verticalMap,"│",isBold)
+            #self.drawChar(x,i,Context.verticalMap,"│",isBold)
+            self.orChar(x,i,"│",isBold)
 
     #                 ─        │        ┌        ┐        └        ┘        ├        ┤        ┬        ┴        ┼
     horizontalMap = {         "│":"┼", "┌":"┬", "┐":"┬", "└":"┴", "┘":"┴", "├":"┼", "┤":"┼", "┬":"┬", "┴":"┴", "┼":"┼"}
@@ -195,7 +220,8 @@ class Context:
         #    minX += 1
         #    maxX -= 1
         for i in range(minX,maxX+1):
-            self.drawChar(i,y,Context.horizontalMap,"─",isBold)
+            #self.drawChar(i,y,Context.horizontalMap,"─",isBold)
+            self.orChar(i,y,"─",isBold)
 
     def invalidateComponent(self,component):
         #print("component rect="+str(component.getRect()))
