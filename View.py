@@ -64,22 +64,48 @@ def intializeMaps():
                     charToHexMap[char] = value
                     hexToCharMap[value] = char
 
+    # insert half blocks into charToHexMap for masking stuff (don't put in hextToCharMap)
+    charToHexMap["▀"]=0x1FFF00
+    charToHexMap["▄"]=0x1FFF
+    charToHexMap["▌"]=0x1B9CE6
+    charToHexMap["▐"]=0xCE33B
+
 intializeMaps()
 
 def charToHex(char):
     return charToHexMap[char]
 
 def hexToChar(hex):
-    return hexToCharMap[hex]
+    if hex in hexToCharMap:
+        return hexToCharMap[hex]
+    else: # find closest match
+        # If this is slow, do more fancy bit-wise math
+        minDiff = 64
+        minChar = None
+        for key,value in hexToCharMap.items():
+            count = bin(hex ^ key).count("1")
+            if count<minDiff:
+                minDiff = count
+                minChar = value
+        return minChar
 
 def orChars(char1,char2):
-    print("or-ing '"+char1+"' and '"+char2+"' -> '"+hexToChar(charToHex(char1) | charToHex(char2) ) +"'")
+    return hexToChar( charToHex(char1) | charToHex(char2) )
 
-orChars("─","│")
-orChars("┎","┘")
-deleteRight = 0x1B9CE6
-print("created Char='"+hexToChar(charToHex("─") & deleteRight | charToHex("│"))+"'")
-#print("created Char='"+hexToChar(charToHex("┎") & deleteRight | charToHex("│"))+"'")
+def andChars(char1,char2):
+    return hexToChar( charToHex(char1) & charToHex(char2) )
+
+#def testOrChars(char1,char2):
+#    print("or-ing '"+char1+"' and '"+char2+"' -> '"+orChars(char1,char2)+"'")
+#
+#orChars("─","│")
+#orChars("┎","┘")
+#
+#print("created Char='"+orChars( andChars("─","▌"), "│")+"'")
+#print("created Char='"+orChars( andChars("┎","▌"), "│")+"'")
+#print("created Char='"+orChars( andChars("━","▌"), "│")+"'")
+#print("created Char='"+orChars( andChars("━","▌"), "─")+"'")
+
 
 # unicode order:
 # "─", "━", "│" "┃",
