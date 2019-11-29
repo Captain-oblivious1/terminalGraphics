@@ -1,5 +1,28 @@
 from enum import Enum
 
+class Point:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+
+    def __add__(self,right):
+        return Point(self.x+right.x,self.y+right.y)
+
+    def __iadd__(self,right):
+        self.x += right.x
+        self.y += right.y
+        return self
+
+    def __sub__(self,right):
+        return Point(self.x-right.x,self.y-right.y)
+
+    def __str__(self):
+        return "Point("+str(self.x)+","+str(self.y)+")"
+
+class Orientation(Enum):
+    HORIZONTAL = 0
+    VERTICAL = 1
+
 class Element:
     def __init__(self):
         pass
@@ -92,6 +115,27 @@ class TextBoxElement(BoxElement):
 
     def __str__(self):
         return "TextBox:{" + self._attrToStr() + "}"
+
+class PathElement(Element):
+    def __init__(self):
+        Element.__init__(self)
+        self.startPoint = None
+        self.startOrientation = 0
+        self.turns = []
+
+    def _attrToStr(self):
+        return Element._attrToStr(self) + ",startPoint=" + str(self.startPoint) + ",startOrientation=" + str(self.startOrientation) + ",turns=" + str(self.turns)
+
+    def __str__(self):
+        return "PathElement:{" + self._attrToStr() + "}"
+
+class ShapeElement(PathElement):
+    def __init__(self):
+        PathElement.__init__(self)
+
+    def __str__(self):
+        return "ShapeElement:{" + self._attrToStr() + "}"
+
 
 class Direction(Enum):
     RIGHT = 0

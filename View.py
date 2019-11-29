@@ -6,6 +6,7 @@ import curses
 from Model import *
 from Components import *
 from ConnectorComponent import *
+from PathComponent import *
 from curses import wrapper
 
 # The following is so that I can more easily do more advanced drawing.
@@ -388,6 +389,12 @@ def createTestDiagram():
     connectorElement2.controlPoints.append(15)
     diagramElement.elements.append(connectorElement2)
 
+    pathElement = PathElement()
+    pathElement.startPoint = Point(80,5)
+    pathElement.startOrientation = Orientation.HORIZONTAL
+    pathElement.turns = [85,30,75,23]
+    diagramElement.elements.append(pathElement)
+
     return diagramElement
 
 def createDiagramComponent(diagramElement):
@@ -398,6 +405,8 @@ def createDiagramComponent(diagramElement):
             component = TextBoxComponent(element)
         elif type(element) is ConnectorElement:
             component = ConnectorComponent(element)
+        elif type(element) is PathElement:
+            component = PathComponent(element)
 
         diagramComponent.components.append(component)
 

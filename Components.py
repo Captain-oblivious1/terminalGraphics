@@ -2,25 +2,6 @@ from enum import Enum
 from Model import *
 import math
 
-class Point:
-    def __init__(self,x,y):
-        self.x = x
-        self.y = y
-
-    def __add__(self,right):
-        return Point(self.x+right.x,self.y+right.y)
-
-    def __iadd__(self,right):
-        self.x += right.x
-        self.y += right.y
-        return self
-
-    def __sub__(self,right):
-        return Point(self.x-right.x,self.y-right.y)
-
-    def __str__(self):
-        return "Point("+str(self.x)+","+str(self.y)+")"
-
 class Rect:
     def __init__(self,x=math.inf,y=math.inf,width=-math.inf,height=-math.inf):
         self.l,self.r = Rect._initDim(x,width)

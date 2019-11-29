@@ -9,9 +9,6 @@ class ConnectorComponent(Component):
     def isOnMe(self,point):
         return False
 
-    def invalidateMe(self,context):
-        self.connectorCache = None
-
     class WhereReference:
         def __init__(self,connection):
             self.connection = connection
@@ -64,10 +61,6 @@ class ConnectorComponent(Component):
 
         def set(self,val):
             pass
-
-    class Orientation(Enum):
-        HORIZONTAL=0
-        VERTICAL=1
 
     class ConnectionPoint(Component):
         # I wish there were arrows and triangles that lined up with blocks
@@ -137,7 +130,7 @@ class ConnectorComponent(Component):
             self.orientation = orientation
 
         def draw(self,context):
-            if self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
+            if self.orientation == Orientation.HORIZONTAL:
                 function = context.drawHorizontalLine
             else:
                 function = context.drawVerticalLine
@@ -153,7 +146,7 @@ class ConnectorComponent(Component):
         def getRect(self):
             rect = self.getFullRect()
             if not rect.isNullRect():
-                if self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
+                if self.orientation == Orientation.HORIZONTAL:
                     rect = Rect(rect.x()+1,rect.y(),rect.width()-1,1)
                 else:
                     rect = Rect(rect.x(),rect.y()+1,1,rect.height()-1)
@@ -167,7 +160,7 @@ class ConnectorComponent(Component):
             to = max(rawFrom,rawTo)
             if to-fro<=1:
                 return Rect()
-            elif self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
+            elif self.orientation == Orientation.HORIZONTAL:
                 return Rect(fro,pos,to-fro+1,1)
             else:
                 return Rect(pos,fro,1,to-fro+1)
@@ -176,7 +169,7 @@ class ConnectorComponent(Component):
             rect = self.getFullRect()
             context.invalidateRect(rect)
 
-            if self.orientation == ConnectorComponent.Orientation.HORIZONTAL:
+            if self.orientation == Orientation.HORIZONTAL:
                 myOffset = offset.y
             else:
                 myOffset = offset.x
@@ -203,12 +196,12 @@ class ConnectorComponent(Component):
             beforePos = self.beforeSegment.posRef.get()
             afterPos = self.afterSegment.posRef.get()
 
-            if self.beforeSegment.orientation==ConnectorComponent.Orientation.VERTICAL:
+            if self.beforeSegment.orientation==Orientation.VERTICAL:
                 x = beforePos
             else:
                 y = beforePos
 
-            if self.afterSegment.orientation==ConnectorComponent.Orientation.VERTICAL:
+            if self.afterSegment.orientation==Orientation.VERTICAL:
                 x = afterPos
             else:
                 y = afterPos
@@ -221,7 +214,7 @@ class ConnectorComponent(Component):
             beforeSum = self.beforeSegment.fromRef.get() + self.beforeSegment.toRef.get()
             afterSum = self.afterSegment.fromRef.get() + self.afterSegment.toRef.get()
 
-            if self.beforeSegment.orientation==ConnectorComponent.Orientation.VERTICAL:
+            if self.beforeSegment.orientation==Orientation.VERTICAL:
                 if beforeSum < 2*point.y:
                     beforeDirection = Direction.DOWN
                 elif beforeSum > 2*point.y:
@@ -236,7 +229,7 @@ class ConnectorComponent(Component):
                 else:
                     beforeDirection = Direction.DOWN if beforeSum<afterSum else Direction.UP
 
-            if self.afterSegment.orientation==ConnectorComponent.Orientation.VERTICAL:
+            if self.afterSegment.orientation==Orientation.VERTICAL:
                 if afterSum < 2*point.y:
                     afterDirection = Direction.UP
                 elif afterSum > 2*point.y:
@@ -285,7 +278,7 @@ class ConnectorComponent(Component):
         refs.append( ConnectorComponent.EdgeReference(toConnection) )
 
         horizontalOrienation = isHorizontal(fromConnection.side)
-        directionMap = { True:ConnectorComponent.Orientation.HORIZONTAL, False:ConnectorComponent.Orientation.VERTICAL }
+        directionMap = { True:Orientation.HORIZONTAL, False:Orientation.VERTICAL }
 
         for index in range(len(refs)-2):
             self.segments.append( ConnectorComponent.Segment(refs[index],refs[index+1],refs[index+2],directionMap[horizontalOrienation]) )
