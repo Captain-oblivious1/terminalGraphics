@@ -1,4 +1,5 @@
 from Components import *
+from Path import *
 from Util import *
 
 class PathComponent(Component):
@@ -212,10 +213,18 @@ class PathComponent(Component):
         return rect
 
     def draw(self,context):
-        for seg in self.segments:
-            seg.draw(context)
-        for elbow in self.elbows:
-            elbow.draw(context)
+
+        turns = [80,5,85,30,75,23]
+        path = Path(Orientation.HORIZONTAL)
+        for element in range(len(turns)):
+            path.appendTurnRef(ArrayElementReference(turns,element))
+        path.draw(context)
+
+    #def draw(self,context):
+    #    for seg in self.segments:
+    #        seg.draw(context)
+    #    for elbow in self.elbows:
+    #        elbow.draw(context)
 
     def children(self):
         returnMe = set()

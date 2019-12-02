@@ -119,7 +119,6 @@ class TextBoxElement(BoxElement):
 class PathElement(Element):
     def __init__(self):
         Element.__init__(self)
-        self.startPoint = None
         self.startOrientation = 0
         self.turns = []
 
