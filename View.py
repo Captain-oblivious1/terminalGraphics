@@ -147,8 +147,13 @@ class Context:
                     self.addString(rect.x()+i,rect.y()+j," ")
 
     def orChar(self,x,y,char,isBold=False):
-        existing = self.readChar(x,y)
-        writeMe = orChars(existing,char)
+        charOrd = ord(char)
+        if (charOrd>=0x2500 and charOrd<=0x254b) or (charOrd>=0x2574 and charOrd<=0x257f):
+            #if is a box char
+            existing = self.readChar(x,y)
+            writeMe = orChars(existing,char)
+        else:
+            writeMe = char
         self.addString(x,y,writeMe,isBold)
 
     def andChar(self,x,y,char,isBold=False):

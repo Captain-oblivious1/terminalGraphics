@@ -214,8 +214,15 @@ class PathComponent(Component):
 
     def draw(self,context):
 
+        #turnSymbol = \
+        #      [ ["─","╮"," ","╯"], \
+        #        ["╰","│","╯"," "], \
+        #        [" ","╭","─","╰"], \
+        #        ["╭"," ","╮","│"] ]
+
         turns = [80,5,85,30,75,23]
         path = Path(Orientation.HORIZONTAL)
+        path.setCorners ( [ "╭", "╮", "╰", "╯", "─", "│" ] )
         for element in range(len(turns)):
             path.appendTurnRef(ArrayElementReference(turns,element))
         path.draw(context)
