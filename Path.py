@@ -128,6 +128,13 @@ class Path:
                 x = self.fromTurn.x()
                 return Path.Segment.Snapshot(x,fromY,toY)
 
+        def getRect(self):
+            snapshot = self.getSnapshot()
+            if self.orientation==Orientation.HORIZONTAL:
+                return Rect(snapshot.fro,snapshot.pos,snapshot.to,snapshot.pos)
+            else:
+                return Rect(snapshot.pos,snapshot.fro,snapshot.pos,snapshot.to)
+
     def createSegmentList(self):
         turns = self.createTurnList()
         segmentList = []

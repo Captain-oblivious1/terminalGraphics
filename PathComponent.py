@@ -6,49 +6,29 @@ class PathComponent(Component):
 
     class Segment(Component):
 
-        def __init__(self,parent,fromRef,posRef,toRef,orientation):
+        def __init__(self,pathSegment):
             Component.__init__(self,None)
+            self.pathSegment = pathSegment
             self.parent = parent
-            self.fromRef = fromRef
-            self.posRef = posRef
-            self.toRef = toRef
-            self.orientation = orientation
 
         def draw(self,context):
-            if self.orientation == Orientation.HORIZONTAL:
-                function = context.drawHorizontalLine
-            else:
-                function = context.drawVerticalLine
-            #function(self.pos,self.fro,self.to,self.selected)
-            pos = self.posRef.get()
-            rawFrom = self.fromRef.get()
-            rawTo = self.toRef.get()
-            fro = min(rawFrom,rawTo)
-            to = max(rawFrom,rawTo)
-            if to-fro>1:
-                function(pos,fro+1,to-1,self.selected)
+            pass
 
         def getRect(self):
-            rect = self.getFullRect()
-            if not rect.isNullRect():
-                if self.orientation == Orientation.HORIZONTAL:
-                    rect = Rect(rect.x()+1,rect.y(),rect.width()-1,1)
-                else:
-                    rect = Rect(rect.x(),rect.y()+1,1,rect.height()-1)
-            return rect
+            return self.pathSegment.getRect()
 
-        def getFullRect(self):
-            pos = self.posRef.get()
-            rawFrom = self.fromRef.get()
-            rawTo = self.toRef.get()
-            fro = min(rawFrom,rawTo)
-            to = max(rawFrom,rawTo)
-            if to-fro<=1:
-                return Rect()
-            elif self.orientation == Orientation.HORIZONTAL:
-                return Rect(fro,pos,to-fro+1,1)
-            else:
-                return Rect(pos,fro,1,to-fro+1)
+        #def getFullRect(self):
+        #    pos = self.posRef.get()
+        #    rawFrom = self.fromRef.get()
+        #    rawTo = self.toRef.get()
+        #    fro = min(rawFrom,rawTo)
+        #    to = max(rawFrom,rawTo)
+        #    if to-fro<=1:
+        #        return Rect()
+        #    elif self.orientation == Orientation.HORIZONTAL:
+        #        return Rect(fro,pos,to-fro+1,1)
+        #    else:
+        #        return Rect(pos,fro,1,to-fro+1)
 
         def move(self,offset,context):
             if self.parent.isEditing():
@@ -172,6 +152,8 @@ class PathComponent(Component):
 
     def createChildren(self):
         element = self.element
+        path = Path(element.startOrientation)
+
         self.segments = []
         self.elbows = []
 
