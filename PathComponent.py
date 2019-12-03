@@ -6,7 +6,7 @@ class PathComponent(Component):
 
     class Segment(Component):
 
-        def __init__(self,pathSegment):
+        def __init__(self,parent,pathSegment):
             Component.__init__(self,None)
             self.pathSegment = pathSegment
             self.parent = parent
@@ -43,94 +43,94 @@ class PathComponent(Component):
             else:
                 myOffset = offset.x
 
-            ref = self.posRef
+            ref = self.pathSegment.getPosRef()
             oldPos = ref.get()
-            self.posRef.set(oldPos+myOffset)
+            ref.set(oldPos+myOffset)
 
-    class Elbow(Component):
+    #class Elbow(Component):
 
-        #turnSymbol = \
-        #      [ ["─","╮"," ","╯"], \
-        #        ["╰","│","╯"," "], \
-        #        [" ","╭","─","╰"], \
-        #        ["╭"," ","╮","│"] ]
+    #    #turnSymbol = \
+    #    #      [ ["─","╮"," ","╯"], \
+    #    #        ["╰","│","╯"," "], \
+    #    #        [" ","╭","─","╰"], \
+    #    #        ["╭"," ","╮","│"] ]
 
-        turnSymbol = \
-              [ ["─","┐"," ","┘"], \
-                ["└","│","┘"," "], \
-                [" ","┌","─","└"], \
-                ["┌"," ","┐","│"] ]
+    #    turnSymbol = \
+    #          [ ["─","┐"," ","┘"], \
+    #            ["└","│","┘"," "], \
+    #            [" ","┌","─","└"], \
+    #            ["┌"," ","┐","│"] ]
 
-        def __init__(self,beforeSegment,afterSegment):
-            Component.__init__(self,None)
-            self.beforeSegment = beforeSegment
-            self.afterSegment = afterSegment
+    #    def __init__(self,beforeSegment,afterSegment):
+    #        Component.__init__(self,None)
+    #        self.beforeSegment = beforeSegment
+    #        self.afterSegment = afterSegment
 
-        def getPoint(self):
+    #    def getPoint(self):
 
-            beforePos = self.beforeSegment.posRef.get()
-            afterPos = self.afterSegment.posRef.get()
+    #        beforePos = self.beforeSegment.posRef.get()
+    #        afterPos = self.afterSegment.posRef.get()
 
-            if self.beforeSegment.orientation==Orientation.VERTICAL:
-                x = beforePos
-            else:
-                y = beforePos
+    #        if self.beforeSegment.orientation==Orientation.VERTICAL:
+    #            x = beforePos
+    #        else:
+    #            y = beforePos
 
-            if self.afterSegment.orientation==Orientation.VERTICAL:
-                x = afterPos
-            else:
-                y = afterPos
+    #        if self.afterSegment.orientation==Orientation.VERTICAL:
+    #            x = afterPos
+    #        else:
+    #            y = afterPos
 
-            return Point(x,y)
+    #        return Point(x,y)
 
-        def getInfo(self):
-            point = self.getPoint()
+    #    def getInfo(self):
+    #        point = self.getPoint()
 
-            beforeSum = self.beforeSegment.fromRef.get() + self.beforeSegment.toRef.get()
-            afterSum = self.afterSegment.fromRef.get() + self.afterSegment.toRef.get()
+    #        beforeSum = self.beforeSegment.fromRef.get() + self.beforeSegment.toRef.get()
+    #        afterSum = self.afterSegment.fromRef.get() + self.afterSegment.toRef.get()
 
-            if self.beforeSegment.orientation==Orientation.VERTICAL:
-                if beforeSum < 2*point.y:
-                    beforeDirection = Direction.DOWN
-                elif beforeSum > 2*point.y:
-                    beforeDirection = Direction.UP
-                else:
-                    beforeDirection = Direction.RIGHT if beforeSum<afterSum else Direction.LEFT
-            else:
-                if beforeSum < 2*point.x:
-                    beforeDirection = Direction.RIGHT
-                elif beforeSum > 2*point.x:
-                    beforeDirection = Direction.LEFT
-                else:
-                    beforeDirection = Direction.DOWN if beforeSum<afterSum else Direction.UP
+    #        if self.beforeSegment.orientation==Orientation.VERTICAL:
+    #            if beforeSum < 2*point.y:
+    #                beforeDirection = Direction.DOWN
+    #            elif beforeSum > 2*point.y:
+    #                beforeDirection = Direction.UP
+    #            else:
+    #                beforeDirection = Direction.RIGHT if beforeSum<afterSum else Direction.LEFT
+    #        else:
+    #            if beforeSum < 2*point.x:
+    #                beforeDirection = Direction.RIGHT
+    #            elif beforeSum > 2*point.x:
+    #                beforeDirection = Direction.LEFT
+    #            else:
+    #                beforeDirection = Direction.DOWN if beforeSum<afterSum else Direction.UP
 
-            if self.afterSegment.orientation==Orientation.VERTICAL:
-                if afterSum < 2*point.y:
-                    afterDirection = Direction.UP
-                elif afterSum > 2*point.y:
-                    afterDirection = Direction.DOWN
-                else:
-                    afterDirection = Direction.RIGHT if beforeSum<afterSum else Direction.LEFT
-            else:
-                if afterSum < 2*point.x:
-                    afterDirection = Direction.LEFT
-                elif afterSum > 2*point.x:
-                    afterDirection = Direction.RIGHT
-                else:
-                    afterDirection = Direction.DOWN if beforeSum<afterSum else Direction.UP
+    #        if self.afterSegment.orientation==Orientation.VERTICAL:
+    #            if afterSum < 2*point.y:
+    #                afterDirection = Direction.UP
+    #            elif afterSum > 2*point.y:
+    #                afterDirection = Direction.DOWN
+    #            else:
+    #                afterDirection = Direction.RIGHT if beforeSum<afterSum else Direction.LEFT
+    #        else:
+    #            if afterSum < 2*point.x:
+    #                afterDirection = Direction.LEFT
+    #            elif afterSum > 2*point.x:
+    #                afterDirection = Direction.RIGHT
+    #            else:
+    #                afterDirection = Direction.DOWN if beforeSum<afterSum else Direction.UP
 
-            return point,PathComponent.Elbow.turnSymbol[beforeDirection.value][afterDirection.value]
+    #        return point,PathComponent.Elbow.turnSymbol[beforeDirection.value][afterDirection.value]
 
-        def getRect(self):
-            return Rect().includePoint( self.getPoint() )
+    #    def getRect(self):
+    #        return Rect().includePoint( self.getPoint() )
 
-        def draw(self,context):
-            point,char = self.getInfo()
-            context.orChar(point.x,point.y,char,self.selected)
+    #    def draw(self,context):
+    #        point,char = self.getInfo()
+    #        context.orChar(point.x,point.y,char,self.selected)
 
-        def move(self,offset,context):
-            self.beforeSegment.move(offset,context)
-            self.afterSegment.move(offset,context)
+    #    def move(self,offset,context):
+    #        self.beforeSegment.move(offset,context)
+    #        self.afterSegment.move(offset,context)
 
 
     def __init__(self,pathElement):
@@ -153,27 +153,34 @@ class PathComponent(Component):
     def createChildren(self):
         element = self.element
         path = Path(element.startOrientation)
+        for index in range(len(element.turns)):
+            path.appendTurnRef( ArrayElementReference(element.turns,index) )
 
         self.segments = []
-        self.elbows = []
+        for pathSegment in path.createSegmentList():
+            self.segments.append( PathComponent.Segment( self, pathSegment ) )
 
-        self.refs = []
-        refs = self.refs
 
-        horizontalOrientation = element.startOrientation==Orientation.HORIZONTAL
+        #self.segments = []
+        #self.elbows = []
 
-        if horizontalOrientation:
-            refs.append( AttrReference(element.startPoint,"x") )
-            refs.append( AttrReference(element.startPoint,"y") )
-        else:
-            refs.append( AttrReference(element.startPoint,"y") )
-            refs.append( AttrReference(element.startPoint,"x") )
+        #self.refs = []
+        #refs = self.refs
 
-        for index in range(len(element.turns)):
-            refs.append( ArrayElementReference(element.turns,index) )
+        #horizontalOrientation = element.startOrientation==Orientation.HORIZONTAL
 
-        self.createSegments(refs,horizontalOrientation)
-        self.createElbows(refs)
+        #if horizontalOrientation:
+        #    refs.append( AttrReference(element.startPoint,"x") )
+        #    refs.append( AttrReference(element.startPoint,"y") )
+        #else:
+        #    refs.append( AttrReference(element.startPoint,"y") )
+        #    refs.append( AttrReference(element.startPoint,"x") )
+
+        #for index in range(len(element.turns)):
+        #    refs.append( ArrayElementReference(element.turns,index) )
+
+        #self.createSegments(refs,horizontalOrientation)
+        #self.createElbows(refs)
 
     def createSegments(self,refs,startHorizontal):
         directionMap = { True:Orientation.HORIZONTAL, False:Orientation.VERTICAL }

@@ -1,5 +1,6 @@
 from Util import *
 from Model import *
+from Components import *
 
 class Path:
 
@@ -103,6 +104,12 @@ class Path:
                 self.pos = pos
                 self.fro = fro
                 self.to = to
+
+        def getPosRef(self):
+            if self.orientation==Orientation.HORIZONTAL:
+                return self.fromTurn.yRef
+            else:
+                return self.fromTurn.xRef
 
         def getSnapshot(self):
             if self.orientation==Orientation.HORIZONTAL:
