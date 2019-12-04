@@ -180,7 +180,7 @@ class Context:
             self.orChar(i,y,"─",isBold)
 
     def invalidateComponent(self,component):
-        self.invalidatedRect.unionWith(component.getRect())
+        self.invalidateRect(component.getRect())
         if "invalidateMe" in dir(component):
             component.invalidateMe(self)
 
@@ -395,9 +395,8 @@ def createTestDiagram():
     diagramElement.elements.append(connectorElement2)
 
     pathElement = PathElement()
-    pathElement.startPoint = Point(80,5)
     pathElement.startOrientation = Orientation.HORIZONTAL
-    pathElement.turns = [85,30,75,23]
+    pathElement.turns = [80,5,85,30,75,24]
     diagramElement.elements.append(pathElement)
 
     return diagramElement

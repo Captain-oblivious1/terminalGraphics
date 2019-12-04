@@ -32,22 +32,55 @@ class PathComponent(Component):
 
         def move(self,offset,context):
             if self.parent.isEditing():
-                self.forceMove(offset,context)
+                context.invalidateComponent(self)
 
-        def forceMove(self,offset,context):
-            rect = self.getFullRect()
-            context.invalidateRect(rect)
+                if self.pathSegment.orientation == Orientation.HORIZONTAL:
+                    myOffset = offset.y
+                else:
+                    myOffset = offset.x
 
-            if self.orientation == Orientation.HORIZONTAL:
-                myOffset = offset.y
-            else:
-                myOffset = offset.x
+                ref = self.pathSegment.getPosRef()
+                oldPos = ref.get()
+                ref.set(oldPos+myOffset)
 
-            ref = self.pathSegment.getPosRef()
-            oldPos = ref.get()
-            ref.set(oldPos+myOffset)
+    class Elbow(Component):
 
-    #class Elbow(Component):
+        def __init__(self,beforeSegment,afterSegment):
+            Component.__init__(self,None)
+            self.beforeSegment = beforeSegment
+            self.afterSegment = afterSegment
+        #def __init__(self,parent,pathTurn):
+        #    self.parent = parent
+        #    self.pathTurn = pathTurn
+
+        def draw(self,context):
+            pass
+
+        def getRect(self):
+            toTurn = self.beforeSegment.toTurn
+            return Rect().includePoint( Point(toTurn.x(),toTurn.y()) )
+
+        def move(self,offset,context):
+            self.beforeSegment.move(offset,context)
+            self.afterSegment.move(offset,context)
+
+        #def move(self,offset,context):
+        #    if self.parent.isEditing():
+        #        context.invalidateComponent(self)
+
+        #        xRef = ref.pathTurn.xRef
+        #        yRef = ref.pathTurn.yRef
+
+        #        xRef
+
+        #        if self.pathSegment.orientation == Orientation.HORIZONTAL:
+        #            myOffset = offset.y
+        #        else:
+        #            myOffset = offset.x
+
+        #        ref = self.pathSegment.getPosRef()
+        #        oldPos = ref.get()
+        #        ref.set(oldPos+myOffset)
 
     #    #turnSymbol = \
     #    #      [ ["─","╮"," ","╯"], \
@@ -152,13 +185,22 @@ class PathComponent(Component):
 
     def createChildren(self):
         element = self.element
-        path = Path(element.startOrientation)
+        self.path = Path(element.startOrientation)
         for index in range(len(element.turns)):
-            path.appendTurnRef( ArrayElementReference(element.turns,index) )
+            self.path.appendTurnRef( ArrayElementReference(element.turns,index) )
 
         self.segments = []
-        for pathSegment in path.createSegmentList():
+        for pathSegment in self.path.createSegmentList():
             self.segments.append( PathComponent.Segment( self, pathSegment ) )
+
+        self.elbows = []
+        prevSegment = None
+        for segment in self.segments:
+            if prevSegment!=None:
+                self.elbows.append(PathComponent.Elbow(prevSegment,segment))
+            prevSegment = segment
+
+
 
 
         #self.segments = []
@@ -182,23 +224,24 @@ class PathComponent(Component):
         #self.createSegments(refs,horizontalOrientation)
         #self.createElbows(refs)
 
-    def createSegments(self,refs,startHorizontal):
-        directionMap = { True:Orientation.HORIZONTAL, False:Orientation.VERTICAL }
-        for index in range(len(refs)-2):
-            self.segments.append( PathComponent.Segment(self,refs[index],refs[index+1],refs[index+2],directionMap[startHorizontal]) )
-            startHorizontal = 1 - startHorizontal
+    #def createSegments(self,refs,startHorizontal):
+    #    directionMap = { True:Orientation.HORIZONTAL, False:Orientation.VERTICAL }
+    #    for index in range(len(refs)-2):
+    #        self.segments.append( PathComponent.Segment(self,refs[index],refs[index+1],refs[index+2],directionMap[startHorizontal]) )
+    #        startHorizontal = 1 - startHorizontal
 
-    def createElbows(self,refs):
-        prevSegment = None
-        for segment in self.segments:
-            if prevSegment:
-                self.elbows.append( PathComponent.Elbow(prevSegment,segment) )
-            prevSegment = segment
+    #def createElbows(self,refs):
+    #    prevSegment = None
+    #    for segment in self.segments:
+    #        if prevSegment:
+    #            self.elbows.append( PathComponent.Elbow(prevSegment,segment) )
+    #        prevSegment = segment
 
     def getRect(self):
         rect = Rect()
         for seg in self.segments:
             rect.unionWith(seg.getRect())
+        #print("returning rect="+str(rect))
         return rect
 
     def draw(self,context):
@@ -209,12 +252,12 @@ class PathComponent(Component):
         #        [" ","╭","─","╰"], \
         #        ["╭"," ","╮","│"] ]
 
-        turns = [80,5,85,30,75,23]
-        path = Path(Orientation.HORIZONTAL)
-        path.setCorners ( [ "╭", "╮", "╰", "╯", "─", "│" ] )
-        for element in range(len(turns)):
-            path.appendTurnRef(ArrayElementReference(turns,element))
-        path.draw(context)
+        #turns = [80,5,85,30,75,23]
+        #path = Path(Orientation.HORIZONTAL)
+        #path.setCorners ( [ "╭", "╮", "╰", "╯", "─", "│" ] )
+        #for element in range(len(turns)):
+        #    path.appendTurnRef(ArrayElementReference(turns,element))
+        self.path.draw(context)
 
     #def draw(self,context):
     #    for seg in self.segments:
@@ -227,8 +270,8 @@ class PathComponent(Component):
         if self.isEditing():
             for segment in self.segments:
                 returnMe.add(segment)
-            for elbow in self.elbows:
-                returnMe.add(elbow)
+            #for elbow in self.elbows:
+            #    returnMe.add(elbow)
         return returnMe
 
     def setSelected(self,selected):

@@ -136,11 +136,10 @@ class Path:
                 return Path.Segment.Snapshot(x,fromY,toY)
 
         def getRect(self):
-            snapshot = self.getSnapshot()
-            if self.orientation==Orientation.HORIZONTAL:
-                return Rect(snapshot.fro,snapshot.pos,snapshot.to,snapshot.pos)
-            else:
-                return Rect(snapshot.pos,snapshot.fro,snapshot.pos,snapshot.to)
+            rect = Rect()
+            rect.includePoint( Point(self.fromTurn.x(),self.fromTurn.y()) )
+            rect.includePoint( Point(self.toTurn.x(),self.toTurn.y()) )
+            return rect
 
     def createSegmentList(self):
         turns = self.createTurnList()
