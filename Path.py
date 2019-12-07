@@ -233,4 +233,17 @@ class Path:
             oldDirection = direction
         self.drawArrow(context,segment,False)
 
+    def move(self,offset,context):
+        if self.initialOrientation == Orientation.HORIZONTAL:
+            xElement = 0
+        else:
+            xElement = 1
 
+        arrayElement = 0
+        for ref in self._elbowRefs:
+            if arrayElement%2 == xElement:
+                elementOffset = offset.x
+            else:
+                elementOffset = offset.y
+            ref.set( ref.get() + elementOffset )
+            arrayElement += 1

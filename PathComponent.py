@@ -19,24 +19,24 @@ class PathComponent(Component):
 
         def move(self,offset,context):
             if self.parent.isEditing():
-                context.invalidateComponent(self.parent)
+                self.forceMove(offset,context)
 
-                if self.pathSegment.orientation == Orientation.HORIZONTAL:
-                    myOffset = offset.y
-                else:
-                    myOffset = offset.x
+        def forceMove(self,offset,context):
+            context.invalidateComponent(self.parent)
 
-                ref = self.pathSegment.getPosRef()
-                oldPos = ref.get()
-                ref.set(oldPos+myOffset)
+            if self.pathSegment.orientation == Orientation.HORIZONTAL:
+                myOffset = offset.y
+            else:
+                myOffset = offset.x
+
+            ref = self.pathSegment.getPosRef()
+            oldPos = ref.get()
+            ref.set(oldPos+myOffset)
 
     class Elbow(Component):
 
-        #def __init__(self,beforeSegment,afterSegment,pathElbow):
         def __init__(self,parent,pathElbow):
             Component.__init__(self,None)
-            #self.beforeSegment = beforeSegment
-            #self.afterSegment = afterSegment
             self.parent = parent
             self.pathElbow = pathElbow
 
@@ -44,8 +44,6 @@ class PathComponent(Component):
             pass
 
         def getRect(self):
-            #toElbow = self.beforeSegment.pathSegment.toElbow
-            #return Rect().includePoint( Point(toElbow.x(),toElbow.y()) )
             return self.pathElbow.getRect()
 
         def move(self,offset,context):
@@ -55,13 +53,6 @@ class PathComponent(Component):
                 oldPoint = self.pathElbow.point()
                 self.pathElbow.xRef.set(oldPoint.x+offset.x)
                 self.pathElbow.yRef.set(oldPoint.y+offset.y)
-
-
-            #if self.beforeSegment:
-            #    self.beforeSegment.move(offset,context)
-            #if self.afterSegment:
-            #    self.afterSegment.move(offset,context)
-
 
     def __init__(self,pathElement):
         Component.__init__(self,pathElement)
@@ -125,18 +116,4 @@ class PathComponent(Component):
             seg.setSelected(selected)
 
     def move(self,offset,context):
-        element = self.element
-        if element.startOrientation == Orientation.HORIZONTAL:
-            xElement = 0
-        else:
-            xElement = 1
-
-        arrayElement = 0
-        for ref in self.refs:
-            if arrayElement%2 == xElement:
-                elementOffset = offset.x
-            else:
-                elementOffset = offset.y
-            ref.set( ref.get() + elementOffset )
-            arrayElement += 1
-
+        self.path.move(offset,context)
