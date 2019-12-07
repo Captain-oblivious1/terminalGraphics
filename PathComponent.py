@@ -32,10 +32,12 @@ class PathComponent(Component):
 
     class Elbow(Component):
 
-        def __init__(self,beforeSegment,afterSegment,pathElbow):
+        #def __init__(self,beforeSegment,afterSegment,pathElbow):
+        def __init__(self,parent,pathElbow):
             Component.__init__(self,None)
-            self.beforeSegment = beforeSegment
-            self.afterSegment = afterSegment
+            #self.beforeSegment = beforeSegment
+            #self.afterSegment = afterSegment
+            self.parent = parent
             self.pathElbow = pathElbow
 
         def draw(self,context):
@@ -47,10 +49,18 @@ class PathComponent(Component):
             return self.pathElbow.getRect()
 
         def move(self,offset,context):
-            if self.beforeSegment:
-                self.beforeSegment.move(offset,context)
-            if self.afterSegment:
-                self.afterSegment.move(offset,context)
+            if self.parent.isEditing():
+                context.invalidateComponent(self.parent)
+
+                oldPoint = self.pathElbow.point()
+                self.pathElbow.xRef.set(oldPoint.x+offset.x)
+                self.pathElbow.yRef.set(oldPoint.y+offset.y)
+
+
+            #if self.beforeSegment:
+            #    self.beforeSegment.move(offset,context)
+            #if self.afterSegment:
+            #    self.afterSegment.move(offset,context)
 
 
     def __init__(self,pathElement):
@@ -84,9 +94,9 @@ class PathComponent(Component):
         self.elbows = []
         prevSegment = None
         for segment in self.segments:
-            self.elbows.append(PathComponent.Elbow(prevSegment,segment,segment.pathSegment.fromElbow))
+            self.elbows.append(PathComponent.Elbow(self,segment.pathSegment.fromElbow))
             prevSegment = segment
-        self.elbows.append(PathComponent.Elbow(prevSegment,None,prevSegment.pathSegment.toElbow))
+        self.elbows.append(PathComponent.Elbow(self,prevSegment.pathSegment.toElbow))
 
 
     def getRect(self):

@@ -16,7 +16,7 @@ class Path:
         self.initialOrientation = initialOrientation
         self.startArrow = Arrow.LINES
         self.endArrow = Arrow.LINES
-        self.corners = Corners.ROUNDED
+        self.corners = Corners.SQUARE
 
     def _setArrow(self,name,value):
         if value==Arrow.NONE:
@@ -204,16 +204,12 @@ class Path:
                 index = 0
             elif endX > otherX:
                 index = 1
-            #if index !=-1 and not isFrom:
-            #    index = 5 - index # swap directions
         else:
             otherY = otherElbow.y()
             if endY < otherY:
                 index = 2
             elif endY > otherY:
                 index = 3
-            #if index!=-1 and not isFrom:
-            #    index = 1 - index # swap directions
         if index != -1:
             context.orChar(endX,endY,self.startArrowCharArray[index])
 
