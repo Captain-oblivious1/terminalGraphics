@@ -1,4 +1,5 @@
 from enum import Enum
+import math
 
 class Point:
     def __init__(self,x,y):
@@ -15,6 +16,19 @@ class Point:
 
     def __sub__(self,right):
         return Point(self.x-right.x,self.y-right.y)
+
+    def length(self):
+        return math.sqrt(self.x*self.x+self.y*self.y)
+
+    def normalize(self):
+        length = self.length()
+        if length==0:
+            return Point(0,0)
+        else:
+            return Point(self.x/length,self.y/length)
+
+    def round(self):
+        return Point(round(self.x),round(self.y))
 
     def __str__(self):
         return "Point("+str(self.x)+","+str(self.y)+")"
@@ -116,14 +130,19 @@ class TextBoxElement(BoxElement):
     def __str__(self):
         return "TextBox:{" + self._attrToStr() + "}"
 
+class Corners(Enum):
+    SQUARE=0
+    ROUNDED=1
+
 class PathElement(Element):
     def __init__(self):
         Element.__init__(self)
         self.startOrientation = 0
         self.turns = []
+        self.corners = Corners.SQUARE
 
     def _attrToStr(self):
-        return Element._attrToStr(self) + ",startPoint=" + str(self.startPoint) + ",startOrientation=" + str(self.startOrientation) + ",turns=" + str(self.turns)
+        return Element._attrToStr(self) + ",startPoint=" + str(self.startPoint) + ",startOrientation=" + str(self.startOrientation) + ",turns=" + str(self.turns) + ",corners=" + str(self.corners)
 
     def __str__(self):
         return "PathElement:{" + self._attrToStr() + "}"
@@ -137,14 +156,15 @@ class ShapeElement(PathElement):
 
 
 class Direction(Enum):
-    RIGHT = 0
-    DOWN = 1
-    LEFT = 2
-    UP = 3
-
-class End(Enum):
     NONE = 0
-    ARROW = 1
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
+    UP = 4
+
+class Arrow(Enum):
+    NONE = 0
+    LINES = 1
     TRIANGLE = 2
 
 class ConnectionPoint:
@@ -152,7 +172,7 @@ class ConnectionPoint:
         self.element = None
         self.side = None
         self.where = None # 0.0 means left/top-most 1.0 is right/bottom most
-        self.end = End.NONE
+        self.end = Arrow.NONE
 
 
 class ConnectorElement(Element):

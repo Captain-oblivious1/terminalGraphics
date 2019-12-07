@@ -43,7 +43,7 @@ class ConnectorComponent(Component):
             connection = self.connection
             element = connection.element
 
-            if connection.end == End.NONE:
+            if connection.end == Arrow.NONE:
                 offset = 1
             else:
                 offset = 0
@@ -98,14 +98,14 @@ class ConnectorComponent(Component):
             connectionPosition = self.getPoint()
             offset = ConnectorComponent.ConnectionPoint.offsetMap[ connection.side ]
 
-            if connection.end == End.NONE:
+            if connection.end == Arrow.NONE:
                 charMap = ConnectorComponent.ConnectionPoint.noneMap
                 char = charMap[ connection.side ]
                 context.orChar(connectionPosition.x,connectionPosition.y,char,self.selected)
             else:
                 connectionPosition += offset # need to dedicate a char to draw the arrow
 
-                if connection.end == End.ARROW:
+                if connection.end == Arrow.LINES:
                     charMap = ConnectorComponent.ConnectionPoint.arrowMap
                 else:
                     charMap = ConnectorComponent.ConnectionPoint.triangleMap
@@ -333,14 +333,14 @@ class ConnectorComponent(Component):
 
         offX, offY = ConnectorComponent.offsetMap[ connection.side ]
 
-        if connection.end == End.NONE:
+        if connection.end == Arrow.NONE:
             context.addString(x,y,ConnectorComponent.noneMap[ connection.side ])
             return (x + offX, y + offY)
         else:
             x += offX
             y += offY
 
-            if connection.end == End.ARROW:
+            if connection.end == Arrow.LINES:
                 theMap = ConnectorComponent.arrowMap
             else:
                 theMap = ConnectorComponent.triangleMap

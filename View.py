@@ -345,54 +345,54 @@ class MovingState(State):
 
 def createTestDiagram():
     diagramElement = Diagram()
-    textBoxElement1 = testTextBox()
-    textBoxElement1.x = 20
-    textBoxElement1.y = 10
-    diagramElement.elements.append(textBoxElement1)
+    #textBoxElement1 = testTextBox()
+    #textBoxElement1.x = 20
+    #textBoxElement1.y = 10
+    #diagramElement.elements.append(textBoxElement1)
 
-    textBoxElement2 = testTextBox()
-    textBoxElement2.x = 60
-    textBoxElement2.y = 20
-    diagramElement.elements.append(textBoxElement2)
+    #textBoxElement2 = testTextBox()
+    #textBoxElement2.x = 60
+    #textBoxElement2.y = 20
+    #diagramElement.elements.append(textBoxElement2)
 
 
-    fromConnectionPoint1 = ConnectionPoint()
-    fromConnectionPoint1.element = textBoxElement1
-    fromConnectionPoint1.side = Direction.RIGHT
-    fromConnectionPoint1.where = 0.5
-    fromConnectionPoint1.end = End.NONE
+    #fromConnectionPoint1 = ConnectionPoint()
+    #fromConnectionPoint1.element = textBoxElement1
+    #fromConnectionPoint1.side = Direction.RIGHT
+    #fromConnectionPoint1.where = 0.5
+    #fromConnectionPoint1.end = Arrow.NONE
 
-    toConnectionPoint1 = ConnectionPoint()
-    toConnectionPoint1.element = textBoxElement2
-    toConnectionPoint1.side = Direction.LEFT
-    toConnectionPoint1.where = 0.25
-    toConnectionPoint1.end = End.TRIANGLE
+    #toConnectionPoint1 = ConnectionPoint()
+    #toConnectionPoint1.element = textBoxElement2
+    #toConnectionPoint1.side = Direction.LEFT
+    #toConnectionPoint1.where = 0.25
+    #toConnectionPoint1.end = Arrow.TRIANGLE
 
-    connectorElement1 = ConnectorElement()
-    connectorElement1.fromConnection = fromConnectionPoint1
-    connectorElement1.toConnection = toConnectionPoint1
-    connectorElement1.controlPoints.append(45)
-    diagramElement.elements.append(connectorElement1)
+    #connectorElement1 = ConnectorElement()
+    #connectorElement1.fromConnection = fromConnectionPoint1
+    #connectorElement1.toConnection = toConnectionPoint1
+    #connectorElement1.controlPoints.append(45)
+    #diagramElement.elements.append(connectorElement1)
 
-    fromConnectionPoint2 = ConnectionPoint()
-    fromConnectionPoint2.element = textBoxElement1
-    fromConnectionPoint2.side = Direction.DOWN
-    fromConnectionPoint2.where = 1.0
-    fromConnectionPoint2.end = End.ARROW
+    #fromConnectionPoint2 = ConnectionPoint()
+    #fromConnectionPoint2.element = textBoxElement1
+    #fromConnectionPoint2.side = Direction.DOWN
+    #fromConnectionPoint2.where = 1.0
+    #fromConnectionPoint2.end = Arrow.LINES
 
-    toConnectionPoint2 = ConnectionPoint()
-    toConnectionPoint2.element = textBoxElement2
-    toConnectionPoint2.side = Direction.UP
-    toConnectionPoint2.where = 0.5
-    toConnectionPoint2.end = End.NONE
+    #toConnectionPoint2 = ConnectionPoint()
+    #toConnectionPoint2.element = textBoxElement2
+    #toConnectionPoint2.side = Direction.UP
+    #toConnectionPoint2.where = 0.5
+    #toConnectionPoint2.end = Arrow.NONE
 
-    connectorElement2 = ConnectorElement()
-    connectorElement2.fromConnection = fromConnectionPoint2
-    connectorElement2.toConnection = toConnectionPoint2
-    connectorElement2.controlPoints.append(19)
-    connectorElement2.controlPoints.append(51)
-    connectorElement2.controlPoints.append(15)
-    diagramElement.elements.append(connectorElement2)
+    #connectorElement2 = ConnectorElement()
+    #connectorElement2.fromConnection = fromConnectionPoint2
+    #connectorElement2.toConnection = toConnectionPoint2
+    #connectorElement2.controlPoints.append(19)
+    #connectorElement2.controlPoints.append(51)
+    #connectorElement2.controlPoints.append(15)
+    #diagramElement.elements.append(connectorElement2)
 
     pathElement = PathElement()
     pathElement.startOrientation = Orientation.HORIZONTAL
