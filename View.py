@@ -396,7 +396,9 @@ def createTestDiagram():
 
     pathElement = PathElement()
     pathElement.startOrientation = Orientation.HORIZONTAL
+    #pathElement.startOrientation = Orientation.VERTICAL
     pathElement.turns = [80,5,85,30,75,24]
+    #pathElement.turns = [5,85,30,75,24]
     diagramElement.elements.append(pathElement)
 
     return diagramElement

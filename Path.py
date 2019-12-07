@@ -26,7 +26,6 @@ class Path:
         elif value==Arrow.TRIANGLE:
             array = Path._triangleArrowArray
         setattr(self,name+"CharArray", array)
-        print("set "+name)
 
     def _setCorners(self,value):
         if value==Corners.SQUARE:
@@ -139,9 +138,8 @@ class Path:
                 toX = self.toElbow.x()
                 minX = min(fromX,toX)
                 maxX = max(fromX,toX)
-                if maxX>minX:
-                    minX+=1
-                    maxX-=1
+                minX+=1
+                maxX-=1
                 y = self.fromElbow.y()
                 return Path.Segment.Snapshot(y,minX,maxX)
             else:
@@ -149,9 +147,8 @@ class Path:
                 toY = self.toElbow.y()
                 minY = min(fromY,toY)
                 maxY = max(fromY,toY)
-                if maxY>minY:
-                    minY+=1
-                    maxY-=1
+                minY+=1
+                maxY-=1
                 x = self.fromElbow.x()
                 return Path.Segment.Snapshot(x,minY,maxY)
 
@@ -232,7 +229,7 @@ class Path:
                 context.orChar(elbow.x(),elbow.y(),self.elbowSymbol[oldDirection.value][direction.value])
 
             snapshot = segment.getSnapshot()
-            if snapshot.fro<snapshot.to:
+            if snapshot.fro<=snapshot.to:
                 if segment.orientation==Orientation.HORIZONTAL:
                     context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to)
                 else:
