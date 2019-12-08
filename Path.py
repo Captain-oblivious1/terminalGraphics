@@ -7,11 +7,10 @@ class Path:
     _squareCorners  = [ "┌", "┐", "└", "┘" ]
     _roundCorners = [ "╭", "╮", "╰", "╯" ]
 
-    def __init__(self,initialOrientation,closed=False):
+    def __init__(self,initialOrientation):
         self._elbowRefs = []
         self.initialOrientation = initialOrientation
         self.corners = Corners.SQUARE
-        self.closed = closed
 
     def _setCorners(self,value):
         if value==Corners.SQUARE:
@@ -68,6 +67,9 @@ class Path:
             return "Elbow{x="+str(self.xRef.get())+",y="+str(self.yRef.get())+"}"
 
     def createElbowList(self):
+        return self.createElbowListFromProvided(self._elbowRefs)
+
+    def createElbowListFromProvided(self,refList):
         elbowList = []
         horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
         first = True
@@ -77,7 +79,8 @@ class Path:
         prevElbow = None
         x=None
         y=None
-        for elbowRef in self._elbowRefs:
+
+        for elbowRef in refList:
 
             if horizontalOrienation:
                 xRef = elbowRef
