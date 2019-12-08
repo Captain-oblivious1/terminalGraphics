@@ -7,25 +7,11 @@ class Path:
     _squareCorners  = [ "┌", "┐", "└", "┘" ]
     _roundCorners = [ "╭", "╮", "╰", "╯" ]
 
-    _noneArrowArray =     [ "╶", "╴", "╷", "╵" ]
-    _linesArrowArray =    [ "<", ">", "∧", "∨" ]
-    _triangleArrowArray = [ "◁", "▷", "△", "▽" ]
-
-    def __init__(self,initialOrientation):
+    def __init__(self,initialOrientation,closed=False):
         self._elbowRefs = []
         self.initialOrientation = initialOrientation
-        self.startArrow = Arrow.LINES
-        self.endArrow = Arrow.LINES
         self.corners = Corners.SQUARE
-
-    def _setArrow(self,name,value):
-        if value==Arrow.NONE:
-            array = Path._noneArrowArray
-        elif value==Arrow.LINES:
-            array = Path._linesArrowArray
-        elif value==Arrow.TRIANGLE:
-            array = Path._triangleArrowArray
-        setattr(self,name+"CharArray", array)
+        self.closed = closed
 
     def _setCorners(self,value):
         if value==Corners.SQUARE:
@@ -47,9 +33,7 @@ class Path:
                 ["╷", tl," ", tr,"│"] ]
 
     def __setattr__(self,name,value):
-        if name=="startArrow" or name=="endArrow":
-            self._setArrow(name,value)
-        elif name=="corners":
+        if name=="corners":
             self._setCorners(value)
         super().__setattr__(name,value)
 
@@ -61,7 +45,6 @@ class Path:
         def __init__(self,xRef,yRef):
             self.xRef = xRef
             self.yRef = yRef
-            #self.char = "#"
 
         class Snapshot:
             def __init__(self,x,y,char):
@@ -82,7 +65,6 @@ class Path:
             return Rect().includePoint(self.point())
 
         def __str__(self):
-            #return "Elbow{x="+str(self.xRef.get())+",y="+str(self.yRef.get())+",char='"+self.char+"'}"
             return "Elbow{x="+str(self.xRef.get())+",y="+str(self.yRef.get())+"}"
 
     def createElbowList(self):
@@ -99,10 +81,8 @@ class Path:
 
             if horizontalOrienation:
                 xRef = elbowRef
-                #x = xRef.get()
             else:
                 yRef = elbowRef
-                #y = yRef.get()
 
             if first:
                 first = False
@@ -184,55 +164,6 @@ class Path:
 
         return segmentList
 
-    def draw(self,context):
-        self.drawSegmentList(context,createSegmentList)
-
-    def drawArrow(self,context,segment,isFrom):
-        if isFrom:
-            otherElbow = segment.toElbow
-            endElbow = segment.fromElbow
-        else:
-            otherElbow = segment.fromElbow
-            endElbow = segment.toElbow
-
-        endX = endElbow.x()
-        endY = endElbow.y()
-        index = -1
-        if segment.orientation == Orientation.HORIZONTAL:
-            otherX = otherElbow.x()
-            if endX < otherX:
-                index = 0
-            elif endX > otherX:
-                index = 1
-        else:
-            otherY = otherElbow.y()
-            if endY < otherY:
-                index = 2
-            elif endY > otherY:
-                index = 3
-        if index != -1:
-            context.orChar(endX,endY,self.startArrowCharArray[index])
-
-    def drawSegmentList(self,context,segmentList):
-        first = True
-        for segment in segmentList:
-            direction = segment.direction()
-            if first:
-                self.drawArrow(context,segment,True)
-                first = False
-            else:
-                elbow = segment.fromElbow
-                context.orChar(elbow.x(),elbow.y(),self.elbowSymbol[oldDirection.value][direction.value])
-
-            snapshot = segment.getSnapshot()
-            if snapshot.fro<=snapshot.to:
-                if segment.orientation==Orientation.HORIZONTAL:
-                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to)
-                else:
-                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to)
-            oldDirection = direction
-        self.drawArrow(context,segment,False)
-
     def move(self,offset,context):
         if self.initialOrientation == Orientation.HORIZONTAL:
             xElement = 0
@@ -247,3 +178,9 @@ class Path:
                 elementOffset = offset.y
             ref.set( ref.get() + elementOffset )
             arrayElement += 1
+
+    def draw(self,context):
+        self.drawSegmentList(context,createSegmentList)
+
+    def drawSegmentList(self,context,createSegmentList):
+        pass  #subclass draws how it sees fit
