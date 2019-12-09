@@ -30,6 +30,12 @@ class Point:
     def round(self):
         return Point(round(self.x),round(self.y))
 
+    def __eq__(self,right):
+        return right!=None and self.x==right.x and self.y==right.y
+
+    def __ne__(self,right):
+        return not self.__eq__(right)
+
     def __str__(self):
         return "Point("+str(self.x)+","+str(self.y)+")"
 

@@ -2,3 +2,4 @@
 
 export TERM=xterm-1003
 python View.py
+#python -m cProfile View.py

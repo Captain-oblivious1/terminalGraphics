@@ -326,23 +326,24 @@ class MovingState(State):
         self.editor.setState(IdleState(self.editor,self.context,self.diagramComponent))
 
     def mouseMoved(self, x, y):
-
-        # Invalidate the location where the connectors were (to erase them if necessary)
-        for component in self.affectedConnectors:
-            self.context.invalidateComponent(component)
-
         newPoint = Point(x,y)
         offset = newPoint - self.lastPoint
-        for component in self.selectedComponents:
-            self.context.invalidateComponent(component)
-            component.move(offset,self.context)
-            self.context.invalidateComponent(component)
+        if offset!=Point(0,0):
 
-        self.lastPoint = newPoint
+            # Invalidate the location where the connectors were (to erase them if necessary)
+            for component in self.affectedConnectors:
+                self.context.invalidateComponent(component)
 
-        # Invalidate the new location where the connectors are now
-        for component in self.affectedConnectors:
-            self.context.invalidateComponent(component)
+            for component in self.selectedComponents:
+                self.context.invalidateComponent(component)
+                component.move(offset,self.context)
+                self.context.invalidateComponent(component)
+
+            self.lastPoint = newPoint
+
+            # Invalidate the new location where the connectors are now
+            for component in self.affectedConnectors:
+                self.context.invalidateComponent(component)
 
 def createTestDiagram():
     diagramElement = Diagram()

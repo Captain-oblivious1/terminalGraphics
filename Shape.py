@@ -68,11 +68,8 @@ class Shape(Path):
 
         def didCross(self,x,y):
             for segment in self.verticals:
-                #print("pos="+str(segment.pos)+" fro="+str(segment.fro)+" to="+str(segment.to)+" x="+str(x)+" y="+str(y))
                 if x>segment.pos and (x-1)<segment.pos and y>segment.fro and y<segment.to:
-                    #print("returning True at x="+str(x)+" y="+str(y))
                     return True
-            #print("returning False at x="+str(x)+" y="+str(y))
             return False
 
     # mask[TL][TR][BL][BR]
@@ -114,13 +111,9 @@ class Shape(Path):
 
         rect = Shape.getRect(segmentList)
         prevRow = [False] * (rect.width() + 1)
-        #for col in range(rect.width()+1):
-        #    print( str(col%10), end='')
-        #print("")
         for row in range(rect.height()):
             y = rect.y()+row
             testY = y + .5
-            #print("row="+str(row)+" y="+str(y)+" testY="+str(testY))
             prevInShape = False
             inShape = False
             for col in range(rect.width()):
@@ -130,22 +123,12 @@ class Shape(Path):
                 if crossed:
                     inShape = not inShape
                 maskChar = Shape.maskCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
-                #if context.readChar(x,y)=="c":
-                #    print("About to do C maskChar='"+maskChar+"' col="+str(col))
-                #    print("tl="+str(prevRow[col])+" tr="+str(prevRow[col+1])+" bl="+str(prevInShape)+" br="+str(inShape))
-                #print("maskChar='"+maskChar+"'")
                 context.andChar(x,y,maskChar)
-                #if col==3:
-                    #return
                 borderChar = Shape.borderCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
                 if borderChar:
                     context.orChar(x,y,borderChar)
-                #context.orChar(x,y,"#" if inShape else "@")    
                 prevRow[col] = prevInShape
                 prevInShape= inShape
-            #for col in range(rect.width()+1):
-            #    print("T" if prevRow[col] else "F", end='')
-            #print("")
 
     def drawUnfilled(self,context,segmentList):
         oldDirection = segmentList[-1].direction()
