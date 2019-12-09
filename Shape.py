@@ -67,10 +67,11 @@ class Shape(Path):
                     self.verticals.append(snapshot)
 
         def didCross(self,x,y):
+            crossCount = 0
             for segment in self.verticals:  #added = to conditions to avoid floating point math
                 if x>=segment.pos and (x-1)<segment.pos and y>=segment.fro and y<segment.to:
-                    return True
-            return False
+                    crossCount += 1
+            return crossCount%2
 
     # mask[TL][TR][BL][BR]
     mask = \
@@ -83,7 +84,7 @@ class Shape(Path):
             [ [ "▄", "▖" ],     \
               [ "▗", " " ] ] ] ]
 
-    # mask[TL][TR][BL][BR]
+    # border[TL][TR][BL][BR]
     border = \
         [ [ [ [None, "┌" ],     \
               [ "┐", "─" ] ],   \
