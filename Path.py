@@ -10,7 +10,8 @@ class Path:
     def __init__(self,initialOrientation):
         self._elbowRefs = []
         self.initialOrientation = initialOrientation
-        self.corners = Corners.SQUARE
+        #self.corners = Corners.SQUARE
+        self.corners = Corners.ROUNDED
 
     def _setCorners(self,value):
         if value==Corners.SQUARE:
@@ -22,8 +23,6 @@ class Path:
         tr = array[1]
         bl = array[2]
         br = array[3]
-        h =  "─"
-        v =  "│"
         self.elbowSymbol = \
               [ [" ","╶","╷","╴","╵"],
                 ["╴","─", tr," ", br],  \

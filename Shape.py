@@ -5,6 +5,31 @@ class Shape(Path):
          Path.__init__(self,initialOrientation)
          self.filled = filled
 
+    def __setattr__(self,name,value):
+        if name=="corners":
+            self._setCorners(value)
+        super().__setattr__(name,value)
+
+    def _setCorners(self,value):
+        super()._setCorners(value)
+        if value==Corners.SQUARE:
+            array = Path._squareCorners
+        else:
+            array = Path._roundCorners
+        tl = array[0]
+        tr = array[1]
+        bl = array[2]
+        br = array[3]
+        self.border = \
+            [ [ [ [None, tl  ],    \
+                  [  tr, "─" ] ],  \
+                [ [  bl, "│" ],    \
+                  [ "┼", br] ], ], \
+              [ [ [  br, "┼" ],    \
+                  [ "│", bl  ] ],  \
+                [ [ "─", tr  ],    \
+                  [  tl, " " ] ] ] ]
+
     def createElbowList(self):
         if not self.testIfClosed():
             refList = self._elbowRefs.copy()
@@ -12,20 +37,19 @@ class Shape(Path):
         else:
             refList = self._elbowRefs
         elbowList = self.createElbowListFromProvided(refList)
-        if self.initialOrientation==Orientation.HORIZONTAL: 
-            xRef = refList[0]
-            yRef = refList[-1]
-        else:
-            xRef = refList[-1]
-            yRef = refList[0]
-        elbowList.append( Path.Elbow(xRef,yRef) )
+        #if self.initialOrientation==Orientation.HORIZONTAL: 
+        #    xRef = refList[0]
+        #    yRef = refList[-1]
+        #else:
+        #    xRef = refList[-1]
+        #    yRef = refList[0]
+        #elbowList.append( Path.Elbow(xRef,yRef) )
         return elbowList
 
     def createSegmentList(self):
         segmentList = super().createSegmentList()
         segmentList[0].fromElbow = segmentList[-1].toElbow
         return segmentList
-
 
     def testIfClosed(self):
         refList = self._elbowRefs
@@ -63,7 +87,6 @@ class Shape(Path):
             for segment in segmentList:
                 if segment.orientation==Orientation.VERTICAL:
                     snapshot = segment.getSnapshot(True)
-                    #print("adding vertical x="+str(snapshot.pos)+" from="+str(snapshot.fro)+" to="+str(snapshot.to))
                     self.verticals.append(snapshot)
 
         def didCross(self,x,y):
@@ -84,22 +107,11 @@ class Shape(Path):
             [ [ "▄", "▖" ],     \
               [ "▗", " " ] ] ] ]
 
-    # border[TL][TR][BL][BR]
-    border = \
-        [ [ [ [None, "┌" ],     \
-              [ "┐", "─" ] ],   \
-            [ [ "└", "│" ],     \
-              [ "┼", "┘" ] ], ],\
-          [ [ [ "┘", "┼" ],     \
-              [ "│", "└" ] ],   \
-            [ [ "─", "┐" ],     \
-              [ "┌", " " ] ] ] ]
-
     def maskCharFor(topLeft,topRight,bottomLeft,bottomRight):
         return Shape.mask[topLeft][topRight][bottomLeft][bottomRight]
 
-    def borderCharFor(topLeft,topRight,bottomLeft,bottomRight):
-        return Shape.border[topLeft][topRight][bottomLeft][bottomRight]
+    def borderCharFor(self,topLeft,topRight,bottomLeft,bottomRight):
+        return self.border[topLeft][topRight][bottomLeft][bottomRight]
 
     def getRect(segmentList):
         rect = Rect()
@@ -124,7 +136,7 @@ class Shape(Path):
                 if crossed:
                     inShape = not inShape
                 maskChar = Shape.maskCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
-                borderChar = Shape.borderCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
+                borderChar = self.borderCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
                 context.andChar(x,y,maskChar)
                 if borderChar:
                     context.orChar(x,y,borderChar)
@@ -136,7 +148,8 @@ class Shape(Path):
         for segment in segmentList:
             direction = segment.direction()
             elbow = segment.fromElbow
-            context.orChar(elbow.x(),elbow.y(),self.elbowSymbol[oldDirection.value][direction.value])
+            elbowChar = self.elbowSymbol[oldDirection.value][direction.value]
+            context.orChar(elbow.x(),elbow.y(),elbowChar)
 
             snapshot = segment.getSnapshot()
             if snapshot.fro<=snapshot.to:

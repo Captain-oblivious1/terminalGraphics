@@ -404,6 +404,7 @@ def createTestDiagram():
     #pathElement.turns = [80,5,85,30,75,24,80,5]
     pathElement.startOrientation = Orientation.VERTICAL
     pathElement.turns = [5,23,12,30,20,2]
+    pathElement.corners = Corners.ROUNDED
     diagramElement.elements.append(pathElement)
 
     return diagramElement
