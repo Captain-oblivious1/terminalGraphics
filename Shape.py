@@ -67,8 +67,8 @@ class Shape(Path):
                     self.verticals.append(snapshot)
 
         def didCross(self,x,y):
-            for segment in self.verticals:
-                if x>segment.pos and (x-1)<segment.pos and y>segment.fro and y<segment.to:
+            for segment in self.verticals:  #added = to conditions to avoid floating point math
+                if x>=segment.pos and (x-1)<segment.pos and y>=segment.fro and y<segment.to:
                     return True
             return False
 
@@ -113,18 +113,18 @@ class Shape(Path):
         prevRow = [False] * (rect.width() + 1)
         for row in range(rect.height()):
             y = rect.y()+row
-            testY = y + .5
+            testY = y #+ .5
             prevInShape = False
             inShape = False
             for col in range(rect.width()):
                 x = rect.x()+col
-                testX = x + .5
+                testX = x #+ .5
                 crossed = fillSnapshot.didCross(testX,testY)
                 if crossed:
                     inShape = not inShape
                 maskChar = Shape.maskCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
-                context.andChar(x,y,maskChar)
                 borderChar = Shape.borderCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
+                context.andChar(x,y,maskChar)
                 if borderChar:
                     context.orChar(x,y,borderChar)
                 prevRow[col] = prevInShape

@@ -35,7 +35,7 @@ boxArray = [
     [ [ "━", "┯", "┳"], [ "┷", "┿", "╈"], [ "┻", "╇", "╋"] ] ] ]
 
 # I made up a scheme that allows me to create box characters by 
-# or-ing and and-ing other characters.  I assign each chacater a
+# or-ing and and-ing other characters.  I assign each character a
 # value based an integer that has "pixels" activated.  The follow
 # indicates what bits represent what pixel.
 #    ┌──┰──┬──┐      All box characters can be created by bitwise
@@ -50,9 +50,9 @@ boxArray = [
 #    │ 3│ 2│ 1┃      "╷" = 0x422
 #    └──┴──┴──┚      "╻" = 0xE77
 # (I blew off the double line versions because there are no
-# unicode characters that mix and match them.  For example
+# Unicode characters that mix and match them.  For example
 # I can simulate or-ing "│" with "━" by using the "┿" char.
-# But there is no equivilent for the or of "║" and "━". Only
+# But there is no equivalent for the or of "║" and "━". Only
 # "║" and "─" (which is "╫").  I think thicker lines is more
 # useful than double lines.  Double lines look too DOSy.
 
@@ -85,7 +85,7 @@ def intializeMaps():
     charToHexMap["▖"]=0x1CE6
     charToHexMap["▗"]=0x73B
 
-    charToHexMap["▙"]=0x1B9CFFF
+    charToHexMap["▙"]=0x1B9FFF
     charToHexMap["▛"]=0x1FFFE6
     charToHexMap["▜"]=0x1FFF3B
     charToHexMap["▟"]=0xCFFFF
@@ -348,6 +348,8 @@ class MovingState(State):
 def createTestDiagram():
     diagramElement = Diagram()
     textBoxElement1 = testTextBox()
+    #textBoxElement1.x = 0
+    #textBoxElement1.y = 20
     textBoxElement1.x = 20
     textBoxElement1.y = 10
     diagramElement.elements.append(textBoxElement1)
