@@ -115,14 +115,15 @@ class Path:
             else:
                 return self.fromElbow.xRef
 
-        def getSnapshot(self):
+        def getSnapshot(self,fullLength=False):
             if self.orientation==Orientation.HORIZONTAL:
                 fromX = self.fromElbow.x()
                 toX = self.toElbow.x()
                 minX = min(fromX,toX)
                 maxX = max(fromX,toX)
-                minX+=1
-                maxX-=1
+                if not fullLength:
+                    minX+=1
+                    maxX-=1
                 y = self.fromElbow.y()
                 return Path.Segment.Snapshot(y,minX,maxX)
             else:
@@ -130,8 +131,9 @@ class Path:
                 toY = self.toElbow.y()
                 minY = min(fromY,toY)
                 maxY = max(fromY,toY)
-                minY+=1
-                maxY-=1
+                if not fullLength:
+                    minY+=1
+                    maxY-=1
                 x = self.fromElbow.x()
                 return Path.Segment.Snapshot(x,minY,maxY)
 

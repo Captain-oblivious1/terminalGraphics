@@ -157,9 +157,10 @@ class Context:
         self.addString(x,y,writeMe,isBold)
 
     def andChar(self,x,y,char,isBold=False):
-        existing = self.readChar(x,y)
-        writeMe = andChars(existing,char)
-        self.addString(x,y,writeMe,isBold)
+        if char!="█":
+            existing = self.readChar(x,y)
+            writeMe = andChars(existing,char)
+            self.addString(x,y,writeMe,isBold)
 
     def drawVerticalLine(self,x,fro=0,to=None,isBold=False):
         if to==None:
@@ -345,15 +346,15 @@ class MovingState(State):
 
 def createTestDiagram():
     diagramElement = Diagram()
-    #textBoxElement1 = testTextBox()
-    #textBoxElement1.x = 20
-    #textBoxElement1.y = 10
-    #diagramElement.elements.append(textBoxElement1)
+    textBoxElement1 = testTextBox()
+    textBoxElement1.x = 20
+    textBoxElement1.y = 10
+    diagramElement.elements.append(textBoxElement1)
 
-    #textBoxElement2 = testTextBox()
-    #textBoxElement2.x = 60
-    #textBoxElement2.y = 20
-    #diagramElement.elements.append(textBoxElement2)
+    textBoxElement2 = testTextBox()
+    textBoxElement2.x = 60
+    textBoxElement2.y = 20
+    diagramElement.elements.append(textBoxElement2)
 
 
     #fromConnectionPoint1 = ConnectionPoint()
@@ -399,7 +400,7 @@ def createTestDiagram():
     #pathElement.turns = [80,5,85,30,75,24]
     #pathElement.turns = [80,5,85,30,75,24,80,5]
     pathElement.startOrientation = Orientation.VERTICAL
-    pathElement.turns = [5,30,10,40,20,2]
+    pathElement.turns = [5,23,12,30,20,2]
     diagramElement.elements.append(pathElement)
 
     return diagramElement
