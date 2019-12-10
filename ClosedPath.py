@@ -1,7 +1,7 @@
 from Path import *
 
 class ClosedPath(Path):
-    def __init__(self,initialOrientation,filled=True):
+    def __init__(self,initialOrientation,filled=False):
          super().__init__(initialOrientation)
          self.filled = filled
 

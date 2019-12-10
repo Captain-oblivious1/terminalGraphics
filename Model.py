@@ -138,11 +138,15 @@ class TextBoxElement(BoxElement):
 
 class Corners(Enum):
     SQUARE=0
-    ROUNDED=1
+    ROUND=1
 
 class PathType(Enum):
     CLOSED = 0
     OPEN = 1
+
+class Fill(Enum):
+    FILLED = 0
+    UNFILLED = 1
 
 class PathElement(Element):
     def __init__(self):
@@ -151,6 +155,7 @@ class PathElement(Element):
         self.turns = []
         self.corners = Corners.SQUARE
         self.pathType = PathType.CLOSED
+        self.fill = Fill.UNFILLED
 
     def _attrToStr(self):
         return Element._attrToStr(self) + ",startPoint=" + str(self.startPoint) + ",startOrientation=" + str(self.startOrientation) + ",turns=" + str(self.turns) + ",corners=" + str(self.corners)

@@ -400,16 +400,19 @@ def createTestDiagram():
     #connectorElement2.controlPoints.append(15)
     #diagramElement.elements.append(connectorElement2)
 
-    pathElement = PathElement()
-    pathElement.pathType = PathType.CLOSED #OPEN
+    pathElement1 = PathElement()
+    pathElement1.pathType = PathType.CLOSED #OPEN
+    pathElement1.startOrientation = Orientation.VERTICAL
+    pathElement1.turns = [5,23,12,30,20,2]
+    pathElement1.corners = Corners.ROUND
+    diagramElement.elements.append(pathElement1)
 
-    #pathElement.startOrientation = Orientation.HORIZONTAL
-    #pathElement.turns = [80,5,85,30,75,24]
-    #pathElement.turns = [80,5,85,30,75,24,80,5]
-    pathElement.startOrientation = Orientation.VERTICAL
-    pathElement.turns = [5,23,12,30,20,2]
-    pathElement.corners = Corners.ROUNDED
-    diagramElement.elements.append(pathElement)
+    pathElement2 = PathElement()
+    pathElement2.pathType = PathType.CLOSED #OPEN
+    pathElement2.startOrientation = Orientation.HORIZONTAL
+    pathElement2.turns = [40,20,50,30]
+    pathElement2.corners = Corners.SQUARE
+    diagramElement.elements.append(pathElement2)
 
     return diagramElement
 
@@ -423,9 +426,11 @@ def createDiagramComponent(diagramElement):
             component = ConnectorComponent(element)
         elif type(element) is PathElement:
             if element.pathType == PathType.CLOSED:
-                pathRenderer = ClosedPath(element.startOrientation)
+                fill = element.fill == Fill.FILLED
+                pathRenderer = ClosedPath(element.startOrientation,fill)
             else:
                 pathRenderer = OpenPath(element.startOrientation)
+            pathRenderer.corners = Corners.SQUARE
             component = PathComponent(element,pathRenderer)
 
         diagramComponent.components.append(component)

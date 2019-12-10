@@ -11,7 +11,7 @@ class Path:
         self._elbowRefs = []
         self.initialOrientation = initialOrientation
         #self.corners = Corners.SQUARE
-        self.corners = Corners.ROUNDED
+        self.corners = Corners.ROUND
 
     def _setCorners(self,value):
         if value==Corners.SQUARE:
