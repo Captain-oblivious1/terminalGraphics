@@ -140,12 +140,17 @@ class Corners(Enum):
     SQUARE=0
     ROUNDED=1
 
+class PathType(Enum):
+    CLOSED = 0
+    OPEN = 1
+
 class PathElement(Element):
     def __init__(self):
         Element.__init__(self)
         self.startOrientation = 0
         self.turns = []
         self.corners = Corners.SQUARE
+        self.pathType = PathType.CLOSED
 
     def _attrToStr(self):
         return Element._attrToStr(self) + ",startPoint=" + str(self.startPoint) + ",startOrientation=" + str(self.startOrientation) + ",turns=" + str(self.turns) + ",corners=" + str(self.corners)
@@ -176,14 +181,15 @@ class Arrow(Enum):
 class ConnectionPoint:
     def __init__(self):
         self.element = None
-        self.side = None
+        #self.side = None
+        self.segment = 0
         self.where = None # 0.0 means left/top-most 1.0 is right/bottom most
         self.end = Arrow.NONE
 
 
 class ConnectorElement(Element):
     def __init__(self):
-        Element.__init__(self)
+        super.__init__()
         self.fromConnection = None
         self.toConnection = None
         self.controlPoints = [] # ints not actual points.

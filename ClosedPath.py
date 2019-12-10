@@ -1,8 +1,8 @@
 from Path import *
 
-class Shape(Path):
+class ClosedPath(Path):
     def __init__(self,initialOrientation,filled=True):
-         Path.__init__(self,initialOrientation)
+         super().__init__(initialOrientation)
          self.filled = filled
 
     def __setattr__(self,name,value):
@@ -108,7 +108,7 @@ class Shape(Path):
               [ "▗", " " ] ] ] ]
 
     def maskCharFor(topLeft,topRight,bottomLeft,bottomRight):
-        return Shape.mask[topLeft][topRight][bottomLeft][bottomRight]
+        return ClosedPath.mask[topLeft][topRight][bottomLeft][bottomRight]
 
     def borderCharFor(self,topLeft,topRight,bottomLeft,bottomRight):
         return self.border[topLeft][topRight][bottomLeft][bottomRight]
@@ -120,9 +120,9 @@ class Shape(Path):
         return rect
 
     def drawFilled(self,context,segmentList):
-        fillSnapshot = Shape.FillSnapshot(segmentList)
+        fillSnapshot = ClosedPath.FillSnapshot(segmentList)
 
-        rect = Shape.getRect(segmentList)
+        rect = ClosedPath.getRect(segmentList)
         prevRow = [False] * (rect.width() + 1)
         for row in range(rect.height()):
             y = rect.y()+row
@@ -135,7 +135,7 @@ class Shape(Path):
                 crossed = fillSnapshot.didCross(testX,testY)
                 if crossed:
                     inShape = not inShape
-                maskChar = Shape.maskCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
+                maskChar = ClosedPath.maskCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
                 borderChar = self.borderCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
                 context.andChar(x,y,maskChar)
                 if borderChar:

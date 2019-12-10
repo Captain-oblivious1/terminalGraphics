@@ -7,6 +7,8 @@ from Model import *
 from Components import *
 from ConnectorComponent import *
 from PathComponent import *
+from OpenPath import *
+from ClosedPath import *
 from curses import wrapper
 
 # The following is so that I can more easily do more advanced drawing.
@@ -347,17 +349,17 @@ class MovingState(State):
 
 def createTestDiagram():
     diagramElement = Diagram()
-    textBoxElement1 = testTextBox()
-    #textBoxElement1.x = 0
-    #textBoxElement1.y = 20
-    textBoxElement1.x = 20
-    textBoxElement1.y = 10
-    diagramElement.elements.append(textBoxElement1)
+    #textBoxElement1 = testTextBox()
+    ##textBoxElement1.x = 0
+    ##textBoxElement1.y = 20
+    #textBoxElement1.x = 20
+    #textBoxElement1.y = 10
+    #diagramElement.elements.append(textBoxElement1)
 
-    textBoxElement2 = testTextBox()
-    textBoxElement2.x = 60
-    textBoxElement2.y = 20
-    diagramElement.elements.append(textBoxElement2)
+    #textBoxElement2 = testTextBox()
+    #textBoxElement2.x = 60
+    #textBoxElement2.y = 20
+    #diagramElement.elements.append(textBoxElement2)
 
 
     #fromConnectionPoint1 = ConnectionPoint()
@@ -399,6 +401,8 @@ def createTestDiagram():
     #diagramElement.elements.append(connectorElement2)
 
     pathElement = PathElement()
+    pathElement.pathType = PathType.CLOSED #OPEN
+
     #pathElement.startOrientation = Orientation.HORIZONTAL
     #pathElement.turns = [80,5,85,30,75,24]
     #pathElement.turns = [80,5,85,30,75,24,80,5]
@@ -418,7 +422,11 @@ def createDiagramComponent(diagramElement):
         elif type(element) is ConnectorElement:
             component = ConnectorComponent(element)
         elif type(element) is PathElement:
-            component = PathComponent(element)
+            if element.pathType == PathType.CLOSED:
+                pathRenderer = ClosedPath(element.startOrientation)
+            else:
+                pathRenderer = OpenPath(element.startOrientation)
+            component = PathComponent(element,pathRenderer)
 
         diagramComponent.components.append(component)
 

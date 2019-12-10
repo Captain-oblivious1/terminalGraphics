@@ -1,7 +1,7 @@
 from Components import *
 from Path import *
-from Connector import *
-from Shape import *
+#from Connector import *
+#from Shape import *
 from Util import *
 
 class PathComponent(Component):
@@ -56,10 +56,10 @@ class PathComponent(Component):
                 self.pathElbow.xRef.set(oldPoint.x+offset.x)
                 self.pathElbow.yRef.set(oldPoint.y+offset.y)
 
-    def __init__(self,pathElement):
-        Component.__init__(self,pathElement)
+    def __init__(self,pathElement,pathRenderer):
+        super().__init__(pathElement)
         self.setEditing(True)
-        self.createChildren(True)
+        self.createChildren(pathRenderer)
 
     def setEditing(self,editing):
         self.editing = editing
@@ -73,11 +73,11 @@ class PathComponent(Component):
                 return True
         return False
 
-    def createChildren(self,closed):
+    def createChildren(self,path):
         element = self.element
+        self.path = path
         #self.path = Connector(element.startOrientation)
-        self.path = Shape(element.startOrientation)
-        #self.path = Path(element.startOrientation,closed)
+        #self.path = Shape(element.startOrientation)
         for index in range(len(element.turns)):
             self.path.appendElbowReference( ArrayElementReference(element.turns,index) )
 

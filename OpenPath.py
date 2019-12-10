@@ -1,24 +1,24 @@
 from Path import *
 
 
-class Connector(Path):
+class OpenPath(Path):
 
     _noneArrowArray =     [ "╶", "╴", "╷", "╵" ]
     _linesArrowArray =    [ "<", ">", "∧", "∨" ]
     _triangleArrowArray = [ "◁", "▷", "△", "▽" ]
 
     def __init__(self,initialOrientation):
-        Path.__init__(self,initialOrientation)
+        super().__init__(initialOrientation)
         self.startArrow = Arrow.LINES
         self.endArrow = Arrow.LINES
 
     def _setArrow(self,name,value):
         if value==Arrow.NONE:
-            array = Connector._noneArrowArray
+            array = OpenPath._noneArrowArray
         elif value==Arrow.LINES:
-            array = Connector._linesArrowArray
+            array = OpenPath._linesArrowArray
         elif value==Arrow.TRIANGLE:
-            array = Connector._triangleArrowArray
+            array = OpenPath._triangleArrowArray
         setattr(self,name+"CharArray", array)
 
     def __setattr__(self,name,value):
