@@ -3,6 +3,7 @@ from Path import *
 #from Connector import *
 #from Shape import *
 from Util import *
+#from Menu import *
 
 class PathComponent(Component):
 
@@ -34,6 +35,15 @@ class PathComponent(Component):
             ref = self.pathSegment.getPosRef()
             oldPos = ref.get()
             ref.set(oldPos+myOffset)
+
+        def showContextMenu(self,point,context):
+            context.showMenu([["hello",self.hello],["there",self.there]],point)
+
+        def hello(self):
+            print("Hello")
+
+        def there(self):
+            print("There")
 
     class Elbow(Component):
 

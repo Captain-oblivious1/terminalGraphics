@@ -3,6 +3,7 @@
 import os
 import sys
 import curses
+from Menu import *
 from Model import *
 from Components import *
 from ConnectorComponent import *
@@ -199,6 +200,11 @@ class Context:
     def allInvalidatedComponents(self):
         return self.invalidatedComponents
 
+    def showMenu(self,options,point):
+        menu = Menu(options,point)
+        menu.draw(self)
+
+
 class State:
     def __init__(self):
         pass
@@ -218,6 +224,9 @@ class State:
     def mouseReleased(self, x, y):
         pass
         #print("Mouse released to x="+str(x)+" y="+str(y))
+
+    def rightReleased(self, x, y):
+        pass
 
     def keyPressed(self,char):
         pass
@@ -262,6 +271,13 @@ class IdleState(State):
                 self.editor.setState(MovingState(self.editor,self.context,self.diagramComponent,self.startDragPoint))
             else:
                 self.editor.setState(LassoState(self.editor,self.context,self.diagramComponent,self.startDragPoint))
+
+    def rightReleased(self, x, y):
+        point = Point(x,y)
+        clickedOn = self.diagramComponent.componentAt(point)
+        if "showContextMenu" in dir(clickedOn):
+            clickedOn.showContextMenu(point,self.context)
+
 
 class LassoState(State):
     def __init__(self,editor,context,diagramComponent,startDragPoint):
@@ -346,6 +362,17 @@ class MovingState(State):
             # Invalidate the new location where the connectors are now
             for component in self.affectedConnectors:
                 self.context.invalidateComponent(component)
+
+class DialogState(State):
+    def __init__(self,dialogComponent):
+        self.dialogComponent = dialogComponent
+
+    def mousePressed(self, x, y):
+        self.dialogComponent.mousePressed(x,y)
+
+    def mouseReleased(self, x, y):
+        self.dialogComponent.mouseReleased(x,y)
+
 
 def createTestDiagram():
     diagramElement = Diagram()
@@ -482,12 +509,15 @@ class Editor:
             elif event == curses.KEY_MOUSE:
                 #ch = 'Y'
                 _ , mx, my, _, bstate = curses.getmouse()
+                #print("bstate="+str(bstate))
                 if bstate & curses.BUTTON1_CLICKED != 0:
                     self.state.mouseClicked(mx,my)
                 elif bstate & curses.BUTTON1_PRESSED != 0:
                     self.state.mousePressed(mx,my)
                 elif bstate & curses.BUTTON1_RELEASED != 0:
                     self.state.mouseReleased(mx,my)
+                elif bstate & curses.BUTTON3_RELEASED != 0:
+                    self.state.rightReleased(mx,my)
                 else:
                     self.state.mouseMoved(mx,my)
             else:
