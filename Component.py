@@ -25,11 +25,14 @@ class Component:
     def isOnMe(self,point):
         return self.getRect().isInsidePoint(point)
 
-    def getRoot(self):
+    def getTopLevelComponent(self):
         if self.parent==None:
             return self
         else:
-            return self.parent.getRoot()
+            return self.parent.getTopLevelComponent()
+
+    def invalidate(self):
+        self.getTopLevelComponent().invalidateRect( self.getRect() )
 
     #def getDiagram(
 

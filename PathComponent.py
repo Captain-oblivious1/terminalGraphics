@@ -25,7 +25,7 @@ class PathComponent(Component):
                 self.forceMove(offset,context)
 
         def forceMove(self,offset,context):
-            context.invalidateComponent(self.parent)
+            self.parent.invalidate()
 
             if self.pathSegment.orientation == Orientation.HORIZONTAL:
                 myOffset = offset.y
@@ -37,7 +37,7 @@ class PathComponent(Component):
             ref.set(oldPos+myOffset)
 
         def showContextMenu(self,point,context):
-            self.getRoot().showMenu([["hello",self.hello],["there",self.there]],point)
+            self.getTopLevelComponent().showMenu([["hello",self.hello],["there",self.there]],point)
 
         def hello(self):
             print("Hello")
@@ -59,7 +59,7 @@ class PathComponent(Component):
 
         def move(self,offset,context):
             if self.parent.isEditing():
-                context.invalidateComponent(self.parent)
+                self.parent.invalidate()
 
                 oldPoint = self.pathElbow.point()
                 self.pathElbow.xRef.set(oldPoint.x+offset.x)

@@ -23,13 +23,13 @@ class IdleState(State):
         if clickedOn==None or not clickedOn in selectedSet:
             for component in selectedSet:
                 component.setSelected(False)
-                self.context.invalidateComponent(component)
+                component.invalidate()
 
         if clickedOn!=None:
             self.movingComponents = True
             clickedOn.setSelected(True)
             #print("Invalidating clicked on")
-            self.context.invalidateComponent(clickedOn)
+            clickedOn.invalidate()
 
     def mouseReleased(self, x, y):
         self.startDragPoint = None

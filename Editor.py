@@ -135,10 +135,10 @@ class Editor:
         context = self.context = Context(screen)
         self.goIdleState()
 
-        diagramComponent.invalidateAll(context)
+        diagramComponent.invalidateAll()
         diagramComponent.draw(context)
         screen.refresh()
-        context.validateAll()
+        diagramComponent.validateAll()
 
         curses.mouseinterval(0)
 
@@ -172,9 +172,8 @@ class Editor:
             else:
                 self.state.keyPressed(event)
 
-            print("loop")
             diagramComponent.draw(context)
-            context.validateAll()
+            diagramComponent.validateAll()
             screen.refresh()
 
         curses.endwin()

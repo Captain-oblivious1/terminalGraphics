@@ -21,7 +21,7 @@ class LassoState(State):
                 else:
                     component.setSelected(False)
 
-            self.context.invalidateRect( self.oldRect )
+            self.diagramComponent.invalidateRect(self.oldRect)
             self.diagramComponent.setSelectionRect(None)
 
         self.editor.goIdleState()
@@ -35,9 +35,9 @@ class LassoState(State):
 
         rect = Rect.makeRectFromPoints(topLeft,bottomRight)
         self.diagramComponent.setSelectionRect(rect)
-        self.context.invalidateRect(rect)
+        self.diagramComponent.invalidateRect(rect)
         if self.oldRect!=None:
-            self.context.invalidateRect(self.oldRect)
+            self.diagramComponent.invalidateRect(self.oldRect)
         self.oldRect = rect
 
 

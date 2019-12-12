@@ -39,9 +39,9 @@ class MovingState(State):
             #    self.context.invalidateComponent(component)
 
             for component in self.selectedComponents:
-                self.context.invalidateComponent(component)
+                component.invalidate()
                 component.move(offset,self.context)
-                self.context.invalidateComponent(component)
+                component.invalidate()
 
             self.lastPoint = newPoint
 

@@ -7,16 +7,27 @@ class DiagramComponent(Component):
         self.diagramElement = diagramElement
         self.components = []
         self.invalidatedRect = Rect()
-        todo: fill in invalidate rect stuff
         self.selectionRect = None
         self.dialog = None
 
-    def invalidateAll(self,context):
+    def invalidateAll(self):
         for component in self.components:
-            context.invalidateComponent(component)
+            component.invalidate()
+
+    def invalidateRect(self,rect):
+        self.invalidatedRect.unionWith(rect)
+
+    def validateAll(self):
+        self.invalidatedRect = Rect()
+
+    def getInvalidatedRect(self):
+        return self.invalidatedRect
+
+    def allInvalidatedComponents(self):
+        return self.invalidatedComponents
 
     def draw(self,context):
-        invalidatedRect = context.getInvalidatedRect()
+        invalidatedRect = self.getInvalidatedRect()
         context.clearRect(invalidatedRect)
 
         for component in self.components:

@@ -113,7 +113,6 @@ def andChars(char1,char2):
 class Context:
     def __init__(self,window):
         self.window = window
-        self.invalidatedRect = Rect()
 
     def addString(self,x,y,text,bold=False,reverse=False):
         if bold or reverse:
@@ -170,23 +169,4 @@ class Context:
         minX = min(fro,to)
         for i in range(minX,maxX+1):
             self.orChar(i,y,"─",isBold)
-
-    def invalidateComponent(self,component):
-        self.invalidateRect(component.getRect())
-        if "invalidateMe" in dir(component):
-            component.invalidateMe(self)
-
-    def invalidateRect(self,rect):
-        self.invalidatedRect.unionWith(rect)
-
-    def validateAll(self):
-        self.invalidatedRect = Rect()
-
-    def getInvalidatedRect(self):
-        return self.invalidatedRect
-
-    def allInvalidatedComponents(self):
-        return self.invalidatedComponents
-
-
 
