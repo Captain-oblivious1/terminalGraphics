@@ -1,6 +1,16 @@
 from Model import *
 from Point import *
 
+class ConstReference:
+    def __init__(self,value):
+        self.value = value
+
+    def get(self):
+        return self.value
+
+    def set(self,val):
+        pass
+
 class AttrReference:
     def __init__(self,obj,attr):
         self.obj = obj

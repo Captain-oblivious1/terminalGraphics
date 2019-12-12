@@ -37,7 +37,7 @@ class PathComponent(Component):
             ref.set(oldPos+myOffset)
 
         def showContextMenu(self,point,context):
-            context.showMenu([["hello",self.hello],["there",self.there]],point)
+            self.getRoot().showMenu([["hello",self.hello],["there",self.there]],point)
 
         def hello(self):
             print("Hello")

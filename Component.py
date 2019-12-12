@@ -25,6 +25,12 @@ class Component:
     def isOnMe(self,point):
         return self.getRect().isInsidePoint(point)
 
+    def getRoot(self):
+        if self.parent==None:
+            return self
+        else:
+            return self.parent.getRoot()
+
     #def getDiagram(
 
 #class BoxComponent(Component):

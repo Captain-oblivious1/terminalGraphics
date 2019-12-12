@@ -1,11 +1,15 @@
 from Component import *
+from Menu import *
 
 class DiagramComponent(Component):
     def __init__(self,diagramElement):
         super().__init__(None)
         self.diagramElement = diagramElement
         self.components = []
+        self.invalidatedRect = Rect()
+        todo: fill in invalidate rect stuff
         self.selectionRect = None
+        self.dialog = None
 
     def invalidateAll(self,context):
         for component in self.components:
@@ -29,7 +33,12 @@ class DiagramComponent(Component):
                     context.addString(col,row,char,False,True)
 
     def children(self):
-        return self.components
+        if self.dialog!=None:
+            list = [self.dialog]
+            list.extend(self.components)
+        else:
+            list =  self.components
+        return list
 
     def setSelectionRect(self,rect):
         self.selectionRect = rect
@@ -60,4 +69,8 @@ class DiagramComponent(Component):
 
     def isOnMe(self, point):
         return False
+
+    def showMenu(self,options,point):
+        self.dialog = Menu(self,options,point)
+
 

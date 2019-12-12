@@ -38,6 +38,9 @@ class Path:
     def appendElbowReference(self,elbowReference):
         self._elbowRefs.append(elbowReference)
 
+    def appendElbowValue(self,elbowValue):
+        self.appendElbowReference(ConstReference(elbowValue))
+
     class Elbow:
 
         def __init__(self,xRef,yRef):

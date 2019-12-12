@@ -188,9 +188,5 @@ class Context:
     def allInvalidatedComponents(self):
         return self.invalidatedComponents
 
-    def showMenu(self,options,point):
-        menu = Menu(options,point)
-        menu.draw(self)
-
 
 

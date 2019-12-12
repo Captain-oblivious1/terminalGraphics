@@ -172,6 +172,7 @@ class Editor:
             else:
                 self.state.keyPressed(event)
 
+            print("loop")
             diagramComponent.draw(context)
             context.validateAll()
             screen.refresh()

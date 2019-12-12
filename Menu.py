@@ -1,8 +1,9 @@
-from PathComponent import *
 from ClosedPath import *
+from Component import *
 
-class Menu(PathComponent):
-    def __init__(self,options,topLeft):
+class Menu(Component):
+    def __init__(self,parent,options,topLeft):
+        super().__init__(parent)
 
         self.options = options
         self.topLeft = topLeft
@@ -11,16 +12,15 @@ class Menu(PathComponent):
         for option in options:
             maxLen = max(len(option[0]),maxLen)
 
-        pathElement = PathElement()
-        pathElement.pathType = PathType.CLOSED
-        pathElement.startOrientation = Orientation.HORIZONTAL
-        pathElement.turns = [topLeft.x,topLeft.y,topLeft.x+maxLen+1,topLeft.y+len(options)+1]
-        pathElement.corners = Corners.ROUND
-
-        super().__init__(pathElement,ClosedPath(Orientation.HORIZONTAL))
+        self.path = ClosedPath(Orientation.HORIZONTAL,True)
+        self.path.appendElbowValue(topLeft.x)
+        self.path.appendElbowValue(topLeft.y)
+        self.path.appendElbowValue(topLeft.x+maxLen+1)
+        self.path.appendElbowValue(topLeft.y+len(options)+1)
 
     def draw(self,context):
-        super().draw(context)
+        self.path.draw(context)
+
         y = self.topLeft.y + 1
         x = self.topLeft.x + 1
         for option in self.options:
