@@ -1,5 +1,6 @@
 from enum import Enum
 from Model import *
+from Rect import *
 import math
 
 def isHorizontal(side):

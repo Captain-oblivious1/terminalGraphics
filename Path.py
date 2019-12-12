@@ -187,7 +187,7 @@ class Path:
             arrayElement += 1
 
     def draw(self,context):
-        self.drawSegmentList(context,createSegmentList)
+        self.drawSegmentList(context,self.createSegmentList())
 
     def drawSegmentList(self,context,createSegmentList):
         pass  #subclass draws how it sees fit

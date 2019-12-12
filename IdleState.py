@@ -9,6 +9,7 @@ class IdleState(State):
         self.diagramComponent = diagramComponent
         self.startDragPoint = None
         self.movingComponents = False
+        self.clickedOn = None
 
     def mousePressed(self, x, y):
         # Curses does not support testing of shift, ctrl, alt, etc.  So I can't 
@@ -19,6 +20,9 @@ class IdleState(State):
         selectedSet = self.diagramComponent.allSelected()
 
         clickedOn = self.diagramComponent.componentAt(self.startDragPoint)
+
+        if "clickedOn" in dir(clickedOn):
+            self.clickedOn = clickedOn
 
         if clickedOn==None or not clickedOn in selectedSet:
             for component in selectedSet:
@@ -34,6 +38,9 @@ class IdleState(State):
     def mouseReleased(self, x, y):
         self.startDragPoint = None
         self.movingComponents = False
+        if self.clickedOn!=None:
+            self.clickedOn.clickedOn(Point(x,y))
+        self.clickedOn = None
 
     def mouseMoved(self, x, y):
         if self.startDragPoint!=None:

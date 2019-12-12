@@ -4,6 +4,7 @@ from Path import *
 #from Shape import *
 from Util import *
 from Rect import *
+from Menu import *
 
 class PathComponent(Component):
 
@@ -37,13 +38,10 @@ class PathComponent(Component):
             ref.set(oldPos+myOffset)
 
         def showContextMenu(self,point,context):
-            self.getTopLevelComponent().showMenu([["hello",self.hello],["there",self.there]],point)
+            self.getTopLevelComponent().showMenu(Menu(self,["split"],point,self.menuResult))
 
-        def hello(self):
-            print("Hello")
-
-        def there(self):
-            print("There")
+        def menuResult(self,selection):
+            print("menu selected="+str(selection))
 
     class Elbow(Component):
 

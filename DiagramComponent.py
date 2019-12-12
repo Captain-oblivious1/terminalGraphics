@@ -8,7 +8,6 @@ class DiagramComponent(Component):
         self.components = []
         self.invalidatedRect = Rect()
         self.selectionRect = None
-        self.dialog = None
 
     def invalidateAll(self):
         for component in self.components:
@@ -44,12 +43,7 @@ class DiagramComponent(Component):
                     context.addString(col,row,char,False,True)
 
     def children(self):
-        if self.dialog!=None:
-            list = [self.dialog]
-            list.extend(self.components)
-        else:
-            list =  self.components
-        return list
+        return self.components
 
     def setSelectionRect(self,rect):
         self.selectionRect = rect
@@ -81,7 +75,15 @@ class DiagramComponent(Component):
     def isOnMe(self, point):
         return False
 
-    def showMenu(self,options,point):
-        self.dialog = Menu(self,options,point)
+    def showMenu(self,menu):
+        self.components.append(menu)
+        menu.invalidate()
 
+    def clearMenu(self):
+        newComponentList = []
+        for component in self.components:
+            if not issubclass(type(component),Menu):
+                newComponentList.append(component)
+
+        self.components = newComponentList
 
