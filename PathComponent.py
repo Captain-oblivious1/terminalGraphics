@@ -38,10 +38,14 @@ class PathComponent(Component):
             ref.set(oldPos+myOffset)
 
         def showContextMenu(self,point,context):
-            self.getTopLevelComponent().showMenu(Menu(self,["split"],point,self.menuResult))
+            self.getTopLevelComponent().showMenu(Menu(self,["split","join"],point,self.menuResult))
 
-        def menuResult(self,selection):
-            print("menu selected="+str(selection))
+        def menuResult(self,menu):
+            if menu.getSelectedOption()=="split":
+                print("Selected split")
+            elif menu.getSelectedOption()=="join":
+                print("Selected join")
+
 
     class Elbow(Component):
 

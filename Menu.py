@@ -20,6 +20,8 @@ class Menu(Component):
         self.path.appendElbowValue(topLeft.y+len(options)+1)
 
         self.rect = Rect(topLeft.x,topLeft.y,maxLen+2,len(options)+2)
+        self.selectedOption = None
+        self.selectedIndex = -1
 
     def draw(self,context):
         self.path.draw(context)
@@ -33,10 +35,21 @@ class Menu(Component):
     def getRect(self):
         return self.rect
 
+    def getTopLeft(self):
+        return self.topLeft
+
+    def getSelectedOption(self):
+        return self.selectedOption
+
+    def getSelectedIndex(self):
+        return self.selectedIndex
+
     def clickedOn(self,point):
         index = (point-self.topLeft).y - 1
         if index>=0 and index<len(self.options):
-            self.resultFunction(index)
+            self.selectedOption = self.options[index]
+            self.selectedIndex = index
+            self.resultFunction(self)
 
         self.invalidate()
         self.getTopLevelComponent().clearMenu()
