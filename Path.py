@@ -1,6 +1,6 @@
 from Util import *
 from Model import *
-from Components import *
+from Rect import *
 
 class Path:
 

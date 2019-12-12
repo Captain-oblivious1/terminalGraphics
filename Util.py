@@ -1,4 +1,5 @@
 from Model import *
+from Point import *
 
 class AttrReference:
     def __init__(self,obj,attr):

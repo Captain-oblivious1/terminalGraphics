@@ -1,16 +1,16 @@
-from Components import *
+from Component import *
 from Path import *
 #from Connector import *
 #from Shape import *
 from Util import *
-#from Menu import *
+from Rect import *
 
 class PathComponent(Component):
 
     class Segment(Component):
 
         def __init__(self,parent,pathSegment):
-            Component.__init__(self,None)
+            super().__init__(parent)
             self.pathSegment = pathSegment
             self.parent = parent
 
@@ -48,8 +48,7 @@ class PathComponent(Component):
     class Elbow(Component):
 
         def __init__(self,parent,pathElbow):
-            Component.__init__(self,None)
-            self.parent = parent
+            super().__init__(parent)
             self.pathElbow = pathElbow
 
         def draw(self,context):
@@ -66,10 +65,12 @@ class PathComponent(Component):
                 self.pathElbow.xRef.set(oldPoint.x+offset.x)
                 self.pathElbow.yRef.set(oldPoint.y+offset.y)
 
-    def __init__(self,pathElement,pathRenderer):
-        super().__init__(pathElement)
+    def __init__(self,parent,element,renderer):
+        super().__init__(parent)
+        self.element = element
+        self.renderer = renderer
         self.setEditing(True)
-        self.createChildren(pathRenderer)
+        self.createChildren(renderer)
 
     def setEditing(self,editing):
         self.editing = editing
