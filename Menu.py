@@ -13,11 +13,12 @@ class Menu(Component):
         for option in options:
             maxLen = max(len(option),maxLen)
 
-        self.path = ClosedPath(Orientation.HORIZONTAL,True)
-        self.path.appendElbowValue(topLeft.x)
-        self.path.appendElbowValue(topLeft.y)
-        self.path.appendElbowValue(topLeft.x+maxLen+1)
-        self.path.appendElbowValue(topLeft.y+len(options)+1)
+        valArray = [topLeft.x,topLeft.y,topLeft.x+maxLen+1,topLeft.y+len(options)+1]
+        refArray = []
+        for val in valArray:
+            refArray.append(ConstReference(val))
+
+        self.path = ClosedPath(Orientation.HORIZONTAL,refArray,True)
 
         self.rect = Rect(topLeft.x,topLeft.y,maxLen+2,len(options)+2)
         self.selectedOption = None

@@ -37,12 +37,22 @@ class PathComponent(Component):
             oldPos = ref.get()
             ref.set(oldPos+myOffset)
 
+        def split(self,point):
+            pathSegment = self.pathSegment
+            if pathSegment.orientation==Orientation.HORIZONTAL:
+                splitPos = point.x
+            else:
+                splitPos = point.y
+            pathSegment.split(splitPos)
+            self.parent.createChildren()
+
+
         def showContextMenu(self,point,context):
             self.getTopLevelComponent().showMenu(Menu(self,["split","join"],point,self.menuResult))
 
         def menuResult(self,menu):
             if menu.getSelectedOption()=="split":
-                print("Selected split")
+                self.split(menu.getTopLeft())
             elif menu.getSelectedOption()=="join":
                 print("Selected join")
 
@@ -72,7 +82,7 @@ class PathComponent(Component):
         self.element = element
         self.renderer = renderer
         self.setEditing(True)
-        self.createChildren(renderer)
+        self.createChildren()
 
     def setEditing(self,editing):
         self.editing = editing
@@ -86,15 +96,19 @@ class PathComponent(Component):
                 return True
         return False
 
-    def createChildren(self,path):
+    def createChildren(self):
+        self.createChildrenRenderer(self.renderer)
+
+    def createChildrenRenderer(self,path):
         element = self.element
         self.path = path
         #self.path = Connector(element.startOrientation)
         #self.path = Shape(element.startOrientation)
-        for index in range(len(element.turns)):
-            self.path.appendElbowReference( ArrayElementReference(element.turns,index) )
+        #refArray = []
+        #for index in range(len(element.turns)):
+        #    refArray.append(ArrayElementReference(element.turns,index))
 
-        self.segmentList = self.path.createSegmentList()
+        self.segmentList = self.path.getSegmentList()
         self.segments = []
         for pathSegment in self.segmentList:
             self.segments.append( PathComponent.Segment( self, pathSegment ) )

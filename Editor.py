@@ -90,10 +90,13 @@ def createDiagramComponent(diagramElement):
             component = ConnectorComponent(diagramComponent)
         elif type(element) is PathElement:
             if element.pathType == PathType.CLOSED:
+                refArray = []
+                for val in element.turns:
+                   refArray.append( VarReference(val) )
                 fill = element.fill == Fill.FILLED
-                renderer = ClosedPath(element.startOrientation,fill)
+                renderer = ClosedPath(element.startOrientation,refArray,fill)
             else:
-                renderer = OpenPath(element.startOrientation)
+                renderer = OpenPath(element.startOrientation,refArray)
             renderer.corners = Corners.SQUARE
             component = PathComponent(diagramComponent,element,renderer)
 

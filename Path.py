@@ -7,11 +7,12 @@ class Path:
     _squareCorners  = [ "┌", "┐", "└", "┘" ]
     _roundCorners = [ "╭", "╮", "╰", "╯" ]
 
-    def __init__(self,initialOrientation):
-        self._elbowRefs = []
+    def __init__(self,initialOrientation,elbowRefs):
+        self._elbowRefs = elbowRefs
         self.initialOrientation = initialOrientation
         #self.corners = Corners.SQUARE
         self.corners = Corners.ROUND
+        self.segments = self.createSegmentList(elbowRefs)
 
     def _setCorners(self,value):
         if value==Corners.SQUARE:
@@ -35,11 +36,11 @@ class Path:
             self._setCorners(value)
         super().__setattr__(name,value)
 
-    def appendElbowReference(self,elbowReference):
-        self._elbowRefs.append(elbowReference)
+    #def appendElbowReference(self,elbowReference):
+    #    self._elbowRefs.append(elbowReference)
 
-    def appendElbowValue(self,elbowValue):
-        self.appendElbowReference(ConstReference(elbowValue))
+    #def appendElbowValue(self,elbowValue):
+    #    self.appendElbowReference(ConstReference(elbowValue))
 
     class Elbow:
 
@@ -68,10 +69,7 @@ class Path:
         def __str__(self):
             return "Elbow{x="+str(self.xRef.get())+",y="+str(self.yRef.get())+"}"
 
-    def createElbowList(self):
-        return self.createElbowListFromProvided(self._elbowRefs)
-
-    def createElbowListFromProvided(self,refList):
+    def createElbowList(self,refList):
         elbowList = []
         horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
         first = True
@@ -100,7 +98,8 @@ class Path:
         return elbowList
 
     class Segment:
-        def __init__(self):
+        def __init__(self,parent):
+            self.parent = parent
             self.fromElbow = None
             self.toElbow = None
             self.orientation = None
@@ -149,13 +148,16 @@ class Path:
         def direction(self):
             return vectorToDirection(self.toElbow.point()-self.fromElbow.point())
 
-    def createSegmentList(self):
-        elbows = self.createElbowList()
+        def split(self,pos):
+            print("splitting at pos="+str(pos))
+
+    def createSegmentList(self,elbowRefs):
+        elbows = self.createElbowList(elbowRefs)
         segmentList = []
         prevElbow = None
         for elbow in elbows:
             if prevElbow:
-                segment = Path.Segment()
+                segment = Path.Segment(self)
                 segment.fromElbow = prevElbow
                 segment.toElbow = elbow
                 if prevElbow.x()==elbow.x():
@@ -170,6 +172,9 @@ class Path:
             prevElbow = elbow
 
         return segmentList
+
+    def getSegmentList(self):
+        return self.segments
 
     def move(self,offset,context):
         if self.initialOrientation == Orientation.HORIZONTAL:
@@ -187,7 +192,7 @@ class Path:
             arrayElement += 1
 
     def draw(self,context):
-        self.drawSegmentList(context,self.createSegmentList())
+        self.drawSegmentList(context,self.segments)
 
     def drawSegmentList(self,context,createSegmentList):
         pass  #subclass draws how it sees fit

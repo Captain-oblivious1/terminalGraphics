@@ -11,6 +11,13 @@ class ConstReference:
     def set(self,val):
         pass
 
+class VarReference(ConstReference):
+    def __init__(self,value):
+        super().__init__(value)
+
+    def set(self,val):
+        self.value = val
+
 class AttrReference:
     def __init__(self,obj,attr):
         self.obj = obj

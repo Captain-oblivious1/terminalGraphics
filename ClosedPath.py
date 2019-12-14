@@ -1,8 +1,8 @@
 from Path import *
 
 class ClosedPath(Path):
-    def __init__(self,initialOrientation,filled=False):
-         super().__init__(initialOrientation)
+    def __init__(self,initialOrientation,elbowRefs,filled=False):
+         super().__init__(initialOrientation,elbowRefs)
          self.filled = filled
 
     def __setattr__(self,name,value):
@@ -30,13 +30,13 @@ class ClosedPath(Path):
                 [ [ "─", tr  ],    \
                   [  tl, " " ] ] ] ]
 
-    def createElbowList(self):
-        if not self.testIfClosed():
+    def createElbowList(self,refList):
+        if not self.testIfClosed(refList):
             refList = self._elbowRefs.copy()
             self.closePath(refList)
         else:
             refList = self._elbowRefs
-        elbowList = self.createElbowListFromProvided(refList)
+        elbowList = super().createElbowList(refList)
         #if self.initialOrientation==Orientation.HORIZONTAL: 
         #    xRef = refList[0]
         #    yRef = refList[-1]
@@ -46,13 +46,12 @@ class ClosedPath(Path):
         #elbowList.append( Path.Elbow(xRef,yRef) )
         return elbowList
 
-    def createSegmentList(self):
-        segmentList = super().createSegmentList()
+    def createSegmentList(self,refList):
+        segmentList = super().createSegmentList(refList)
         segmentList[0].fromElbow = segmentList[-1].toElbow
         return segmentList
 
-    def testIfClosed(self):
-        refList = self._elbowRefs
+    def testIfClosed(self,refList):
         refLen = len(refList)
         if refLen<5:
             return False
