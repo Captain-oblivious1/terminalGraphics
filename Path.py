@@ -37,7 +37,7 @@ class Path:
         super().__setattr__(name,value)
 
     #def appendElbowReference(self,elbowReference):
-    #    self._elbowRefs.append(elbowReference)
+    #    self._elbowRefs.append(elbowReference) = segmentIndex+2)
 
     #def appendElbowValue(self,elbowValue):
     #    self.appendElbowReference(ConstReference(elbowValue))
@@ -149,23 +149,38 @@ class Path:
             return vectorToDirection(self.toElbow.point()-self.fromElbow.point())
 
         def split(self,pos):
-            print("splitting at pos="+str(pos))
+            segmentIndex = 0
+            newSegments = []
+            for segment in self.parent.segments:
+                if segment == self:
+                    break
+                segmentIndex+=1
+
+            elbowRefs = self.parent._elbowRefs
+            currentElbowRefLen = len(elbowRefs)
+            splitIndex = (segmentIndex+1)%currentElbowRefLen
+            insertIndex = (segmentIndex+2)%currentElbowRefLen
+            elbowRefs.insert(insertIndex,VarReference(elbowRefs[splitIndex].get()))
+            elbowRefs.insert(insertIndex,VarReference(pos))
+
+            self.parent.segments = self.parent.createSegmentList(elbowRefs)
 
     def createSegmentList(self,elbowRefs):
         elbows = self.createElbowList(elbowRefs)
         segmentList = []
         prevElbow = None
+        horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
         for elbow in elbows:
             if prevElbow:
                 segment = Path.Segment(self)
                 segment.fromElbow = prevElbow
                 segment.toElbow = elbow
-                if prevElbow.x()==elbow.x():
-                    segment.orientation = Orientation.VERTICAL
-                elif  prevElbow.y()==elbow.y():
+                if horizontalOrienation:
                     segment.orientation = Orientation.HORIZONTAL
                 else:
-                    raise Exception("segments are neither horizontal or vertical")
+                    segment.orientation = Orientation.VERTICAL
+
+                horizontalOrienation = not horizontalOrienation
 
                 segmentList.append( segment )
 
