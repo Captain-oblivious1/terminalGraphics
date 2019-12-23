@@ -148,13 +148,16 @@ class Path:
         def direction(self):
             return vectorToDirection(self.toElbow.point()-self.fromElbow.point())
 
-        def split(self,pos):
+        def getMySegmentIndex(self):
             segmentIndex = 0
-            newSegments = []
             for segment in self.parent.segments:
                 if segment == self:
                     break
                 segmentIndex+=1
+            return segmentIndex
+
+        def split(self,pos):
+            segmentIndex = self.getMySegmentIndex()
 
             elbowRefs = self.parent._elbowRefs
             currentElbowRefLen = len(elbowRefs)
@@ -164,6 +167,23 @@ class Path:
             elbowRefs.insert(insertIndex,VarReference(pos))
 
             self.parent.segments = self.parent.createSegmentList(elbowRefs)
+
+        def join(self,pos):
+            # 5 0  1  2  3  4
+            #[5,23,12,30,20,2]
+            #[y, x, y, x, y,x]
+
+            # 5 0  1  2  3  4
+            #[5,23,pos,2]
+            elbowRefs = self.parent._elbowRefs
+
+            segmentIndex = self.getMySegmentIndex()
+            for a in range(3):
+                del elbowRefs[(segmentIndex)%len(elbowRefs)]
+            elbowRefs.insert((segmentIndex)%len(elbowRefs),VarReference(pos))
+
+            self.parent.segments = self.parent.createSegmentList(elbowRefs)
+
 
     def createSegmentList(self,elbowRefs):
         elbows = self.createElbowList(elbowRefs)

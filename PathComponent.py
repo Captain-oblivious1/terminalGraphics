@@ -46,6 +46,16 @@ class PathComponent(Component):
             pathSegment.split(splitPos)
             self.parent.createChildren()
 
+        def join(self,point):
+            self.parent.invalidate()
+            pathSegment = self.pathSegment
+            if pathSegment.orientation==Orientation.HORIZONTAL:
+                joinPos = point.x
+            else:
+                joinPos = point.y
+            pathSegment.join(joinPos)
+            self.parent.createChildren()
+            self.parent.invalidate()
 
         def showContextMenu(self,point,context):
             self.getTopLevelComponent().showMenu(Menu(self,["split","join"],point,self.menuResult))
@@ -54,7 +64,7 @@ class PathComponent(Component):
             if menu.getSelectedOption()=="split":
                 self.split(menu.getTopLeft())
             elif menu.getSelectedOption()=="join":
-                print("Selected join")
+                self.join(menu.getTopLeft())
 
 
     class Elbow(Component):

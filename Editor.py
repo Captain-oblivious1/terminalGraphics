@@ -64,7 +64,7 @@ def createTestDiagram():
     #diagramElement.elements.append(connectorElement2)
 
     pathElement1 = PathElement()
-    pathElement1.pathType = PathType.CLOSED #OPEN
+    pathElement1.pathType = PathType.CLOSED
     pathElement1.startOrientation = Orientation.VERTICAL
     pathElement1.turns = [5,23,12,30,20,2]
     pathElement1.corners = Corners.ROUND
@@ -89,10 +89,10 @@ def createDiagramComponent(diagramElement):
         elif type(element) is ConnectorElement:
             component = ConnectorComponent(diagramComponent)
         elif type(element) is PathElement:
+            refArray = []
+            for val in element.turns:
+               refArray.append( VarReference(val) )
             if element.pathType == PathType.CLOSED:
-                refArray = []
-                for val in element.turns:
-                   refArray.append( VarReference(val) )
                 fill = element.fill == Fill.FILLED
                 renderer = ClosedPath(element.startOrientation,refArray,fill)
             else:
