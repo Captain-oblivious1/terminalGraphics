@@ -10,7 +10,6 @@ class Path:
     def __init__(self,initialOrientation,elbowRefs):
         self._elbowRefs = elbowRefs
         self.initialOrientation = initialOrientation
-        #self.corners = Corners.SQUARE
         self.corners = Corners.ROUND
         self.segments = self.createSegmentList(elbowRefs)
 

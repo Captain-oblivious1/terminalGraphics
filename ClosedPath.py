@@ -8,7 +8,8 @@ class ClosedPath(Path):
     def __setattr__(self,name,value):
         if name=="corners":
             self._setCorners(value)
-        super().__setattr__(name,value)
+        else:
+            super().__setattr__(name,value)
 
     def _setCorners(self,value):
         super()._setCorners(value)

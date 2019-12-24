@@ -97,7 +97,7 @@ def createDiagramComponent(diagramElement):
                 renderer = ClosedPath(element.startOrientation,refArray,fill)
             else:
                 renderer = OpenPath(element.startOrientation,refArray)
-            renderer.corners = Corners.SQUARE
+            renderer.corners = element.corners
             component = PathComponent(diagramComponent,element,renderer)
 
         diagramComponent.components.append(component)
