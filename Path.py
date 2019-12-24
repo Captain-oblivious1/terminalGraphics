@@ -103,6 +103,7 @@ class Path:
             self.fromElbow = None
             self.toElbow = None
             self.orientation = None
+            self.listeners = set({})
 
         class Snapshot:
             def __init__(self,pos,fro,to):
@@ -156,6 +157,13 @@ class Path:
                 segmentIndex+=1
             return segmentIndex
 
+        def addListener(self,listener):
+            self.listeners.add(listener)
+
+        def removeListener(self,listener):
+            self.listeners.remove(listener)
+
+ 
         def split(self,pos):
             segmentIndex = self.getMySegmentIndex()
 
@@ -166,15 +174,19 @@ class Path:
             elbowRefs.insert(insertIndex,VarReference(elbowRefs[splitIndex].get()))
             elbowRefs.insert(insertIndex,VarReference(pos))
 
-            self.parent.segments = self.parent.createSegmentList(elbowRefs)
+            oldSegments = self.parent.segments
+            newSegments = self.parent.segments = self.parent.createSegmentList(elbowRefs)
+
+            for index in range(segmentIndex):
+                newSegments[index].listeners = oldSegments[index].listeners
+
+            for index in range(segmentIndex+1,len(oldSegments)):
+                newSegments[index+2].listeners = oldSegments[index].listeners
+
+            for listener in self.listeners:
+                listener.segmentSplit(self,newSegments[segmentIndex],newSegments[segmentIndex+1],newSegments[segmentIndex+2])
 
         def join(self,pos):
-            # 5 0  1  2  3  4
-            #[5,23,12,30,20,2]
-            #[y, x, y, x, y,x]
-
-            # 5 0  1  2  3  4
-            #[5,23,pos,2]
             elbowRefs = self.parent._elbowRefs
 
             segmentIndex = self.getMySegmentIndex()
@@ -182,7 +194,11 @@ class Path:
                 del elbowRefs[(segmentIndex)%len(elbowRefs)]
             elbowRefs.insert((segmentIndex)%len(elbowRefs),VarReference(pos))
 
-            self.parent.segments = self.parent.createSegmentList(elbowRefs)
+            oldSegments = self.parent.segments
+            newSegments = self.parent.segments = self.parent.createSegmentList(elbowRefs)
+
+            for listener in self.listeners:
+                listener.segmentJoined(oldSegments[segmentIndex-1],oldSegments[segmentIndex],oldSegments[segmentIndex+1],self)
 
 
     def createSegmentList(self,elbowRefs):
