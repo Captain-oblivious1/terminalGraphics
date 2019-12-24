@@ -50,7 +50,11 @@ class OpenPath(Path):
             elif endY > otherY:
                 index = 3
         if index != -1:
-            context.orChar(endX,endY,self.startArrowCharArray[index])
+            if isFrom:
+                array = self.startArrowCharArray
+            else:
+                array = self.endArrowCharArray
+            context.orChar(endX,endY,array[index])
 
     def drawSegmentList(self,context,segmentList):
         first = True

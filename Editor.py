@@ -71,11 +71,13 @@ def createTestDiagram():
     diagramElement.elements.append(pathElement1)
 
     pathElement2 = PathElement()
-    pathElement2.pathType = PathType.CLOSED #OPEN
+    pathElement2.pathType = PathType.OPEN
     pathElement2.fill = Fill.FILLED
     pathElement2.startOrientation = Orientation.HORIZONTAL
     pathElement2.turns = [40,20,50,30]
     pathElement2.corners = Corners.SQUARE
+    pathElement2.startArrow = Arrow.LINES
+    pathElement2.endArrow = Arrow.TRIANGLE
     diagramElement.elements.append(pathElement2)
 
     return diagramElement
@@ -97,6 +99,8 @@ def createDiagramComponent(diagramElement):
                 renderer = ClosedPath(element.startOrientation,refArray,fill)
             else:
                 renderer = OpenPath(element.startOrientation,refArray)
+                renderer.startArrow = element.startArrow
+                renderer.endArrow = element.endArrow
             renderer.corners = element.corners
             component = PathComponent(diagramComponent,element,renderer)
 

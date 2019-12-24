@@ -153,7 +153,6 @@ class ConnectionPoint:
         self.where = None # 0.0 means left/top-most 1.0 is right/bottom most
         self.end = Arrow.NONE
 
-
 class ConnectorElement(Element):
     def __init__(self):
         super.__init__()
