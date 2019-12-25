@@ -3,8 +3,9 @@ from Util import *
 
 class ConnectorComponent(PathComponent):
 
-    def __init__(self,parent,pathSegment):#fromOrientation,fromSegment,fromWhere,fromArrow,toSegment,toWhere,toArrow,turnArray):
+    def __init__(self,parent,pathSegment):
         super().__init__(parent,pathSegment)
+
         #super().__init__(pathElement)
         #self.connectorCache = None
 
