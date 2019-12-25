@@ -149,16 +149,16 @@ class ConnectionPoint:
     def __init__(self):
         self.element = None
         #self.side = None
-        self.segment = 0
+        self.segmentIndex = 0
         self.where = None # 0.0 means left/top-most 1.0 is right/bottom most
         self.end = Arrow.NONE
 
 class ConnectorElement(Element):
     def __init__(self):
-        super.__init__()
+        super().__init__()
         self.fromConnection = None
         self.toConnection = None
-        self.controlPoints = [] # ints not actual points.
+        self.turns = [] # ints not actual points.
 
 def testTextBox():
     textBox = TextBoxElement()

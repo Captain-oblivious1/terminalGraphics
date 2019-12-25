@@ -7,11 +7,10 @@ class Path:
     _squareCorners  = [ "┌", "┐", "└", "┘" ]
     _roundCorners = [ "╭", "╮", "╰", "╯" ]
 
-    def __init__(self,initialOrientation,elbowRefs):
-        self._elbowRefs = elbowRefs
+    def __init__(self,initialOrientation=None,elbowRefs=None):
         self.initialOrientation = initialOrientation
+        self.elbowRefs = elbowRefs
         self.corners = Corners.ROUND
-        self.segments = self.createSegmentList(elbowRefs)
 
     def _setCorners(self,value):
         if value==Corners.SQUARE:
@@ -33,10 +32,12 @@ class Path:
     def __setattr__(self,name,value):
         if name=="corners":
             self._setCorners(value)
+        elif name=="elbowRefs":
+            self.segments = self.createSegmentList(value)
         super().__setattr__(name,value)
 
     #def appendElbowReference(self,elbowReference):
-    #    self._elbowRefs.append(elbowReference) = segmentIndex+2)
+    #    self.elbowRefs.append(elbowReference) = segmentIndex+2)
 
     #def appendElbowValue(self,elbowValue):
     #    self.appendElbowReference(ConstReference(elbowValue))
@@ -166,7 +167,7 @@ class Path:
         def split(self,pos):
             segmentIndex = self.getMySegmentIndex()
 
-            elbowRefs = self.parent._elbowRefs
+            elbowRefs = self.parent.elbowRefs
             currentElbowRefLen = len(elbowRefs)
             splitIndex = (segmentIndex+1)%currentElbowRefLen
             insertIndex = (segmentIndex+2)%currentElbowRefLen
@@ -186,7 +187,7 @@ class Path:
                 listener.segmentSplit(self,newSegments[segmentIndex],newSegments[segmentIndex+1],newSegments[segmentIndex+2])
 
         def join(self,pos):
-            elbowRefs = self.parent._elbowRefs
+            elbowRefs = self.parent.elbowRefs
 
             segmentIndex = self.getMySegmentIndex()
             for a in range(3):
@@ -233,7 +234,7 @@ class Path:
             xElement = 1
 
         arrayElement = 0
-        for ref in self._elbowRefs:
+        for ref in self.elbowRefs:
             if arrayElement%2 == xElement:
                 elementOffset = offset.x
             else:

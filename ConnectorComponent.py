@@ -3,8 +3,9 @@ from Util import *
 
 class ConnectorComponent(PathComponent):
 
-    def __init__(self,connectorElement):
-        super().__init__(pathElement)
+    def __init__(self,parent,pathSegment):#fromOrientation,fromSegment,fromWhere,fromArrow,toSegment,toWhere,toArrow,turnArray):
+        super().__init__(parent,pathSegment)
+        #super().__init__(pathElement)
         #self.connectorCache = None
 
 #    def isOnMe(self,point):

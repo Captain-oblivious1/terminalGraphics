@@ -1,7 +1,7 @@
 from Path import *
 
 class ClosedPath(Path):
-    def __init__(self,initialOrientation,elbowRefs,filled=False):
+    def __init__(self,initialOrientation=None,elbowRefs=None,filled=False):
          super().__init__(initialOrientation,elbowRefs)
          self.filled = filled
 
@@ -33,10 +33,10 @@ class ClosedPath(Path):
 
     def createElbowList(self,refList):
         if not self.testIfClosed(refList):
-            refList = self._elbowRefs.copy()
+            refList = refList.copy()
             self.closePath(refList)
         else:
-            refList = self._elbowRefs
+            refList = self.elbowRefs
         elbowList = super().createElbowList(refList)
         #if self.initialOrientation==Orientation.HORIZONTAL: 
         #    xRef = refList[0]

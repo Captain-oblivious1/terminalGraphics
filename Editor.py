@@ -80,6 +80,25 @@ def createTestDiagram():
     pathElement2.endArrow = Arrow.TRIANGLE
     diagramElement.elements.append(pathElement2)
 
+    #fromConnection = ConnectionPoint()
+    #fromConnection.element = pathElement1
+    #fromConnection.segmentIndex = 2
+    #fromConnection.where = .5
+    #fromConnection.end = Arrow.TRIANGLE
+
+    #toConnection = ConnectionPoint()
+    #toConnection.element = pathElement1
+    #toConnection.segmentIndex = 1
+    #toConnection.where = .3
+    #toConnection.end = Arrow.NONE
+
+    #connection = ConnectorElement()
+    #connection.fromConnection = fromConnection
+    #connection.toConnection = toConnection
+    #connection.turns = [40,50]
+
+    #diagramElement.elements.append(connection)
+
     return diagramElement
 
 def createDiagramComponent(diagramElement):
