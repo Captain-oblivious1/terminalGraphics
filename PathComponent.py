@@ -24,6 +24,10 @@ class PathComponent(Component):
         def move(self,offset,context):
             if self.parent.isEditing():
                 self.forceMove(offset,context)
+            else:
+                self.parent.invalidate()
+                self.parent.move(offset,context)
+                self.parent.invalidate()
 
         def forceMove(self,offset,context):
             self.parent.invalidate()
@@ -58,13 +62,21 @@ class PathComponent(Component):
             self.parent.invalidate()
 
         def showContextMenu(self,point,context):
-            self.getTopLevelComponent().showMenu(Menu(self,["split","join"],point,self.menuResult))
+            if self.parent.isEditing():
+                options = ["split","join","stop editing"]
+            else:
+                options = ["edit shape"]
+            self.getTopLevelComponent().showMenu(Menu(self,options,point,self.menuResult))
 
         def menuResult(self,menu):
             if menu.getSelectedOption()=="split":
                 self.split(menu.getTopLeft())
             elif menu.getSelectedOption()=="join":
                 self.join(menu.getTopLeft())
+            elif menu.getSelectedOption()=="stop editing":
+                self.parent.setEditing(False)
+            elif menu.getSelectedOption()=="edit shape":
+                self.parent.setEditing(True)
 
 
     class Elbow(Component):
@@ -86,6 +98,10 @@ class PathComponent(Component):
                 oldPoint = self.pathElbow.point()
                 self.pathElbow.xRef.set(oldPoint.x+offset.x)
                 self.pathElbow.yRef.set(oldPoint.y+offset.y)
+            else:
+                self.parent.invalidate()
+                self.parent.move(offset,context)
+                self.parent.invalidate()
 
     def __init__(self,parent,element,renderer):
         super().__init__(parent)
@@ -144,7 +160,7 @@ class PathComponent(Component):
 
     def children(self):
         returnMe = set()
-        if self.isEditing():
+        if True or self.isEditing():
             for segment in self.segments:
                 returnMe.add(segment)
             for elbow in self.elbows:
@@ -158,10 +174,3 @@ class PathComponent(Component):
 
     def move(self,offset,context):
         self.path.move(offset,context)
-
-    def showContextMenu(self,point,context):
-        self.getTopLevelComponent().showMenu(Menu(self,["Connect To"],point,self.menuResult))
-
-    def menuResult(self,menu):
-        if menu.getSelectedOption()=="Connect To":
-            print("Choose connect to")
