@@ -91,7 +91,7 @@ class PathComponent(Component):
         super().__init__(parent)
         self.element = element
         self.renderer = renderer
-        self.setEditing(True)
+        self.setEditing(False)
         self.createChildren()
 
     def setEditing(self,editing):
@@ -158,3 +158,10 @@ class PathComponent(Component):
 
     def move(self,offset,context):
         self.path.move(offset,context)
+
+    def showContextMenu(self,point,context):
+        self.getTopLevelComponent().showMenu(Menu(self,["Connect To"],point,self.menuResult))
+
+    def menuResult(self,menu):
+        if menu.getSelectedOption()=="Connect To":
+            print("Choose connect to")
