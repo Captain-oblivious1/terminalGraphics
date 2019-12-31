@@ -23,7 +23,7 @@ class OpenPath(Path):
             super().__init__(index,xRef,yRef)
 
         def connectTo(self):
-            pass
+            print("invoked ArrowElbow.connectTo")
 
     def _setArrow(self,name,value):
         if value==Arrow.NONE:

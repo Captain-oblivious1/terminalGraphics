@@ -38,13 +38,6 @@ class ClosedPath(Path):
         else:
             refList = self.elbowRefs
         elbowList = super().createElbowList(refList)
-        #if self.initialOrientation==Orientation.HORIZONTAL: 
-        #    xRef = refList[0]
-        #    yRef = refList[-1]
-        #else:
-        #    xRef = refList[-1]
-        #    yRef = refList[0]
-        #elbowList.append( Path.Elbow(xRef,yRef) )
         return elbowList
 
     def createSegmentList(self,refList):

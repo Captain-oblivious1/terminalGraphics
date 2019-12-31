@@ -101,8 +101,8 @@ def createTestDiagram():
 
     return diagramElement
 
-def createDiagramComponent(diagramElement):
-    diagramComponent = DiagramComponent(diagramElement)
+def createDiagramComponent(editor,diagramElement):
+    diagramComponent = DiagramComponent(editor,diagramElement)
 
     for element in diagramElement.elements:
         if type(element) is TextBoxElement:
@@ -156,7 +156,7 @@ class Editor:
 
         diagram = createTestDiagram()
         print("============")
-        diagramComponent = self.diagramComponent = createDiagramComponent(diagram)
+        diagramComponent = self.diagramComponent = createDiagramComponent(self,diagram)
 
         context = self.context = Context(screen)
         self.goIdleState()

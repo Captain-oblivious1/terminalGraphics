@@ -11,6 +11,9 @@ class Component:
         self.parent = parent
         self.selected = False
 
+    def getEditor(self):
+        return self.parent.getEditor()
+
     def getRect(self):
         return Rect()
 

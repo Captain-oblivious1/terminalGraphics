@@ -2,8 +2,9 @@ from Component import *
 from Menu import *
 
 class DiagramComponent(Component):
-    def __init__(self,diagramElement):
+    def __init__(self,editor,diagramElement):
         super().__init__(None)
+        self.editor = editor
         self.diagramElement = diagramElement
         self.components = []
         self.invalidatedRect = Rect()
@@ -12,6 +13,9 @@ class DiagramComponent(Component):
     def invalidateAll(self):
         for component in self.components:
             component.invalidate()
+
+    def getEditor(self):
+        return self.editor
 
     def invalidateRect(self,rect):
         self.invalidatedRect.unionWith(rect)

@@ -110,7 +110,8 @@ class PathComponent(Component):
 
         def menuResult(self,menu):
             if menu.getSelectedOption()=="Connect to":
-                print("Connect to")
+                self.getEditor().printACussWord()
+                #self.pathElbow.connectTo()
 
     def __init__(self,parent,element,renderer):
         super().__init__(parent)
@@ -137,11 +138,6 @@ class PathComponent(Component):
     def createChildrenRenderer(self,path):
         element = self.element
         self.path = path
-        #self.path = Connector(element.startOrientation)
-        #self.path = Shape(element.startOrientation)
-        #refArray = []
-        #for index in range(len(element.turns)):
-        #    refArray.append(ArrayElementReference(element.turns,index))
 
         self.segmentList = self.path.getSegmentList()
         self.segments = []
