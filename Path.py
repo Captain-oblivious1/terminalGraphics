@@ -30,21 +30,19 @@ class Path:
                 ["╷", tl," ", tr,"│"] ]
 
     def __setattr__(self,name,value):
+        super().__setattr__(name,value)
         if name=="corners":
             self._setCorners(value)
         elif name=="elbowRefs":
             self.segments = self.createSegmentList(value)
-        super().__setattr__(name,value)
 
-    #def appendElbowReference(self,elbowReference):
-    #    self.elbowRefs.append(elbowReference) = segmentIndex+2)
-
-    #def appendElbowValue(self,elbowValue):
-    #    self.appendElbowReference(ConstReference(elbowValue))
+    def createElbow(self,index,xRef,yRef):
+        return Path.Elbow(index,xRef,yRef)
 
     class Elbow:
 
-        def __init__(self,xRef,yRef):
+        def __init__(self,index,xRef,yRef):
+            self.index = index
             self.xRef = xRef
             self.yRef = yRef
 
@@ -67,7 +65,7 @@ class Path:
             return Rect().includePoint(self.point())
 
         def __str__(self):
-            return "Elbow{x="+str(self.xRef.get())+",y="+str(self.yRef.get())+"}"
+            return "Elbow{index="+str(self.index)+" x="+str(self.xRef.get())+",y="+str(self.yRef.get())+"}"
 
     def createElbowList(self,refList):
         elbowList = []
@@ -80,6 +78,7 @@ class Path:
         x=None
         y=None
 
+        index = 0
         for elbowRef in refList:
 
             if horizontalOrienation:
@@ -90,7 +89,8 @@ class Path:
             if first:
                 first = False
             else:
-                elbow = Path.Elbow(xRef,yRef)
+                elbow = self.createElbow(index,xRef,yRef)
+                index += 1
                 elbowList.append(elbow)
                 prevElbow = elbow
             horizontalOrienation = not horizontalOrienation

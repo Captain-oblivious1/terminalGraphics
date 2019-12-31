@@ -63,7 +63,7 @@ class PathComponent(Component):
 
         def showContextMenu(self,point,context):
             if self.parent.isEditing():
-                options = ["split","join","stop editing"]
+                options = ["stop editing","","split","join"]
             else:
                 options = ["edit shape"]
             self.getTopLevelComponent().showMenu(Menu(self,options,point,self.menuResult))
@@ -102,6 +102,15 @@ class PathComponent(Component):
                 self.parent.invalidate()
                 self.parent.move(offset,context)
                 self.parent.invalidate()
+
+        def showContextMenu(self,point,context):
+            if "connectTo" in dir(self.pathElbow):
+                options = ["Connect to"]
+                self.getTopLevelComponent().showMenu(Menu(self,options,point,self.menuResult))
+
+        def menuResult(self,menu):
+            if menu.getSelectedOption()=="Connect to":
+                print("Connect to")
 
     def __init__(self,parent,element,renderer):
         super().__init__(parent)

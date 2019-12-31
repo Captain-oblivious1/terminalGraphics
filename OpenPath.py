@@ -12,6 +12,19 @@ class OpenPath(Path):
         self.startArrow = Arrow.LINES
         self.endArrow = Arrow.LINES
 
+    def createElbow(self,index,xRef,yRef):
+        if index==0 or index==len(self.elbowRefs)-2:
+            return OpenPath.ArrowElbow(index,xRef,yRef)
+        else:
+            return super().createElbow(index,xRef,yRef)
+
+    class ArrowElbow(Path.Elbow):
+        def __init__(self,index,xRef,yRef):
+            super().__init__(index,xRef,yRef)
+
+        def connectTo(self):
+            pass
+
     def _setArrow(self,name,value):
         if value==Arrow.NONE:
             array = OpenPath._noneArrowArray
@@ -22,9 +35,9 @@ class OpenPath(Path):
         setattr(self,name+"CharArray", array)
 
     def __setattr__(self,name,value):
+        super().__setattr__(name,value)
         if name=="startArrow" or name=="endArrow":
             self._setArrow(name,value)
-        super().__setattr__(name,value)
 
     def drawArrow(self,context,segment,isFrom):
         if isFrom:
