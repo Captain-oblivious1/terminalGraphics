@@ -147,6 +147,10 @@ class Editor:
         import MovingState
         self.state = MovingState.MovingState(self,self.context,self.diagramComponent,startDragPoint)
 
+    def goSelectComponentState(self,eventListener):
+        import SelectComponentState
+        self.state = SelectComponentState.SelectComponentState(self.diagramComponent,eventListener)
+
     def run(self):
         screen = curses.initscr()
         curses.curs_set(0)

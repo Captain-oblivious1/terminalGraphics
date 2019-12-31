@@ -78,6 +78,13 @@ class PathComponent(Component):
             elif menu.getSelectedOption()=="edit shape":
                 self.parent.setEditing(True)
 
+    class ComponentSelectListener:
+        def __init__(self,editor):
+            self.editor = editor
+
+        def componentSelected(self,component):
+            print("component selected="+str(component))
+            self.editor.goIdleState()
 
     class Elbow(Component):
 
@@ -110,7 +117,8 @@ class PathComponent(Component):
 
         def menuResult(self,menu):
             if menu.getSelectedOption()=="Connect to":
-                self.getEditor().printACussWord()
+                editor = self.getEditor()
+                editor.goSelectComponentState(PathComponent.ComponentSelectListener(editor))
                 #self.pathElbow.connectTo()
 
     def __init__(self,parent,element,renderer):
