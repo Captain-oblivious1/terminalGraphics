@@ -36,12 +36,13 @@ class Path:
         elif name=="elbowRefs":
             self.segments = self.createSegmentList(value)
 
-    def createElbow(self,index,xRef,yRef):
-        return Path.Elbow(index,xRef,yRef)
+    def createElbow(self,path,index,xRef,yRef):
+        return Path.Elbow(path,index,xRef,yRef)
 
     class Elbow:
 
-        def __init__(self,index,xRef,yRef):
+        def __init__(self,path,index,xRef,yRef):
+            self.path = path
             self.index = index
             self.xRef = xRef
             self.yRef = yRef
@@ -89,7 +90,7 @@ class Path:
             if first:
                 first = False
             else:
-                elbow = self.createElbow(index,xRef,yRef)
+                elbow = self.createElbow(self,index,xRef,yRef)
                 index += 1
                 elbowList.append(elbow)
                 prevElbow = elbow

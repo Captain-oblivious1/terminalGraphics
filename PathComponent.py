@@ -79,12 +79,14 @@ class PathComponent(Component):
                 self.parent.setEditing(True)
 
     class ComponentSelectListener:
-        def __init__(self,editor):
-            self.editor = editor
+        def __init__(self,elbow):
+            self.elbow = elbow
 
-        def componentSelected(self,component):
-            print("component selected="+str(component))
-            self.editor.goIdleState()
+        def componentSelected(self,component,point):
+            if isinstance(component,PathComponent.Segment):
+                pathSegment = component.pathSegment
+                self.elbow.pathElbow.connectTo(pathSegment,point)
+                self.elbow.getEditor().goIdleState()
 
     class Elbow(Component):
 
@@ -118,7 +120,7 @@ class PathComponent(Component):
         def menuResult(self,menu):
             if menu.getSelectedOption()=="Connect to":
                 editor = self.getEditor()
-                editor.goSelectComponentState(PathComponent.ComponentSelectListener(editor))
+                editor.goSelectComponentState(PathComponent.ComponentSelectListener(self))
                 #self.pathElbow.connectTo()
 
     def __init__(self,parent,element,renderer):

@@ -18,6 +18,4 @@ class SelectComponentState(State):
         clickedOn = self.diagramComponent.componentAt(point)
         if clickedOn != self.selectedComponent:
             clickedOn = None
-        self.eventListener.componentSelected(clickedOn)
-
-
+        self.eventListener.componentSelected(clickedOn,point)
