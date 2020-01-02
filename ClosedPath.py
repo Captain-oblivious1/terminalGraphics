@@ -8,6 +8,9 @@ class ClosedPath(Path):
     def __setattr__(self,name,value):
         if name=="corners":
             self._setCorners(value)
+        elif name=="elbowRefs":
+            elbowRefs = self.closePath(value)
+            super().__setattr__(name,elbowRefs)
         else:
             super().__setattr__(name,value)
 
@@ -67,6 +70,7 @@ class ClosedPath(Path):
             else:
                 refList.append(refList[1])
                 refList.append(refList[0])
+        return refList
 
     def drawSegmentList(self,context,segmentList):
         if self.filled:
@@ -152,3 +156,18 @@ class ClosedPath(Path):
                     context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to)
             oldDirection = direction
 
+    def move(self,offset,context):
+        if self.initialOrientation == Orientation.HORIZONTAL:
+            xElement = 0
+        else:
+            xElement = 1
+
+        arrayElement = 0
+        for ref in self.elbowRefs:
+            if arrayElement>=2:
+                if arrayElement%2 == xElement:
+                    elementOffset = offset.x
+                else:
+                    elementOffset = offset.y
+                ref.set( ref.get() + elementOffset )
+            arrayElement += 1

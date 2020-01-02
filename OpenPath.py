@@ -12,24 +12,24 @@ class OpenPath(Path):
         self.startArrow = Arrow.LINES
         self.endArrow = Arrow.LINES
 
-    def createElbow(self,path,index,xRef,yRef):
+    def createElbow(self,path,index,xRefIndex,yRefIndex):
         if index==0 or index==len(self.elbowRefs)-2:
-            return OpenPath.ArrowElbow(path,index,xRef,yRef)
+            return OpenPath.ArrowElbow(path,index,xRefIndex,yRefIndex)
         else:
-            return super().createElbow(path,index,xRef,yRef)
+            return super().createElbow(path,index,xRefIndex,yRefIndex)
 
     class ArrowElbow(Path.Elbow):
         def __init__(self,path,index,xRef,yRef):
             super().__init__(path,index,xRef,yRef)
 
         def connectTo(self,segment,point):
-            path = segment.parent
-            if segment.orientation==Orientation.HORIZONTAL:
-                xRef =
-                yRef = segment.getPosRef()
-            else:
-                xRef = segment.getPosRef()
-                yRef =
+            #path = segment.parent
+            #if segment.orientation==Orientation.HORIZONTAL:
+            #    xRef =
+            #    yRef = segment.getPosRef()
+            #else:
+            #    xRef = segment.getPosRef()
+            #    yRef =
             print("invoked ArrowElbow.connectTo segment="+str(segment)+" point="+str(point))
 
     def _setArrow(self,name,value):

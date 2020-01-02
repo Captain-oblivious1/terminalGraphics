@@ -36,16 +36,16 @@ class Path:
         elif name=="elbowRefs":
             self.segments = self.createSegmentList(value)
 
-    def createElbow(self,path,index,xRef,yRef):
-        return Path.Elbow(path,index,xRef,yRef)
+    def createElbow(self,path,index,xRefIndex,yRefIndex):
+        return Path.Elbow(path,index,xRefIndex,yRefIndex)
 
     class Elbow:
 
-        def __init__(self,path,index,xRef,yRef):
+        def __init__(self,path,index,xRefIndex,yRefIndex):
             self.path = path
             self.index = index
-            self.xRef = xRef
-            self.yRef = yRef
+            self.xRefIndex = xRefIndex
+            self.yRefIndex = yRefIndex
 
         class Snapshot:
             def __init__(self,x,y,char):
@@ -54,10 +54,10 @@ class Path:
                 self.char = char
 
         def x(self):
-            return self.xRef.get()
+            return self.path.elbowRefs[self.xRefIndex].get()
 
         def y(self):
-            return self.yRef.get()
+            return self.path.elbowRefs[self.yRefIndex].get()
 
         def point(self):
             return Point(self.x(),self.y())
@@ -66,7 +66,7 @@ class Path:
             return Rect().includePoint(self.point())
 
         def __str__(self):
-            return "Elbow{index="+str(self.index)+" x="+str(self.xRef.get())+",y="+str(self.yRef.get())+"}"
+            return "Elbow{index="+str(self.index)+" x="+str(self.path.elbowRefs[self.xRefIndex].get())+",y="+str(self.path.elbowRefs[self.yRefIndex].get())+"}"
 
     def createElbowList(self,refList):
         elbowList = []
@@ -79,19 +79,22 @@ class Path:
         x=None
         y=None
 
-        index = 0
+        elbowIndex = 0
+        refIndex = 0
         for elbowRef in refList:
 
             if horizontalOrienation:
-                xRef = elbowRef
+                xRefIndex = refIndex
             else:
-                yRef = elbowRef
+                yRefIndex = refIndex
+
+            refIndex += 1
 
             if first:
                 first = False
             else:
-                elbow = self.createElbow(self,index,xRef,yRef)
-                index += 1
+                elbow = self.createElbow(self,elbowIndex,xRefIndex,yRefIndex)
+                elbowIndex += 1
                 elbowList.append(elbow)
                 prevElbow = elbow
             horizontalOrienation = not horizontalOrienation
@@ -114,9 +117,9 @@ class Path:
 
         def getPosRef(self):
             if self.orientation==Orientation.HORIZONTAL:
-                return self.fromElbow.yRef
+                return self.parent.elbowRefs[self.fromElbow.yRefIndex]
             else:
-                return self.fromElbow.xRef
+                return self.parent.elbowRefs[self.fromElbow.xRefIndex]
 
         def getSnapshot(self,fullLength=False):
             if self.orientation==Orientation.HORIZONTAL:
