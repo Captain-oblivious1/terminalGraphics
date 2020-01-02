@@ -105,8 +105,8 @@ class PathComponent(Component):
                 self.parent.invalidate()
 
                 oldPoint = self.pathElbow.point()
-                self.pathElbow.xRef.set(oldPoint.x+offset.x)
-                self.pathElbow.yRef.set(oldPoint.y+offset.y)
+                self.pathElbow.setX(oldPoint.x+offset.x)
+                self.pathElbow.setY(oldPoint.y+offset.y)
             else:
                 self.parent.invalidate()
                 self.parent.move(offset,context)

@@ -146,7 +146,7 @@ class ClosedPath(Path):
             direction = segment.direction()
             elbow = segment.fromElbow
             elbowChar = self.elbowSymbol[oldDirection.value][direction.value]
-            context.orChar(elbow.x(),elbow.y(),elbowChar)
+            context.orChar(elbow.getX(),elbow.getY(),elbowChar)
 
             snapshot = segment.getSnapshot()
             if snapshot.fro<=snapshot.to:

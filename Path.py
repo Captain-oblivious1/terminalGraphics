@@ -53,20 +53,35 @@ class Path:
                 self.y = y
                 self.char = char
 
-        def x(self):
-            return self.path.elbowRefs[self.xRefIndex].get()
+        def _allElbowRefs(self):
+            return self.path.elbowRefs
 
-        def y(self):
-            return self.path.elbowRefs[self.yRefIndex].get()
+        def getXRef(self):
+            return self._allElbowRefs()[self.xRefIndex]
+
+        def getX(self):
+            return self.getXRef().get()
+
+        def setX(self,value):
+            return self.getXRef().set(value)
+
+        def getYRef(self):
+            return self._allElbowRefs()[self.yRefIndex]
+
+        def getY(self):
+            return self.getYRef().get()
+
+        def setY(self,value):
+            return self.getYRef().set(value)
 
         def point(self):
-            return Point(self.x(),self.y())
+            return Point(self.getX(),self.getY())
 
         def getRect(self):
             return Rect().includePoint(self.point())
 
         def __str__(self):
-            return "Elbow{index="+str(self.index)+" x="+str(self.path.elbowRefs[self.xRefIndex].get())+",y="+str(self.path.elbowRefs[self.yRefIndex].get())+"}"
+            return "Elbow{index="+str(self.index)+" x="+str(self.getX())+",y="+str(self.getY())+"}"
 
     def createElbowList(self,refList):
         elbowList = []
@@ -123,24 +138,24 @@ class Path:
 
         def getSnapshot(self,fullLength=False):
             if self.orientation==Orientation.HORIZONTAL:
-                fromX = self.fromElbow.x()
-                toX = self.toElbow.x()
+                fromX = self.fromElbow.getX()
+                toX = self.toElbow.getX()
                 minX = min(fromX,toX)
                 maxX = max(fromX,toX)
                 if not fullLength:
                     minX+=1
                     maxX-=1
-                y = self.fromElbow.y()
+                y = self.fromElbow.getY()
                 return Path.Segment.Snapshot(y,minX,maxX)
             else:
-                fromY = self.fromElbow.y()
-                toY = self.toElbow.y()
+                fromY = self.fromElbow.getY()
+                toY = self.toElbow.getY()
                 minY = min(fromY,toY)
                 maxY = max(fromY,toY)
                 if not fullLength:
                     minY+=1
                     maxY-=1
-                x = self.fromElbow.x()
+                x = self.fromElbow.getX()
                 return Path.Segment.Snapshot(x,minY,maxY)
 
         def getRect(self):

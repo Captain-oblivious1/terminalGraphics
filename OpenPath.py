@@ -54,17 +54,17 @@ class OpenPath(Path):
             otherElbow = segment.fromElbow
             endElbow = segment.toElbow
 
-        endX = endElbow.x()
-        endY = endElbow.y()
+        endX = endElbow.getX()
+        endY = endElbow.getY()
         index = -1
         if segment.orientation == Orientation.HORIZONTAL:
-            otherX = otherElbow.x()
+            otherX = otherElbow.getX()
             if endX < otherX:
                 index = 0
             elif endX > otherX:
                 index = 1
         else:
-            otherY = otherElbow.y()
+            otherY = otherElbow.getY()
             if endY < otherY:
                 index = 2
             elif endY > otherY:
@@ -85,7 +85,7 @@ class OpenPath(Path):
                 first = False
             else:
                 elbow = segment.fromElbow
-                context.orChar(elbow.x(),elbow.y(),self.elbowSymbol[oldDirection.value][direction.value])
+                context.orChar(elbow.getX(),elbow.getY(),self.elbowSymbol[oldDirection.value][direction.value])
 
             snapshot = segment.getSnapshot()
             if snapshot.fro<=snapshot.to:
