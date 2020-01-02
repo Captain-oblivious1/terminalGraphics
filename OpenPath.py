@@ -23,6 +23,13 @@ class OpenPath(Path):
             super().__init__(path,index,xRef,yRef)
 
         def connectTo(self,segment,point):
+            path = segment.parent
+            if segment.orientation==Orientation.HORIZONTAL:
+                xRef =
+                yRef = segment.getPosRef()
+            else:
+                xRef = segment.getPosRef()
+                yRef =
             print("invoked ArrowElbow.connectTo segment="+str(segment)+" point="+str(point))
 
     def _setArrow(self,name,value):
