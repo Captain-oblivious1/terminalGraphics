@@ -73,8 +73,8 @@ def createTestDiagram():
     pathElement2 = PathElement()
     pathElement2.pathType = PathType.OPEN
     pathElement2.fill = Fill.FILLED
-    pathElement2.startOrientation = Orientation.HORIZONTAL
-    pathElement2.turns = [40,20,50,30]
+    pathElement2.startOrientation = Orientation.VERTICAL #HORIZONTAL
+    pathElement2.turns = [15,40,20,50,30,60]
     pathElement2.corners = Corners.SQUARE
     pathElement2.startArrow = Arrow.LINES
     pathElement2.endArrow = Arrow.TRIANGLE

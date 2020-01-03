@@ -23,14 +23,25 @@ class OpenPath(Path):
             super().__init__(path,index,xRef,yRef)
 
         def connectTo(self,segment,point):
-            #path = segment.parent
+            path = self.path
+            elbowRefs = path.elbowRefs
+
+            print("index="+str(self.index))
+            if self.index==0:
+                xIndex = 0
+            else:
+                xIndex = len(elbowRefs)-2
+            yIndex = xIndex+1
+
+            initVertical = path.initialOrientation==Orientation.VERTICAL
+            if (xIndex==0 and initVertical) or (xIndex%2==0 and initVertical): # if my segment is vertical than swap
+                temp = xIndex
+                xIndex = yIndex
+                yIndex = temp
+
             #if segment.orientation==Orientation.HORIZONTAL:
-            #    xRef =
-            #    yRef = segment.getPosRef()
-            #else:
-            #    xRef = segment.getPosRef()
-            #    yRef =
-            print("invoked ArrowElbow.connectTo segment="+str(segment)+" point="+str(point))
+
+            print("invoked ArrowElbow.connectTo segment="+str(segment)+" point="+str(point)+" xIndex="+str(xIndex)+" yIndex="+str(yIndex))
 
     def _setArrow(self,name,value):
         if value==Arrow.NONE:
