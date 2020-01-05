@@ -84,8 +84,10 @@ class PathComponent(Component):
 
         def componentSelected(self,component,point):
             if isinstance(component,PathComponent.Segment):
+                self.elbow.parent.invalidate()
                 pathSegment = component.pathSegment
                 self.elbow.pathElbow.connectTo(pathSegment,point)
+                self.elbow.parent.invalidate()
                 self.elbow.getEditor().goIdleState()
 
     class Elbow(Component):

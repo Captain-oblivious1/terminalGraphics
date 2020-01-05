@@ -26,7 +26,6 @@ class OpenPath(Path):
             path = self.path
             elbowRefs = path.elbowRefs
 
-            print("index="+str(self.index))
             if self.index==0:
                 xIndex = 0
             else:
@@ -39,9 +38,19 @@ class OpenPath(Path):
                 xIndex = yIndex
                 yIndex = temp
 
-            #if segment.orientation==Orientation.HORIZONTAL:
-
             print("invoked ArrowElbow.connectTo segment="+str(segment)+" point="+str(point)+" xIndex="+str(xIndex)+" yIndex="+str(yIndex))
+
+            if segment.orientation==Orientation.HORIZONTAL:
+                xRef = VarReference(point.x)
+                yRef = segment.getPosRef()
+            else:
+                xRef = sefment.getPosRef()
+                yRef = VarReference(point.y)
+
+            elbowRefs[xIndex]= xRef
+            elbowRefs[yIndex]= yRef
+
+
 
     def _setArrow(self,name,value):
         if value==Arrow.NONE:
