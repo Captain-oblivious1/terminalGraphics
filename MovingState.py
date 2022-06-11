@@ -40,6 +40,7 @@ class MovingState(State):
 
             for component in self.selectedComponents:
                 component.invalidate()
+                #print("Moving offset x="+str(offset.x)+" y="+str(offset.y))
                 component.move(offset,self.context)
                 component.invalidate()
 

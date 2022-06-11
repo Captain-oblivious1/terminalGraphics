@@ -65,6 +65,7 @@ def createTestDiagram():
 
     pathElement1 = PathElement()
     pathElement1.pathType = PathType.CLOSED
+    pathElement1.fill = Fill.FILLED
     pathElement1.startOrientation = Orientation.VERTICAL
     pathElement1.turns = [5,23,12,30,20,2]
     pathElement1.corners = Corners.ROUND
@@ -72,7 +73,7 @@ def createTestDiagram():
 
     pathElement2 = PathElement()
     pathElement2.pathType = PathType.OPEN
-    pathElement2.fill = Fill.FILLED
+    #pathElement2.fill = Fill.FILLED
     pathElement2.startOrientation = Orientation.VERTICAL #HORIZONTAL
     pathElement2.turns = [15,40,20,50,30,60]
     pathElement2.corners = Corners.SQUARE
