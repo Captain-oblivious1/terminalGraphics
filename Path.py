@@ -87,16 +87,10 @@ class Path:
         elbowList = []
         horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
         first = True
-        prevDirection = None
-        xPrev = None
-        yPrev = None
-        prevElbow = None
-        x=None
-        y=None
 
         elbowIndex = 0
         refIndex = 0
-        for elbowRef in refList:
+        for refIndex in range(len(refList)):
 
             if horizontalOrienation:
                 xRefIndex = refIndex
@@ -111,7 +105,6 @@ class Path:
                 elbow = self.createElbow(self,elbowIndex,xRefIndex,yRefIndex)
                 elbowIndex += 1
                 elbowList.append(elbow)
-                prevElbow = elbow
             horizontalOrienation = not horizontalOrienation
 
         return elbowList
@@ -209,7 +202,7 @@ class Path:
             elbowRefs = self.parent.elbowRefs
 
             segmentIndex = self.getMySegmentIndex()
-            for a in range(3):
+            for _ in range(3):
                 del elbowRefs[(segmentIndex)%len(elbowRefs)]
             elbowRefs.insert((segmentIndex)%len(elbowRefs),VarReference(pos))
 
@@ -247,7 +240,7 @@ class Path:
         return self.segments
 
     def move(self,offset,context):
-        print("Path.move offset x="+str(offset.x)+" y="+str(offset.y))
+        #print("Path.move offset x="+str(offset.x)+" y="+str(offset.y))
         if self.initialOrientation == Orientation.HORIZONTAL:
             xElement = 0
         else:
@@ -262,8 +255,8 @@ class Path:
             ref.set( ref.get() + elementOffset )
             arrayElement += 1
 
-    def draw(self,context):
-        self.drawSegmentList(context,self.segments)
+    #def draw(self,context):
+    #    self.drawSegmentList(context,self.segments)
 
-    def drawSegmentList(self,context,createSegmentList):
-        pass  #subclass draws how it sees fit
+    #def drawSegmentList(self,context,createSegmentList):
+    #    pass  #subclass draws how it sees fit

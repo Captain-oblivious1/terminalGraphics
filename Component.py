@@ -36,7 +36,7 @@ class Component:
             return self.parent.getTopLevelComponent()
 
     def invalidate(self):
-        self.getTopLevelComponent().invalidateRect( self.getRect() )
+        self.getEditor().getContext().invalidateRect( self.getRect() )
 
     #def getDiagram(
 

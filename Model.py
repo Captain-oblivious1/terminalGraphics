@@ -10,12 +10,22 @@ class Element:
         pass
         #self.parent = None
 
-    def _attrToStr(self):
-        return ""
-        #return "parent=" + str(object.__str__(self.parent))
+    def _attrToStr(self,attributeNames):
+        result = ""
+        first = True
+        for attributeName in attributeNames:
+            if first:
+                first = False
+            else:
+                result+=","
+            result += attributeName + "=" + str(getattr(self,attributeName))
+        return result
+
+    def _genString(self,attributeNames):
+        return self.__class__.__name__ + ":{" + self._attrToStr(attributeNames) + "}"
 
     def __str__(self):
-        return "Element:{" + self._attrToStr() + "}"
+        return self._genString(list(filter(lambda x: not x.startswith("_"), self.__dir__())))
 
 class BoxElement(Element):
     def __init__(self):
@@ -25,31 +35,10 @@ class BoxElement(Element):
         self.width = 0
         self.height = 0
 
-    def _attrToStr(self):
-        return Element._attrToStr(self) + ",x=" + str(self.x) + ",y=" + str(self.y) + ",width=" + str(self.width) + ",height=" + str(self.height)
-
-    def __str__(self):
-        return "BoxElement:{" + self._attrToStr() + "}"
-
 class Diagram(Element):
     def __init__(self):
         Element.__init__(self)
-        self.elements = [] # top to bottom (as in what in draw on top of what, not y locations)
-
-    def _attrToStr(self):
-        retMe = Element._attrToStr(self) + ",elements=["
-        firstLine = True
-        for element in self.elements:
-            if firstLine:
-                firstLine = False
-            else:
-                retMe += ","
-            retMe += str(element)
-        retMe += "]"
-        return retMe
-
-    def __str__(self):
-        return "Diagram:{" + self._attrToStr() + "}"
+        self.elements = [] # front to back
 
 class Justification(Enum):
     LEFT = 0
@@ -60,12 +49,6 @@ class LineOfText:
     def __init__(self):
         self.justification = Justification.LEFT
         self.text = ""
-
-    def _attrToStr(self):
-        return "justification=" + str(self.justification) + ",text=\"" + self.text + "\""
-
-    def __str__(self):
-        return "LineOfText:{" + self._attrToStr() + "}"
 
 
 class TextBoxElement(BoxElement):
@@ -83,21 +66,6 @@ class TextBoxElement(BoxElement):
         self.width += 2 # For border on each side
         self.height = len(self.lines) + 2 # for border on top and bottom
 
-    def _attrToStr(self):
-        retMe = BoxElement._attrToStr(self) + ",lines=["
-        firstLine = True
-        for line in self.lines:
-            if firstLine:
-                firstLine = False
-            else:
-                retMe += ","
-            retMe += str(line)
-        retMe += "]"
-        return retMe
-
-    def __str__(self):
-        return "TextBox:{" + self._attrToStr() + "}"
-
 class Corners(Enum):
     SQUARE=0
     ROUND=1
@@ -107,8 +75,8 @@ class PathType(Enum):
     OPEN = 1
 
 class Fill(Enum):
-    FILLED = 0
-    UNFILLED = 1
+    OPAQUE = 0
+    TRANSPARENT = 1
 
 class PathElement(Element):
     def __init__(self):
@@ -117,20 +85,11 @@ class PathElement(Element):
         self.turns = []
         self.corners = Corners.SQUARE
         self.pathType = PathType.CLOSED
-        self.fill = Fill.UNFILLED
-
-    def _attrToStr(self):
-        return Element._attrToStr(self) + ",startPoint=" + str(self.startPoint) + ",startOrientation=" + str(self.startOrientation) + ",turns=" + str(self.turns) + ",corners=" + str(self.corners)
-
-    def __str__(self):
-        return "PathElement:{" + self._attrToStr() + "}"
+        self.fill = Fill.TRANSPARENT
 
 class ShapeElement(PathElement):
     def __init__(self):
         PathElement.__init__(self)
-
-    def __str__(self):
-        return "ShapeElement:{" + self._attrToStr() + "}"
 
 
 class Direction(Enum):

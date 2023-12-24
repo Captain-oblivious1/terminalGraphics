@@ -15,8 +15,8 @@ class PathComponent(Component):
             self.pathSegment = pathSegment
             self.parent = parent
 
-        def draw(self,context):
-            pass
+        #def draw(self,context):
+        #    pass
 
         def getRect(self):
             return self.pathSegment.getRect()
@@ -96,8 +96,8 @@ class PathComponent(Component):
             super().__init__(parent)
             self.pathElbow = pathElbow
 
-        def draw(self,context):
-            pass
+        #def draw(self,context):
+        #    pass
 
         def getRect(self):
             return self.pathElbow.getRect()
@@ -191,3 +191,7 @@ class PathComponent(Component):
 
     def move(self,offset,context):
         self.path.move(offset,context)
+
+    def __str__(self):
+        return "Component{element="+self.element.__str__()+"}";
+

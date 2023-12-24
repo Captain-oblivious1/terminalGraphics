@@ -30,17 +30,17 @@ boxArray = [
 # or-ing and and-ing other characters.  I assign each character a
 # value based an integer that has "pixels" activated.  The follow
 # indicates what bits represent what pixel.
-#    ┌──┰──┬──┐      All box characters can be created by bitwise
-#    │21┃20│19│      or-ing any of the following:
-# ┌──┼──╂──┼──┼──┐   " " = 0x0
-# │18│17┃16│15│14│   "╴" = 0x1C00
-# ├──╁──╀──┼──┼──┤   "╸" = 0x39CE0
-# │13┃12│11│10│ 9│   "╶" = 0x700
-# ┟──╀──┼──┼──╁──┤   "╺" = 0xE738
-# ┃ 8│ 7│ 6│ 5┃ 4│   "╵" = 0x88400
-# ┖──┼──┼──┼──╂──┘   "╹" = 0x1DCE00
-#    │ 3│ 2│ 1┃      "╷" = 0x422
-#    └──┴──┴──┚      "╻" = 0xE77
+#    ┌──┬──┬──┐      All box characters can be created by bitwise
+#    │21│20│19│      or-ing any of the following:
+# ┌──┼──┼──┼──┼──┐   " " = 0x0
+# │18│17│16│15│14│   "╴" = 0x1C00
+# ├──┼──┼──┼──┼──┤   "╸" = 0x39CE0
+# │13│12│11│10│ 9│   "╶" = 0x700
+# ├──┼──┼──┼──┼──┤   "╺" = 0xE738
+# │ 8│ 7│ 6│ 5│ 4│   "╵" = 0x88400
+# └──┼──┼──┼──┼──┘   "╹" = 0x1DCE00
+#    │ 3│ 2│ 1│      "╷" = 0x422
+#    └──┴──┴──┘      "╻" = 0xE77
 # (I blew off the double line versions because there are no
 # Unicode characters that mix and match them.  For example
 # I can simulate or-ing "│" with "━" by using the "┿" char.
@@ -113,8 +113,19 @@ def andChars(char1,char2):
 class Context:
     def __init__(self,window):
         self.window = window
+        self.invalidatedRect = Rect()
+
+    def invalidateRect(self,rect):
+        self.invalidatedRect.unionWith(rect)
+
+    def validateAll(self):
+        self.invalidatedRect = Rect()
+
+    def getInvalidatedRect(self):
+        return self.invalidatedRect
 
     def addString(self,x,y,text,bold=False,reverse=False):
+        # TODO: make his adhere to invalidatedRect
         if bold or reverse:
             pair = curses.color_pair(1)
             if bold:
@@ -137,20 +148,22 @@ class Context:
                     self.addString(rect.x()+i,rect.y()+j," ")
 
     def orChar(self,x,y,char,isBold=False):
-        charOrd = ord(char)
-        if (charOrd>=0x2500 and charOrd<=0x254b) or (charOrd>=0x2574 and charOrd<=0x257f):
-            #if is a box char
-            existing = self.readChar(x,y)
-            writeMe = orChars(existing,char)
-        else:
-            writeMe = char
-        self.addString(x,y,writeMe,isBold)
+        if self.invalidatedRect.isInsidePoint(Point(x,y)):
+            charOrd = ord(char)
+            if (charOrd>=0x2500 and charOrd<=0x254b) or (charOrd>=0x2574 and charOrd<=0x257f):
+                #if is a box char
+                existing = self.readChar(x,y)
+                writeMe = orChars(existing,char)
+            else:
+                writeMe = char
+            self.addString(x,y,writeMe,isBold)
 
     def andChar(self,x,y,char,isBold=False):
-        if char!="█":
-            existing = self.readChar(x,y)
-            writeMe = andChars(existing,char)
-            self.addString(x,y,writeMe,isBold)
+        if self.invalidatedRect.isInsidePoint(Point(x,y)):
+            if char!="█":
+                existing = self.readChar(x,y)
+                writeMe = andChars(existing,char)
+                self.addString(x,y,writeMe,isBold)
 
     def drawVerticalLine(self,x,fro=0,to=None,isBold=False):
         if to==None:

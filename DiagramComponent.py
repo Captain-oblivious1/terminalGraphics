@@ -17,23 +17,25 @@ class DiagramComponent(Component):
     def getEditor(self):
         return self.editor
 
-    def invalidateRect(self,rect):
-        self.invalidatedRect.unionWith(rect)
+    #def invalidateRect(self,rect):
+    #    self.invalidatedRect.unionWith(rect)
 
-    def validateAll(self):
-        self.invalidatedRect = Rect()
+    #def validateAll(self):
+    #    self.invalidatedRect = Rect()
 
-    def getInvalidatedRect(self):
-        return self.invalidatedRect
+    #def getInvalidatedRect(self):
+    #    return self.invalidatedRect
 
-    def allInvalidatedComponents(self):
-        return self.invalidatedComponents
+    #def allInvalidatedComponents(self):
+    #    return self.invalidatedComponents
 
     def draw(self,context):
-        invalidatedRect = self.getInvalidatedRect()
+        invalidatedRect = context.getInvalidatedRect()
         context.clearRect(invalidatedRect)
 
+        #print("About to draw all components")
         for component in self.components:
+            #print("   Testing component intersection for="+str(component))
             #print("testing intesection of "+str(component.getRect())+" and "+str(invalidatedRect))
             if component.getRect().doesIntersect(invalidatedRect):
                 #print("Found intersection")

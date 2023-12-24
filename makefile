@@ -1,4 +1,4 @@
 all:
-	/usr/bin/xfce4-terminal -x python TerminalGraphics.py
+	/usr/bin/xfce4-terminal -x python main.py
 
 #test

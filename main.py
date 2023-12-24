@@ -7,7 +7,7 @@ class StdOutWrapper:
     text = ""
     def write(self,txt):
         self.text += txt
-        self.text = '\n'.join(self.text.split('\n')[-30:])
+        self.text = '\n'.join(self.text.split('\n')[-1000:])
     def get_text(self,beg=0,end=-1):
         return '\n'.join(self.text.split('\n')[beg:end])
 

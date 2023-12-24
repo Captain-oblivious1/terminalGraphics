@@ -157,7 +157,7 @@ class ClosedPath(Path):
             oldDirection = direction
 
     def move(self,offset,context):
-        print("ClosedPath.move offset x="+str(offset.x)+" y="+str(offset.y))
+        #print("ClosedPath.move offset x="+str(offset.x)+" y="+str(offset.y))
         if self.initialOrientation == Orientation.HORIZONTAL:
             xElement = 0
         else:

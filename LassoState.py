@@ -34,8 +34,10 @@ class LassoState(State):
         bottomRight = Point( max(startX,x), max(startY,y) )
 
         rect = Rect.makeRectFromPoints(topLeft,bottomRight)
-        self.diagramComponent.setSelectionRect(rect)
-        self.diagramComponent.invalidateRect(rect)
+        editor = self.diagramComponent.getEditor()
+        context = editor.getContext()
+        context.setSelectionRect(rect)
+        context.invalidateRect(rect)
         if self.oldRect!=None:
             self.diagramComponent.invalidateRect(self.oldRect)
         self.oldRect = rect
