@@ -39,8 +39,14 @@ class Rect:
     def isNullRect(self):
         return self.l==math.inf or self.t==math.inf or self.r==-math.inf or self.b==-math.inf
 
-    def isInsideRect(self,amIInside):
-        return self.l<=amIInside.l and self.r>amIInside.r and self.t<=amIInside.t and self.b>amIInside.b
+    def isInsideRect(self,amIInside,inclusive=False):
+        if inclusive:
+            r = self.r+1
+            b = self.b+1
+        else: 
+            r = self.r
+            b = self.b
+        return self.l<=amIInside.l and r>amIInside.r and self.t<=amIInside.t and b>amIInside.b
 
     def isInsidePoint(self,amIInside):
         return self.l<=amIInside.x and self.r>amIInside.x and self.t<=amIInside.y and self.b>amIInside.y

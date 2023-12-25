@@ -21,7 +21,6 @@ class Component:
         return self.selected
 
     def setSelected(self,newSelected):
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! setting selected (this="+str(self)+")="+str(newSelected))
         self.selected = newSelected
 
     def children(self):

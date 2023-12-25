@@ -16,7 +16,7 @@ class LassoState(State):
     def mouseReleased(self, x, y):
         if self.oldRect!=None:
             for component in self.diagramComponent.children():
-                if self.oldRect.isInsideRect(component.getRect()):
+                if self.oldRect.isInsideRect(component.getRect(),True):
                     component.setSelected(True)
                 else:
                     component.setSelected(False)

@@ -129,15 +129,22 @@ class Context:
         if bold or reverse:
             pair = curses.color_pair(1)
             if bold:
-                pair |= curses.A_BOLD
+                #pair |= curses.A_BOLD # doesn't work for some reason
+                pair |= curses.A_REVERSE
             if reverse:
                 pair |= curses.A_REVERSE
+            #print("in bold="+str(bold)+" pair="+str(pair))
+            #text = "A"
+            #print("text="+text)
             self.window.addstr(y,x,text,pair)
         else:
+            #print("in non bold="+str(bold))
             self.window.addstr(y,x,text)
 
     def readChar(self,x,y):
+        #print("inch="+str(self.window.inch(y,x)))
         return chr(0xFFFF & self.window.inch(y,x))
+        #return chr(0xFF & self.window.inch(y,x))
 
     def clearRect(self,rect=None):
         if rect == None:

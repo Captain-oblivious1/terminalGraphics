@@ -126,6 +126,8 @@ class Editor:
         curses.mouseinterval(0)
 
         curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
+        oldX=-1
+        oldY=-1
         while(True):
             event = self.screen.getch()
             #print("event='"+str(curses.keyname(event))+"'")
@@ -151,7 +153,10 @@ class Editor:
                 elif bstate & curses.BUTTON3_RELEASED != 0:
                     self.state.rightReleased(mx,my)
                 else:
+                    #if mx!=oldX or my!=oldY:
                     self.state.mouseMoved(mx,my)
+                    #    oldX = mx
+                    #    oldY = my
             else:
                 self.state.keyPressed(event)
                 #print("key pressed="+str(event))
