@@ -66,7 +66,7 @@ class OpenPath(Path):
         if name=="startArrow" or name=="endArrow":
             self._setArrow(name,value)
 
-    def drawArrow(self,context,segment,isFrom):
+    def drawArrow(self,context,segment,isFrom,bold):
         if isFrom:
             otherElbow = segment.toElbow
             endElbow = segment.fromElbow
@@ -94,25 +94,25 @@ class OpenPath(Path):
                 array = self.startArrowCharArray
             else:
                 array = self.endArrowCharArray
-            context.orChar(endX,endY,array[index])
+            context.orChar(endX,endY,array[index],bold)
 
-    def drawSegmentList(self,context,segmentList):
+    def drawSegmentList(self,context,segmentList,bold):
         first = True
         for segment in segmentList:
             direction = segment.direction()
             if first:
-                self.drawArrow(context,segment,True)
+                self.drawArrow(context,segment,True,bold)
                 first = False
             else:
                 elbow = segment.fromElbow
-                context.orChar(elbow.getX(),elbow.getY(),self.elbowSymbol[oldDirection.value][direction.value])
+                context.orChar(elbow.getX(),elbow.getY(),self.elbowSymbol[oldDirection.value][direction.value],bold)
 
             snapshot = segment.getSnapshot()
             if snapshot.fro<=snapshot.to:
                 if segment.orientation==Orientation.HORIZONTAL:
-                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to)
+                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,bold)
                 else:
-                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to)
+                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,bold)
             oldDirection = direction
-        self.drawArrow(context,segment,False)
+        self.drawArrow(context,segment,False,bold)
 

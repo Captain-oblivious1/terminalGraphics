@@ -21,19 +21,23 @@ class Component:
         return self.selected
 
     def setSelected(self,newSelected):
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! setting selected (this="+str(self)+")="+str(newSelected))
         self.selected = newSelected
 
     def children(self):
         return set()
 
     def isOnMe(self,point):
-        return self.getRect().isInsidePoint(point)
+        return True  #this is only called if point is within bounding rect.
 
     def getTopLevelComponent(self):
         if self.parent==None:
             return self
         else:
             return self.parent.getTopLevelComponent()
+
+    def getDiagramComponent(self):
+        return self.getTopLevelComponent()
 
     def invalidate(self):
         self.getEditor().getContext().invalidateRect( self.getRect() )

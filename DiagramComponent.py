@@ -20,7 +20,7 @@ class DiagramComponent(Component):
     #def invalidateRect(self,rect):
     #    self.invalidatedRect.unionWith(rect)
 
-    #def validateAll(self):
+   #def validateAll(self):
     #    self.invalidatedRect = Rect()
 
     #def getInvalidatedRect(self):
@@ -39,6 +39,7 @@ class DiagramComponent(Component):
             #print("testing intesection of "+str(component.getRect())+" and "+str(invalidatedRect))
             if component.getRect().doesIntersect(invalidatedRect):
                 #print("Found intersection")
+                #print("drawing component="+str(component))
                 component.draw(context)
 
         if self.selectionRect!=None:
@@ -54,6 +55,7 @@ class DiagramComponent(Component):
     def setSelectionRect(self,rect):
         self.selectionRect = rect
 
+    @staticmethod
     def allSelectedComponent(component,theSet):
         if component.isSelected():
             theSet.add(component)
@@ -65,18 +67,19 @@ class DiagramComponent(Component):
         DiagramComponent.allSelectedComponent(self,returnMe)
         return returnMe
 
-    def componentAt(component,point):
+    def componentAt(self,point):
         #print("testing at point="+str(point))  (51,17)
-        for child in component.children():
-            found = DiagramComponent.componentAt(child,point)
-            #print("testing child="+str(child)+" found="+str(found))
-            if found!=None:
-                return found
+        #for child in component.children():
+        #    found = DiagramComponent.componentAt(child,point)
+        #    #print("testing child="+str(child)+" found="+str(found))
+        #    if found!=None:
+        #        return found
 
-        if component.isOnMe(point):
-            return component
-        else:
-            return None
+        for child in self.children():
+            if child.getRect().isInsidePoint(point) and child.isOnMe(point):
+                return child
+
+        return None
 
     def isOnMe(self, point):
         return False

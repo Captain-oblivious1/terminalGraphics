@@ -72,11 +72,11 @@ class ClosedPath(Path):
                 refList.append(refList[0])
         return refList
 
-    def drawSegmentList(self,context,segmentList):
+    def drawSegmentList(self,context,segmentList,bold):
         if self.filled:
-            self.drawFilled(context,segmentList)
+            self.drawFilled(context,segmentList,bold)
         else:
-            self.drawUnfilled(context,segmentList)
+            self.drawUnfilled(context,segmentList,bold)
 
     class FillSnapshot:
         def __init__(self,segmentList):
@@ -116,7 +116,8 @@ class ClosedPath(Path):
             rect.unionWith(seg.getRect())
         return rect
 
-    def drawFilled(self,context,segmentList):
+    def drawFilled(self,context,segmentList,bold):
+        print("bold="+str(bold))
         fillSnapshot = ClosedPath.FillSnapshot(segmentList)
 
         rect = ClosedPath.getRect(segmentList)
@@ -134,26 +135,26 @@ class ClosedPath(Path):
                     inShape = not inShape
                 maskChar = ClosedPath.maskCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
                 borderChar = self.borderCharFor(prevRow[col],prevRow[col+1],prevInShape,inShape)
-                context.andChar(x,y,maskChar)
+                context.andChar(x,y,maskChar,bold)
                 if borderChar:
-                    context.orChar(x,y,borderChar)
+                    context.orChar(x,y,borderChar,bold)
                 prevRow[col] = prevInShape
                 prevInShape= inShape
 
-    def drawUnfilled(self,context,segmentList):
+    def drawUnfilled(self,context,segmentList,bold):
         oldDirection = segmentList[-1].direction()
         for segment in segmentList:
             direction = segment.direction()
             elbow = segment.fromElbow
             elbowChar = self.elbowSymbol[oldDirection.value][direction.value]
-            context.orChar(elbow.getX(),elbow.getY(),elbowChar)
+            context.orChar(elbow.getX(),elbow.getY(),elbowChar,bold)
 
             snapshot = segment.getSnapshot()
             if snapshot.fro<=snapshot.to:
                 if segment.orientation==Orientation.HORIZONTAL:
-                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to)
+                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,bold)
                 else:
-                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to)
+                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,bold)
             oldDirection = direction
 
     def move(self,offset,context):

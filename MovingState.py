@@ -38,9 +38,10 @@ class MovingState(State):
             #for component in self.affectedConnectors:
             #    self.context.invalidateComponent(component)
 
+            print("Moving "+str(len(self.selectedComponents))+" components offset x="+str(offset.x)+" y="+str(offset.y))
             for component in self.selectedComponents:
                 component.invalidate()
-                #print("Moving offset x="+str(offset.x)+" y="+str(offset.y))
+                print("  Moving component="+str(component))
                 component.move(offset,self.context)
                 component.invalidate()
 
