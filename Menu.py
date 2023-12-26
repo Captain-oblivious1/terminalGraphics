@@ -46,7 +46,6 @@ class Menu(Component):
         return self.selectedIndex
 
     def clickedOn(self,point):
-        print("clicked on menu")
         index = (point-self.topLeft).y - 1
         if index>=0 and index<len(self.options):
             self.selectedOption = self.options[index]

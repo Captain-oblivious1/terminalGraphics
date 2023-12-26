@@ -13,7 +13,8 @@ class PathComponent(Component):
     def __init__(self,parent,element):
         super().__init__(parent)
         self.element = element
-        self.setEditing(False)
+        self.rightClickPoint = None
+        self.editing = False
         self.updateElement(element)
 
     def updateElement(self,element):
@@ -30,11 +31,11 @@ class PathComponent(Component):
 
         self.renderer.corners = element.corners
 
-    def setEditing(self,editing):
-        self.editing = editing
+    #def setEditing(self,editing):
+    #    self.editing = editing
 
-    def isEditing(self):
-        return self.editing
+    #def isEditing(self):
+    #    return self.editingPoint!=None
 
     def isOnMe(self,point):
         return self.renderer.isPointInPath(point)
@@ -46,10 +47,31 @@ class PathComponent(Component):
         self.renderer.draw(context,self.isSelected())
 
     def move(self,offset,context):
-        self.renderer.move(offset,context)
+        if self.editing:
+            self.editSegment(offset,context)
+        else:
+            self.renderer.move(offset,context)
+
+    def editSegment(self,offset,context):
+        self.invalidate()
+
+        pathElement = self.renderer.pathElementAt(self.rightClickPoint)
+        if isinstance(pathElement,Path.Segment):
+            if pathElement.orientation == Orientation.HORIZONTAL:
+                myOffset = offset.y
+            else:
+                myOffset = offset.x
+
+            ref = pathElement.getPosRef()
+            oldPos = ref.get()
+            ref.set(oldPos+myOffset)
+        else:
+            pass
+            #TODO: move elbow
 
     def showContextMenu(self,point,context):
-        if self.isEditing():
+        self.rightClickPoint = point
+        if self.editing:
             options = ["stop editing","","split","join"]
         else:
             options = ["edit shape"]
@@ -57,22 +79,23 @@ class PathComponent(Component):
 
     def menuResult(self,menu):
         if menu.getSelectedOption()=="split":
-            self.split(menu.getTopLeft())
+            self.split(self.rightClickPoint)
         elif menu.getSelectedOption()=="join":
-            self.join(menu.getTopLeft())
+            self.join(self.rightClickPoint)
         elif menu.getSelectedOption()=="stop editing":
-            self.setEditing(False)
+            self.editing = False
         elif menu.getSelectedOption()=="edit shape":
-            self.setEditing(True)
+            self.editing = True
 
     def split(self,point):
-        pathSegment = self.pathSegment
-        if pathSegment.orientation==Orientation.HORIZONTAL:
-            splitPos = point.x
-        else:
-            splitPos = point.y
-        pathSegment.split(splitPos)
-        self.parent.createChildren()
+        pathElement = self.renderer.pathElementAt(point)
+        if isinstance(pathElement,Path.Segment):
+            if pathElement.orientation==Orientation.HORIZONTAL:
+                splitPos = point.x
+            else:
+                splitPos = point.y
+            pathElement.split(splitPos)
+        #self.createChildren()
 
     def join(self,point):
         self.parent.invalidate()

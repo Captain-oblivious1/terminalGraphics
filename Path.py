@@ -114,12 +114,16 @@ class Path:
             arrayElement += 1
 
     def isPointInPath(self,point):
+        return self.pathElementAt(point)!=None
+
+    def pathElementAt(self,point):
         for segment in self.segments:
             fromElbow = segment.fromElbow
-            if point.isEqual(fromElbow.getX(), fromElbow.getY()) or \
-                    segment.getRect().isInsidePoint(point):
-                return True
-        return False
+            if point.isEqual(fromElbow.getX(), fromElbow.getY()):
+                return fromElbow
+            elif segment.getRect().isInsidePoint(point):
+                return segment
+        return None
 
     #def draw(self,context):
     #    self.drawSegmentList(context,self.segments)
