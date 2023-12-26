@@ -31,6 +31,7 @@ class DiagramComponent(Component):
 
     def draw(self,context):
         invalidatedRect = context.getInvalidatedRect()
+        #print("context.rect="+str(context.invalidatedRect))
         context.clearRect(invalidatedRect)
 
         #print("About to draw all components")
@@ -46,8 +47,6 @@ class DiagramComponent(Component):
             for col in range(self.selectionRect.l,self.selectionRect.r):
                 for row in range(self.selectionRect.t,self.selectionRect.b):
                     char = context.readChar(col,row)
-                    if char=='Ġ':
-                        raise Exception("fuck")
                     #print("char='"+char+"' ord="+hex(ord(char)))
                     context.addString(col,row,char,False,True)
 
@@ -85,6 +84,37 @@ class DiagramComponent(Component):
 
     def isOnMe(self, point):
         return False
+
+    def moveSelectedToFront(self):
+        topList = []
+        bottomList = []
+        selected = self.allSelected()
+        for component in self.components:
+            if component in selected:
+                bottomList.append(component)
+                component.invalidate()
+            else:
+                topList.append(component)
+        self.components = topList + bottomList
+
+    def moveSelectedToBack(self):
+        topList = []
+        bottomList = []
+        selected = self.allSelected()
+        for component in self.components:
+            if component in selected:
+                topList.append(component)
+                component.invalidate()
+            else:
+                bottomList.append(component)
+        self.components = topList + bottomList
+        pass
+
+    def moveSelectedForward(self):
+        pass
+
+    def moveSelectedBackward(self):
+        pass
 
     def showMenu(self,menu):
         self.components.append(menu)

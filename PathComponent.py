@@ -1,5 +1,7 @@
 from Component import *
 from Path import *
+from OpenPath import *
+from ClosedPath import *
 #from Connector import *
 #from Shape import *
 from Util import *
@@ -7,6 +9,86 @@ from Rect import *
 from Menu import *
 
 class PathComponent(Component):
+
+    def __init__(self,parent,element):
+        super().__init__(parent)
+        self.element = element
+        self.setEditing(False)
+        self.updateElement(element)
+
+    def updateElement(self,element):
+        refArray = []
+        for val in element.turns:
+           refArray.append( VarReference(val) )
+
+        if element.pathType == PathType.CLOSED:
+            self.renderer = ClosedPath(element.startOrientation,refArray,element.fill == Fill.OPAQUE)
+        else:
+            self.renderer = OpenPath(element.startOrientation,refArray)
+            self.renderer.startArrow = element.startArrow
+            self.renderer.endArrow = element.endArrow
+
+        self.renderer.corners = element.corners
+
+    def setEditing(self,editing):
+        self.editing = editing
+
+    def isEditing(self):
+        return self.editing
+
+    def isOnMe(self,point):
+        #for seg in self.segments:
+        #    if seg.isOnMe(point):
+        #        return True
+        return True
+
+    def getRect(self):
+        return self.renderer.getRect()
+
+    def draw(self,context):
+        self.renderer.draw(context,self.isSelected())
+
+#    def createChildren(self):
+#        self.createChildrenRenderer(self.renderer)
+#
+#    def createChildrenRenderer(self,path):
+#        element = self.element
+#        self.path = path
+#
+#        self.segmentList = self.path.getSegmentList()
+#        self.segments = []
+#        for pathSegment in self.segmentList:
+#            self.segments.append( PathComponent.Segment( self, pathSegment ) )
+#
+#        self.elbows = []
+#        prevSegment = None
+#        for segment in self.segments:
+#            self.elbows.append(PathComponent.Elbow(self,segment.pathSegment.fromElbow))
+#            prevSegment = segment
+#        self.elbows.append(PathComponent.Elbow(self,prevSegment.pathSegment.toElbow))
+
+
+
+#    def children(self):
+#        returnMe = set()
+#        if True or self.isEditing():
+#            for segment in self.segments:
+#                returnMe.add(segment)
+#            for elbow in self.elbows:
+#                returnMe.add(elbow)
+#        return returnMe
+
+    #def setSelected(self,selected):
+    #    Component.setSelected(self,selected)
+    #    #for seg in self.segments:
+    #    #    seg.setSelected(selected)
+
+    def move(self,offset,context):
+        self.renderer.move(offset,context)
+
+    def __str__(self):
+        return "Component{element="+self.element.__str__()+"}";
+
 
 #    class Segment(Component):
 #
@@ -140,79 +222,3 @@ class PathComponent(Component):
 #                editor = self.getEditor()
 #                editor.goSelectComponentState(PathComponent.ComponentSelectListener(self))
 #                #self.pathElbow.connectTo()
-
-    def __init__(self,parent,element,renderer):
-        super().__init__(parent)
-        self.element = element
-        self.renderer = renderer
-        self.setEditing(False)
-        #self.createChildren()
-
-    def setEditing(self,editing):
-        self.editing = editing
-
-    def isEditing(self):
-        return self.editing
-
-    def isOnMe(self,point):
-        for seg in self.segments:
-            if seg.isOnMe(point):
-                return True
-        return False
-
-#    def createChildren(self):
-#        self.createChildrenRenderer(self.renderer)
-#
-#    def createChildrenRenderer(self,path):
-#        element = self.element
-#        self.path = path
-#
-#        self.segmentList = self.path.getSegmentList()
-#        self.segments = []
-#        for pathSegment in self.segmentList:
-#            self.segments.append( PathComponent.Segment( self, pathSegment ) )
-#
-#        self.elbows = []
-#        prevSegment = None
-#        for segment in self.segments:
-#            self.elbows.append(PathComponent.Elbow(self,segment.pathSegment.fromElbow))
-#            prevSegment = segment
-#        self.elbows.append(PathComponent.Elbow(self,prevSegment.pathSegment.toElbow))
-
-
-    def getRect(self):
-        rect = Rect()
-#        for seg in self.segments:
-#            rect.unionWith(seg.getRect())
-#        rect.unionWith(self.elbows[0].getRect())
-#        rect.unionWith(self.elbows[-1].getRect())
-        return rect
-
-    def draw(self,context):
-        #print("drawwing path component (this="+str(self)+") selected="+str(self.isSelected()))
-        #self.path.drawSegmentList(context,self.segmentList,self.isSelected())
-        self.renderer.drawSegmentList(context,self.segmentList,self.isSelected())
-
-    def children(self):
-        returnMe = set()
-        if True or self.isEditing():
-            for segment in self.segments:
-                returnMe.add(segment)
-            for elbow in self.elbows:
-                returnMe.add(elbow)
-        return returnMe
-
-    #def setSelected(self,selected):
-    #    Component.setSelected(self,selected)
-    #    #for seg in self.segments:
-    #    #    seg.setSelected(selected)
-
-    def move(self,offset,context):
-        print("moving offset="+str(offset))
-        #import traceback
-        #traceback.print_stack()
-        self.path.move(offset,context)
-
-    def __str__(self):
-        return "Component{element="+self.element.__str__()+"}";
-

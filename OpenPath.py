@@ -18,39 +18,13 @@ class OpenPath(Path):
         else:
             return super().createElbow(path,index,xRefIndex,yRefIndex)
 
-    class ArrowElbow(Path.Elbow):
-        def __init__(self,path,index,xRef,yRef):
-            super().__init__(path,index,xRef,yRef)
-
-        def connectTo(self,segment,point):
-            path = self.path
-            elbowRefs = path.elbowRefs
-
-            if self.index==0:
-                xIndex = 0
-            else:
-                xIndex = len(elbowRefs)-2
-            yIndex = xIndex+1
-
-            initVertical = path.initialOrientation==Orientation.VERTICAL
-            if (xIndex==0 and initVertical) or (xIndex%2==0 and initVertical): # if my segment is vertical than swap
-                temp = xIndex
-                xIndex = yIndex
-                yIndex = temp
-
-            print("invoked ArrowElbow.connectTo segment="+str(segment)+" point="+str(point)+" xIndex="+str(xIndex)+" yIndex="+str(yIndex))
-
-            if segment.orientation==Orientation.HORIZONTAL:
-                xRef = VarReference(point.x)
-                yRef = segment.getPosRef()
-            else:
-                xRef = sefment.getPosRef()
-                yRef = VarReference(point.y)
-
-            elbowRefs[xIndex]= xRef
-            elbowRefs[yIndex]= yRef
-
-
+    def getRect(self):
+        rect = Rect()
+        for segment in self.segments:
+            rect.unionWith(segment.getRect())
+        rect.unionWith(self.segments[0].fromElbow.getRect())
+        rect.unionWith(self.segments[-1].toElbow.getRect())
+        return rect
 
     def _setArrow(self,name,value):
         if value==Arrow.NONE:
@@ -96,9 +70,10 @@ class OpenPath(Path):
                 array = self.endArrowCharArray
             context.orChar(endX,endY,array[index],bold)
 
-    def drawSegmentList(self,context,segmentList,bold):
+    def draw(self,context,bold):
+        #segmentList = self.createSegmentList(self.elbowRefs)
         first = True
-        for segment in segmentList:
+        for segment in self.segments:
             direction = segment.direction()
             if first:
                 self.drawArrow(context,segment,True,bold)
@@ -116,3 +91,34 @@ class OpenPath(Path):
             oldDirection = direction
         self.drawArrow(context,segment,False,bold)
 
+    class ArrowElbow(Path.Elbow):
+        def __init__(self,path,index,xRef,yRef):
+            super().__init__(path,index,xRef,yRef)
+
+        def connectTo(self,segment,point):
+            path = self.path
+            elbowRefs = path.elbowRefs
+
+            if self.index==0:
+                xIndex = 0
+            else:
+                xIndex = len(elbowRefs)-2
+            yIndex = xIndex+1
+
+            initVertical = path.initialOrientation==Orientation.VERTICAL
+            if (xIndex==0 and initVertical) or (xIndex%2==0 and initVertical): # if my segment is vertical than swap
+                temp = xIndex
+                xIndex = yIndex
+                yIndex = temp
+
+            print("invoked ArrowElbow.connectTo segment="+str(segment)+" point="+str(point)+" xIndex="+str(xIndex)+" yIndex="+str(yIndex))
+
+            if segment.orientation==Orientation.HORIZONTAL:
+                xRef = VarReference(point.x)
+                yRef = segment.getPosRef()
+            else:
+                xRef = segment.getPosRef()
+                yRef = VarReference(point.y)
+
+            elbowRefs[xIndex]= xRef
+            elbowRefs[yIndex]= yRef

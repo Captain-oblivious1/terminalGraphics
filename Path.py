@@ -39,6 +39,87 @@ class Path:
     def createElbow(self,path,index,xRefIndex,yRefIndex):
         return Path.Elbow(path,index,xRefIndex,yRefIndex)
 
+    def getRect(self):
+        rect = Rect()
+        for segment in self.segments:
+            rect.unionWith(segment.getRect())
+        return rect
+
+    def createElbowList(self,refList):
+        elbowList = []
+        horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
+        first = True
+
+        elbowIndex = 0
+        refIndex = 0
+        for refIndex in range(len(refList)):
+
+            if horizontalOrienation:
+                xRefIndex = refIndex
+            else:
+                yRefIndex = refIndex
+
+            refIndex += 1
+
+            if first:
+                first = False
+            else:
+                elbow = self.createElbow(self,elbowIndex,xRefIndex,yRefIndex)
+                elbowIndex += 1
+                elbowList.append(elbow)
+            horizontalOrienation = not horizontalOrienation
+
+        return elbowList
+
+    def createSegmentList(self,elbowRefs):
+        elbows = self.createElbowList(elbowRefs)
+        segmentList = []
+        prevElbow = None
+        horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
+        for elbow in elbows:
+            if prevElbow:
+                segment = Path.Segment(self)
+                segment.fromElbow = prevElbow
+                segment.toElbow = elbow
+                if horizontalOrienation:
+                    segment.orientation = Orientation.HORIZONTAL
+                else:
+                    segment.orientation = Orientation.VERTICAL
+
+                horizontalOrienation = not horizontalOrienation
+
+                segmentList.append( segment )
+
+            prevElbow = elbow
+
+        return segmentList
+
+    def getSegmentList(self):
+        return self.segments
+
+
+    def move(self,offset,context):
+        #print("Path.move offset x="+str(offset.x)+" y="+str(offset.y))
+        if self.initialOrientation == Orientation.HORIZONTAL:
+            xElement = 0
+        else:
+            xElement = 1
+
+        arrayElement = 0
+        for ref in self.elbowRefs:
+            if arrayElement%2 == xElement:
+                elementOffset = offset.x
+            else:
+                elementOffset = offset.y
+            ref.set( ref.get() + elementOffset )
+            arrayElement += 1
+
+    #def draw(self,context):
+    #    self.drawSegmentList(context,self.segments)
+
+    #def drawSegmentList(self,context,createSegmentList):
+    #    pass  #subclass draws how it sees fit
+
     class Elbow:
 
         def __init__(self,path,index,xRefIndex,yRefIndex):
@@ -82,32 +163,6 @@ class Path:
 
         def __str__(self):
             return "Elbow{index="+str(self.index)+" x="+str(self.getX())+",y="+str(self.getY())+"}"
-
-    def createElbowList(self,refList):
-        elbowList = []
-        horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
-        first = True
-
-        elbowIndex = 0
-        refIndex = 0
-        for refIndex in range(len(refList)):
-
-            if horizontalOrienation:
-                xRefIndex = refIndex
-            else:
-                yRefIndex = refIndex
-
-            refIndex += 1
-
-            if first:
-                first = False
-            else:
-                elbow = self.createElbow(self,elbowIndex,xRefIndex,yRefIndex)
-                elbowIndex += 1
-                elbowList.append(elbow)
-            horizontalOrienation = not horizontalOrienation
-
-        return elbowList
 
     class Segment:
         def __init__(self,parent):
@@ -212,51 +267,3 @@ class Path:
             for listener in self.listeners:
                 listener.segmentJoined(oldSegments[segmentIndex-1],oldSegments[segmentIndex],oldSegments[segmentIndex+1],self)
 
-
-    def createSegmentList(self,elbowRefs):
-        elbows = self.createElbowList(elbowRefs)
-        segmentList = []
-        prevElbow = None
-        horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
-        for elbow in elbows:
-            if prevElbow:
-                segment = Path.Segment(self)
-                segment.fromElbow = prevElbow
-                segment.toElbow = elbow
-                if horizontalOrienation:
-                    segment.orientation = Orientation.HORIZONTAL
-                else:
-                    segment.orientation = Orientation.VERTICAL
-
-                horizontalOrienation = not horizontalOrienation
-
-                segmentList.append( segment )
-
-            prevElbow = elbow
-
-        return segmentList
-
-    def getSegmentList(self):
-        return self.segments
-
-    def move(self,offset,context):
-        #print("Path.move offset x="+str(offset.x)+" y="+str(offset.y))
-        if self.initialOrientation == Orientation.HORIZONTAL:
-            xElement = 0
-        else:
-            xElement = 1
-
-        arrayElement = 0
-        for ref in self.elbowRefs:
-            if arrayElement%2 == xElement:
-                elementOffset = offset.x
-            else:
-                elementOffset = offset.y
-            ref.set( ref.get() + elementOffset )
-            arrayElement += 1
-
-    #def draw(self,context):
-    #    self.drawSegmentList(context,self.segments)
-
-    #def drawSegmentList(self,context,createSegmentList):
-    #    pass  #subclass draws how it sees fit

@@ -18,18 +18,19 @@ def createTestDiagram():
     diagramElement.elements.append(RectElement( Rect(5,6,10,7) ))
     diagramElement.elements.append(RectElement( Rect(8,13,16,8) ))
 
-    #pathElement1 = PathElement()
+    pathElement1 = PathElement()
     #pathElement1.pathType = PathType.CLOSED
-    ##pathElement1.pathType = PathType.OPEN
-    #pathElement1.fill = Fill.OPAQUE
-    #pathElement1.startOrientation = Orientation.VERTICAL
-    ##pathElement1.turns = [5,23,12,30,20,2]
+    pathElement1.pathType = PathType.OPEN
+    pathElement1.fill = Fill.OPAQUE
+    pathElement1.startOrientation = Orientation.VERTICAL
+    #pathElement1.turns = [5,23,12,30,20,2]
+    pathElement1.turns = [15,40,20,50,30,60]
     #pathElement1.turns = [0,0,10,20]
-    ##pathElement1.corners = Corners.ROUND
-    #pathElement1.corners = Corners.SQUARE
-    ##pathElement1.startArrow = Arrow.NONE
-    ##pathElement1.endArrow = Arrow.TRIANGLE
-    #diagramElement.elements.append(pathElement1)
+    #pathElement1.corners = Corners.ROUND
+    pathElement1.corners = Corners.SQUARE
+    pathElement1.startArrow = Arrow.LINES
+    pathElement1.endArrow = Arrow.TRIANGLE
+    diagramElement.elements.append(pathElement1)
 
     #pathElement2 = PathElement()
     #pathElement2.pathType = PathType.OPEN
@@ -41,13 +42,13 @@ def createTestDiagram():
     #pathElement2.endArrow = Arrow.TRIANGLE
     #diagramElement.elements.append(pathElement2)
 
-    #pathElement3 = PathElement()
-    #pathElement3.pathType = PathType.CLOSED
-    #pathElement3.fill = Fill.OPAQUE
-    #pathElement3.startOrientation = Orientation.VERTICAL
-    #pathElement3.turns = [5,5,15,25,30,30]
-    #pathElement3.corners = Corners.ROUND
-    #diagramElement.elements.append(pathElement3)
+    pathElement3 = PathElement()
+    pathElement3.pathType = PathType.CLOSED
+    pathElement3.fill = Fill.OPAQUE
+    pathElement3.startOrientation = Orientation.VERTICAL
+    pathElement3.turns = [5,5,15,25,30,30]
+    pathElement3.corners = Corners.ROUND
+    diagramElement.elements.append(pathElement3)
 
     return diagramElement
 
@@ -60,18 +61,7 @@ def createDiagramComponent(editor,diagramElement):
         elif type(element) is ConnectorElement:
             component = ConnectorComponent(diagramComponent)
         elif type(element) is PathElement:
-            refArray = []
-            for val in element.turns:
-               refArray.append( VarReference(val) )
-            if element.pathType == PathType.CLOSED:
-                fill = element.fill == Fill.OPAQUE
-                renderer = ClosedPath(element.startOrientation,refArray,fill)
-            else:
-                renderer = OpenPath(element.startOrientation,refArray)
-                renderer.startArrow = element.startArrow
-                renderer.endArrow = element.endArrow
-            renderer.corners = element.corners
-            component = PathComponent(diagramComponent,element,renderer)
+            component = PathComponent(diagramComponent,element)
         elif type(element) is RectElement:
             component = RectComponent(diagramComponent,element)
 
@@ -118,8 +108,10 @@ class Editor:
 
         self.goIdleState()
 
-        self.diagramComponent.invalidateAll()
-        self.diagramComponent.draw(self.context)
+        diagram = self.diagramComponent
+
+        diagram.invalidateAll()
+        diagram.draw(self.context)
         self.screen.refresh()
         self.context.validateAll()
 
@@ -140,6 +132,14 @@ class Editor:
                     break;
             elif event == ord('q'):
                 break
+            elif event == curses.KEY_PPAGE:
+                diagram.moveSelectedForward()
+            elif event == curses.KEY_NPAGE:
+                diagram.moveSelectedBackward()
+            elif event == curses.KEY_HOME:
+                diagram.moveSelectedToFront()
+            elif event == curses.KEY_END:
+                diagram.moveSelectedToBack()
             elif event == curses.KEY_MOUSE:
                 #ch = 'Y'
                 _ , mx, my, _, bstate = curses.getmouse()
@@ -153,7 +153,7 @@ class Editor:
                 elif bstate & curses.BUTTON3_RELEASED != 0:
                     self.state.rightReleased(mx,my)
                 else:
-                    #if mx!=oldX or my!=oldY:
+                    #if mx!=oldX or my!=oldY: #This added the weird G characters when hilighting
                     self.state.mouseMoved(mx,my)
                     #    oldX = mx
                     #    oldY = my
@@ -161,7 +161,7 @@ class Editor:
                 self.state.keyPressed(event)
                 #print("key pressed="+str(event))
 
-            self.diagramComponent.draw(self.context)
+            diagram.draw(self.context)
             self.context.validateAll()
             self.screen.refresh()
 

@@ -72,26 +72,11 @@ class ClosedPath(Path):
                 refList.append(refList[0])
         return refList
 
-    def drawSegmentList(self,context,segmentList,bold):
+    def draw(self,context,bold):
         if self.filled:
-            self.drawFilled(context,segmentList,bold)
+            self.drawFilled(context,self.segments,bold)
         else:
-            self.drawUnfilled(context,segmentList,bold)
-
-    class FillSnapshot:
-        def __init__(self,segmentList):
-            self.verticals=[]
-            for segment in segmentList:
-                if segment.orientation==Orientation.VERTICAL:
-                    snapshot = segment.getSnapshot(True)
-                    self.verticals.append(snapshot)
-
-        def didCross(self,x,y):
-            crossCount = 0
-            for segment in self.verticals:  #added = to conditions to avoid floating point math
-                if x>=segment.pos and (x-1)<segment.pos and y>=segment.fro and y<segment.to:
-                    crossCount += 1
-            return crossCount%2
+            self.drawUnfilled(context,self.segments,bold)
 
     # mask[TL][TR][BL][BR]
     mask = \
@@ -110,17 +95,16 @@ class ClosedPath(Path):
     def borderCharFor(self,topLeft,topRight,bottomLeft,bottomRight):
         return self.border[topLeft][topRight][bottomLeft][bottomRight]
 
-    def getRect(segmentList):
-        rect = Rect()
-        for seg in segmentList:
-            rect.unionWith(seg.getRect())
-        return rect
+    #def getRect(segmentList):
+    #    rect = Rect()
+    #    for seg in segmentList:
+    #        rect.unionWith(seg.getRect())
+    #    return rect
 
     def drawFilled(self,context,segmentList,bold):
-        print("bold="+str(bold))
         fillSnapshot = ClosedPath.FillSnapshot(segmentList)
 
-        rect = ClosedPath.getRect(segmentList)
+        rect = self.getRect()
         prevRow = [False] * (rect.width() + 1)
         for row in range(rect.height()):
             y = rect.y()+row
@@ -173,3 +157,18 @@ class ClosedPath(Path):
                     elementOffset = offset.y
                 ref.set( ref.get() + elementOffset )
             arrayElement += 1
+
+    class FillSnapshot:
+        def __init__(self,segmentList):
+            self.verticals=[]
+            for segment in segmentList:
+                if segment.orientation==Orientation.VERTICAL:
+                    snapshot = segment.getSnapshot(True)
+                    self.verticals.append(snapshot)
+
+        def didCross(self,x,y):
+            crossCount = 0
+            for segment in self.verticals:  #added = to conditions to avoid floating point math
+                if x>=segment.pos and (x-1)<segment.pos and y>=segment.fro and y<segment.to:
+                    crossCount += 1
+            return crossCount%2
