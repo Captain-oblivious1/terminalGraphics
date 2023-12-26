@@ -48,6 +48,43 @@ class PathComponent(Component):
     def move(self,offset,context):
         self.renderer.move(offset,context)
 
+    def showContextMenu(self,point,context):
+        if self.isEditing():
+            options = ["stop editing","","split","join"]
+        else:
+            options = ["edit shape"]
+        self.getDiagramComponent().showMenu(Menu(self,options,point,self.menuResult))
+
+    def menuResult(self,menu):
+        if menu.getSelectedOption()=="split":
+            self.split(menu.getTopLeft())
+        elif menu.getSelectedOption()=="join":
+            self.join(menu.getTopLeft())
+        elif menu.getSelectedOption()=="stop editing":
+            self.setEditing(False)
+        elif menu.getSelectedOption()=="edit shape":
+            self.setEditing(True)
+
+    def split(self,point):
+        pathSegment = self.pathSegment
+        if pathSegment.orientation==Orientation.HORIZONTAL:
+            splitPos = point.x
+        else:
+            splitPos = point.y
+        pathSegment.split(splitPos)
+        self.parent.createChildren()
+
+    def join(self,point):
+        self.parent.invalidate()
+        pathSegment = self.pathSegment
+        if pathSegment.orientation==Orientation.HORIZONTAL:
+            joinPos = point.x
+        else:
+            joinPos = point.y
+        pathSegment.join(joinPos)
+        self.parent.createChildren()
+        self.parent.invalidate()
+
     def __str__(self):
         return "Component{element="+self.element.__str__()+"}";
 
@@ -163,19 +200,19 @@ class PathComponent(Component):
 #                self.parent.setEditing(False)
 #            elif menu.getSelectedOption()=="edit shape":
 #                self.parent.setEditing(True)
-
-    class ComponentSelectListener:
-        def __init__(self,elbow):
-            self.elbow = elbow
-
-        def componentSelected(self,component,point):
-            if isinstance(component,PathComponent.Segment):
-                self.elbow.parent.invalidate()
-                pathSegment = component.pathSegment
-                self.elbow.pathElbow.connectTo(pathSegment,point)
-                self.elbow.parent.invalidate()
-                self.elbow.getEditor().goIdleState()
-
+#
+#    class ComponentSelectListener:
+#        def __init__(self,elbow):
+#            self.elbow = elbow
+#
+#        def componentSelected(self,component,point):
+#            if isinstance(component,PathComponent.Segment):
+#                self.elbow.parent.invalidate()
+#                pathSegment = component.pathSegment
+#                self.elbow.pathElbow.connectTo(pathSegment,point)
+#                self.elbow.parent.invalidate()
+#                self.elbow.getEditor().goIdleState()
+#
 #    class Elbow(Component):
 #
 #        def __init__(self,parent,pathElbow):

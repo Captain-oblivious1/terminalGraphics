@@ -25,7 +25,7 @@ class Menu(Component):
         self.selectedIndex = -1
 
     def draw(self,context):
-        self.path.draw(context)
+        self.path.draw(context,False)
 
         y = self.topLeft.y + 1
         x = self.topLeft.x + 1
@@ -46,6 +46,7 @@ class Menu(Component):
         return self.selectedIndex
 
     def clickedOn(self,point):
+        print("clicked on menu")
         index = (point-self.topLeft).y - 1
         if index>=0 and index<len(self.options):
             self.selectedOption = self.options[index]
