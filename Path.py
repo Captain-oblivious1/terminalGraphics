@@ -97,7 +97,6 @@ class Path:
     def getSegmentList(self):
         return self.segments
 
-
     def move(self,offset,context):
         #print("Path.move offset x="+str(offset.x)+" y="+str(offset.y))
         if self.initialOrientation == Orientation.HORIZONTAL:
@@ -113,6 +112,14 @@ class Path:
                 elementOffset = offset.y
             ref.set( ref.get() + elementOffset )
             arrayElement += 1
+
+    def isPointInPath(self,point):
+        for segment in self.segments:
+            fromElbow = segment.fromElbow
+            if point.isEqual(fromElbow.getX(), fromElbow.getY()) or \
+                    segment.getRect().isInsidePoint(point):
+                return True
+        return False
 
     #def draw(self,context):
     #    self.drawSegmentList(context,self.segments)

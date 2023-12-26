@@ -91,6 +91,15 @@ class OpenPath(Path):
             oldDirection = direction
         self.drawArrow(context,segment,False,bold)
 
+    def isPointInPath(self,point):
+        parentResult = super().isPointInPath(point)
+        if parentResult:
+            return True
+        else:
+            endElbow = self.segments[-1].toElbow
+            return point.isEqual(endElbow.getX(), endElbow.getY())
+
+
     class ArrowElbow(Path.Elbow):
         def __init__(self,path,index,xRef,yRef):
             super().__init__(path,index,xRef,yRef)

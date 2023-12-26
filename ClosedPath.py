@@ -158,6 +158,19 @@ class ClosedPath(Path):
                 ref.set( ref.get() + elementOffset )
             arrayElement += 1
 
+    # I am not sure I want this behavior
+    #def isPointInPath(self,point):
+    #    parentResult = super().isPointInPath(point)
+    #    if parentResult:
+    #        return True
+    #    else:
+    #        return self.isPointInside(point)
+
+    # This doesn't work anyway...
+    #def isPointInside(self,point):
+    #    fillSnapshot = ClosedPath.FillSnapshot(self.segments)
+    #    return fillSnapshot.didCross(point.x,point.y)
+
     class FillSnapshot:
         def __init__(self,segmentList):
             self.verticals=[]

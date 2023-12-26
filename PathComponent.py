@@ -37,16 +37,19 @@ class PathComponent(Component):
         return self.editing
 
     def isOnMe(self,point):
-        #for seg in self.segments:
-        #    if seg.isOnMe(point):
-        #        return True
-        return True
+        return self.renderer.isPointInPath(point)
 
     def getRect(self):
         return self.renderer.getRect()
 
     def draw(self,context):
         self.renderer.draw(context,self.isSelected())
+
+    def move(self,offset,context):
+        self.renderer.move(offset,context)
+
+    def __str__(self):
+        return "Component{element="+self.element.__str__()+"}";
 
 #    def createChildren(self):
 #        self.createChildrenRenderer(self.renderer)
@@ -82,12 +85,6 @@ class PathComponent(Component):
     #    Component.setSelected(self,selected)
     #    #for seg in self.segments:
     #    #    seg.setSelected(selected)
-
-    def move(self,offset,context):
-        self.renderer.move(offset,context)
-
-    def __str__(self):
-        return "Component{element="+self.element.__str__()+"}";
 
 
 #    class Segment(Component):
