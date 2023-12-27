@@ -47,7 +47,7 @@ class RectComponent(Component):
         b = rect.b-1
         return point.x==l or point.x==r or point.y==t or point.y==b
 
-    def move(self,offset,context):
+    def move(self,fromPoint,offset,context):
         oldRect = self.rectElement.rect
         newRect = Rect(oldRect.l+offset.x,oldRect.t+offset.y,oldRect.width(),oldRect.height())
         self.rectElement.rect = newRect

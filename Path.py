@@ -98,7 +98,6 @@ class Path:
         return self.segments
 
     def move(self,offset,context):
-        #print("Path.move offset x="+str(offset.x)+" y="+str(offset.y))
         if self.initialOrientation == Orientation.HORIZONTAL:
             xElement = 0
         else:

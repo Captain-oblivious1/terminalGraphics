@@ -40,7 +40,7 @@ class MovingState(State):
 
             for component in self.selectedComponents:
                 component.invalidate()
-                component.move(offset,self.context)
+                component.move(self.lastPoint,offset,self.context)
                 component.invalidate()
 
             self.lastPoint = newPoint

@@ -46,16 +46,16 @@ class PathComponent(Component):
     def draw(self,context):
         self.renderer.draw(context,self.isSelected())
 
-    def move(self,offset,context):
+    def move(self,fromPoint,offset,context):
         if self.editing:
-            self.editSegment(offset,context)
+            self.editSegment(fromPoint,offset,context)
         else:
             self.renderer.move(offset,context)
 
-    def editSegment(self,offset,context):
+    def editSegment(self,fromPoint,offset,context):
         self.invalidate()
 
-        pathElement = self.renderer.pathElementAt(self.rightClickPoint)
+        pathElement = self.renderer.pathElementAt(fromPoint)
         if isinstance(pathElement,Path.Segment):
             if pathElement.orientation == Orientation.HORIZONTAL:
                 myOffset = offset.y
@@ -99,14 +99,14 @@ class PathComponent(Component):
 
     def join(self,point):
         self.parent.invalidate()
-        pathSegment = self.pathSegment
-        if pathSegment.orientation==Orientation.HORIZONTAL:
+        pathElement = self.renderer.pathElementAt(point)
+        if pathElement.orientation==Orientation.HORIZONTAL:
             joinPos = point.x
         else:
             joinPos = point.y
-        pathSegment.join(joinPos)
-        self.parent.createChildren()
-        self.parent.invalidate()
+        pathElement.join(joinPos)
+        #self.parent.createChildren()
+        self.invalidate()
 
     def __str__(self):
         return "Component{element="+self.element.__str__()+"}";
