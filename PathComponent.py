@@ -48,26 +48,32 @@ class PathComponent(Component):
 
     def move(self,fromPoint,offset,context):
         if self.editing:
-            self.editSegment(fromPoint,offset,context)
+            self.editShape(fromPoint,offset,context)
         else:
             self.renderer.move(offset,context)
 
-    def editSegment(self,fromPoint,offset,context):
+    def editShape(self,fromPoint,offset,context):
         self.invalidate()
 
         pathElement = self.renderer.pathElementAt(fromPoint)
-        if isinstance(pathElement,Path.Segment):
-            if pathElement.orientation == Orientation.HORIZONTAL:
+        if pathElement==None:
+            print("Warning pathElement was None for some reason")
+        elif isinstance(pathElement,Path.Segment):
+            self.editSegment(pathElement,offset)
+        else: # is elbow
+            self.editSegment(pathElement.fromSegment,offset)
+            self.editSegment(pathElement.toSegment,offset)
+    
+    def editSegment(self,segment,offset):
+        if segment!=None:
+            if segment.orientation == Orientation.HORIZONTAL:
                 myOffset = offset.y
             else:
                 myOffset = offset.x
 
-            ref = pathElement.getPosRef()
+            ref = segment.getPosRef()
             oldPos = ref.get()
             ref.set(oldPos+myOffset)
-        else:
-            pass
-            #TODO: move elbow
 
     def showContextMenu(self,point,context):
         self.rightClickPoint = point

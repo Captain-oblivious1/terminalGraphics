@@ -80,7 +80,9 @@ class Path:
             if prevElbow:
                 segment = Path.Segment(self)
                 segment.fromElbow = prevElbow
+                prevElbow.toSegment = segment
                 segment.toElbow = elbow
+                elbow.fromSegment = segment
                 if horizontalOrienation:
                     segment.orientation = Orientation.HORIZONTAL
                 else:
@@ -137,6 +139,8 @@ class Path:
             self.index = index
             self.xRefIndex = xRefIndex
             self.yRefIndex = yRefIndex
+            self.fromSegment = None
+            self.toSegment = None
 
         class Snapshot:
             def __init__(self,x,y,char):
