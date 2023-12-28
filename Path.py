@@ -37,7 +37,7 @@ class Path:
             self.segments = self.createSegmentList(value)
 
     def createElbow(self,path,index,xRefIndex,yRefIndex):
-        return Path.Elbow(path,index,xRefIndex,yRefIndex)
+        return Path.Elbow(self,path,index,xRefIndex,yRefIndex)
 
     def getRect(self):
         rect = Rect()
@@ -120,11 +120,16 @@ class Path:
     def pathElementAt(self,point):
         for segment in self.segments:
             fromElbow = segment.fromElbow
-            if point.isEqual(fromElbow.getX(), fromElbow.getY()):
+            if fromElbow.isAtPoint(point):
                 return fromElbow
             elif segment.getRect().isInsidePoint(point):
                 return segment
-        return None
+
+        lastElbow = self.segments[-1].toElbow
+        if lastElbow.isAtPoint(point):
+            return lastElbow
+        else:
+            return None
 
     #def draw(self,context):
     #    self.drawSegmentList(context,self.segments)
@@ -134,7 +139,8 @@ class Path:
 
     class Elbow:
 
-        def __init__(self,path,index,xRefIndex,yRefIndex):
+        def __init__(self,parent,path,index,xRefIndex,yRefIndex):
+            self.parent = parent
             self.path = path
             self.index = index
             self.xRefIndex = xRefIndex
@@ -174,6 +180,15 @@ class Path:
 
         def getRect(self):
             return Rect().includePoint(self.point())
+
+        def isAtPoint(self,point):
+            return point.isEqual(self.getX(), self.getY())
+
+        def edit(self,offset):
+            if self.fromSegment!=None:
+                self.fromSegment.edit(offset)
+            if self.toSegment!=None:
+                self.toSegment.edit(offset)
 
         def __str__(self):
             return "Elbow{index="+str(self.index)+" x="+str(self.getX())+",y="+str(self.getY())+"}"
@@ -237,6 +252,16 @@ class Path:
                     break
                 segmentIndex+=1
             return segmentIndex
+
+        def edit(self,offset):
+            if self.orientation == Orientation.HORIZONTAL:
+                myOffset = offset.y
+            else:
+                myOffset = offset.x
+
+            ref = self.getPosRef()
+            oldPos = ref.get()
+            ref.set(oldPos+myOffset)
 
         def addListener(self,listener):
             self.listeners.add(listener)

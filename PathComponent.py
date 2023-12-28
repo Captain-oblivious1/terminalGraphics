@@ -58,22 +58,8 @@ class PathComponent(Component):
         pathElement = self.renderer.pathElementAt(fromPoint)
         if pathElement==None:
             print("Warning pathElement was None for some reason")
-        elif isinstance(pathElement,Path.Segment):
-            self.editSegment(pathElement,offset)
         else: # is elbow
-            self.editSegment(pathElement.fromSegment,offset)
-            self.editSegment(pathElement.toSegment,offset)
-    
-    def editSegment(self,segment,offset):
-        if segment!=None:
-            if segment.orientation == Orientation.HORIZONTAL:
-                myOffset = offset.y
-            else:
-                myOffset = offset.x
-
-            ref = segment.getPosRef()
-            oldPos = ref.get()
-            ref.set(oldPos+myOffset)
+            pathElement.edit(offset)
 
     def showContextMenu(self,point,context):
         self.rightClickPoint = point

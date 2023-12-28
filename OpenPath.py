@@ -14,7 +14,7 @@ class OpenPath(Path):
 
     def createElbow(self,path,index,xRefIndex,yRefIndex):
         if index==0 or index==len(self.elbowRefs)-2:
-            return OpenPath.ArrowElbow(path,index,xRefIndex,yRefIndex)
+            return OpenPath.ArrowElbow(self,path,index,xRefIndex,yRefIndex)
         else:
             return super().createElbow(path,index,xRefIndex,yRefIndex)
 
@@ -101,8 +101,8 @@ class OpenPath(Path):
 
 
     class ArrowElbow(Path.Elbow):
-        def __init__(self,path,index,xRef,yRef):
-            super().__init__(path,index,xRef,yRef)
+        def __init__(self,parent,path,index,xRef,yRef):
+            super().__init__(parent,path,index,xRef,yRef)
 
         def connectTo(self,segment,point):
             path = self.path
@@ -131,3 +131,10 @@ class OpenPath(Path):
 
             elbowRefs[xIndex]= xRef
             elbowRefs[yIndex]= yRef
+
+        def edit(self,offset):
+            super().edit(offset)
+            xRef = self.parent.elbowRefs[self.xRefIndex]
+            xRef.set( xRef.get() + offset.x )
+            yRef = self.parent.elbowRefs[self.yRefIndex]
+            yRef.set( yRef.get() + offset.y )
