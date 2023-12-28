@@ -133,7 +133,6 @@ class OpenPath(Path):
             elbowRefs[yIndex]= yRef
 
         def edit(self,offset):
-            super().edit(offset)
             xRef = self.parent.elbowRefs[self.xRefIndex]
             xRef.set( xRef.get() + offset.x )
             yRef = self.parent.elbowRefs[self.yRefIndex]

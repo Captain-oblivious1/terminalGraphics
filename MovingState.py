@@ -10,6 +10,9 @@ class MovingState(State):
         self.lastPoint = startDragPoint
 
         self.selectedComponents = diagramComponent.allSelected()
+        for component in self.selectedComponents:
+            if "startMove" in dir(component):
+                component.startMove(startDragPoint,context)
 
         #selectedElements = set()
         #for component in self.selectedComponents:
@@ -27,6 +30,11 @@ class MovingState(State):
         pass
 
     def mouseReleased(self, x, y):
+        point = Point(x,y)
+        for component in self.selectedComponents:
+            if "finishMove" in dir(component):
+                component.finishMove(point,self.context)
+
         self.editor.goIdleState()
 
     def mouseMoved(self, x, y):

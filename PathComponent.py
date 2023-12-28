@@ -15,6 +15,7 @@ class PathComponent(Component):
         self.element = element
         self.rightClickPoint = None
         self.editing = False
+        self.pathElementEditing = None
         self.updateElement(element)
 
     def updateElement(self,element):
@@ -46,20 +47,29 @@ class PathComponent(Component):
     def draw(self,context):
         self.renderer.draw(context,self.isSelected())
 
+    def startMove(self,point,context):
+        if self.editing:
+            self.pathElementEditing = self.renderer.pathElementAt(point)
+
     def move(self,fromPoint,offset,context):
         if self.editing:
             self.editShape(fromPoint,offset,context)
         else:
             self.renderer.move(offset,context)
 
+    def finishMove(self,point,context):
+        if self.editing:
+            self.pathElementEditing = None
+
     def editShape(self,fromPoint,offset,context):
         self.invalidate()
 
-        pathElement = self.renderer.pathElementAt(fromPoint)
-        if pathElement==None:
-            print("Warning pathElement was None for some reason")
-        else: # is elbow
-            pathElement.edit(offset)
+        #pathElement = self.renderer.pathElementAt(fromPoint)
+        #if pathElement==None:
+        #    print("Warning pathElement was None for some reason")
+        #else: # is elbow
+        #    pathElement.edit(offset)
+        self.pathElementEditing.edit(offset)
 
     def showContextMenu(self,point,context):
         self.rightClickPoint = point

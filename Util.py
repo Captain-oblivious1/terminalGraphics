@@ -41,12 +41,12 @@ class ArrayElementReference:
     def set(self,val):
         self.array[self.element] = val
 
-class ArrayReference:
-    def __init__(self,array):
-        self.array = array
-
-    def clear(self):
-        self.hj
+#class ArrayReference:
+#    def __init__(self,array):
+#        self.array = array
+#
+#    def clear(self):
+#        self.hj
 
 _vToDArray = [ [ None          , Direction.UP  , None            ], \
                [ Direction.LEFT, Direction.NONE, Direction.RIGHT ], \
