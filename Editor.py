@@ -6,6 +6,7 @@ from Model import *
 from Component import *
 from ConnectorComponent import *
 from PathComponent import *
+from TextComponent import *
 from OpenPath import *
 from ClosedPath import *
 from Context import *
@@ -50,16 +51,20 @@ def createTestDiagram():
     pathElement3.corners = Corners.ROUND
     diagramElement.elements.append(pathElement3)
 
+    textElement = TextElement()
+    textElement.text = "Duane was here.\nYet\nagain."
+    textElement.location = Point(20,10)
+    textElement.justification = Justification.CENTER
+    diagramElement.elements.append(textElement)
+
     return diagramElement
 
 def createDiagramComponent(editor,diagramElement):
     diagramComponent = DiagramComponent(editor,diagramElement)
 
     for element in diagramElement.elements:
-        if type(element) is TextBoxElement:
-            component = TextBoxComponent(diagramComponent)
-        elif type(element) is ConnectorElement:
-            component = ConnectorComponent(diagramComponent)
+        if type(element) is TextElement:
+            component = TextComponent(diagramComponent,element)
         elif type(element) is PathElement:
             component = PathComponent(diagramComponent,element)
         elif type(element) is RectElement:
