@@ -100,7 +100,8 @@ class PathComponent(Component):
         #self.createChildren()
 
     def join(self,point):
-        self.parent.invalidate()
+        #self.parent.invalidate()
+        self.invalidate()
         pathElement = self.renderer.pathElementAt(point)
         if pathElement.orientation==Orientation.HORIZONTAL:
             joinPos = point.x

@@ -1,6 +1,10 @@
 from State import *
 #from MovingState import *
 from Point import *
+from Menu import *
+from TextComponent import *
+from PathComponent import *
+from Model import *
 
 class IdleState(State):
     def __init__(self,editor,context,diagramComponent):
@@ -21,19 +25,20 @@ class IdleState(State):
 
         clickedOn = self.diagramComponent.componentAt(self.startDragPoint)
 
-        if "clickedOn" in dir(clickedOn):
-            self.clickedOn = clickedOn
-
         if clickedOn==None or not clickedOn in selectedSet:
             for component in selectedSet:
                 component.setSelected(False)
                 component.invalidate()
 
         if clickedOn!=None:
+            if "clickedOn" in dir(clickedOn):
+                self.clickedOn = clickedOn
+
             self.movingComponents = True
             clickedOn.setSelected(True)
             #print("Invalidating clicked on")
             clickedOn.invalidate()
+
 
     def mouseReleased(self, x, y):
         self.startDragPoint = None
@@ -52,8 +57,30 @@ class IdleState(State):
     def rightReleased(self, x, y):
         point = Point(x,y)
         clickedOn = self.diagramComponent.componentAt(point)
-        if "showContextMenu" in dir(clickedOn):
-            clickedOn.showContextMenu(point,self.context)
+        if clickedOn!=None:
+            if "showContextMenu" in dir(clickedOn):
+                clickedOn.showContextMenu(point,self.context)
+        else:
+            self.showContextMenu(point)
 
+    def showContextMenu(self,point):
+        options = ["Add text","Add path"]
+        self.diagramComponent.showMenu(Menu(self.diagramComponent,options,point,self.menuResult))
 
-
+    def menuResult(self,menu):
+        option = menu.getSelectedOption()
+        if option=="Add text":
+            textElement = TextElement()
+            textElement.text = "New text"
+            textElement.location = menu.topLeft
+            textElement.justification = Justification.LEFT
+            self.diagramComponent.addComponent(TextComponent(self.diagramComponent,textElement))
+        elif option=="Add path":
+            pathElement = PathElement()
+            pathElement.pathType = PathType.CLOSED
+            pathElement.fill = Fill.OPAQUE
+            pathElement.startOrientation = Orientation.HORIZONTAL
+            p = menu.topLeft
+            pathElement.turns = [p.x,p.y,p.x+5,p.y+3]
+            pathElement.corners = Corners.ROUND
+            self.diagramComponent.addComponent(PathComponent(self.diagramComponent,pathElement))

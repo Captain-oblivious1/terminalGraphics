@@ -1,7 +1,9 @@
 import os
 import sys
-from Editor import *
 from curses import wrapper
+
+from Editor import *
+from FileParser import *
 
 class StdOutWrapper:
     text = ""
@@ -11,8 +13,26 @@ class StdOutWrapper:
     def get_text(self,beg=0,end=-1):
         return '\n'.join(self.text.split('\n')[beg:end])
 
-def myMain(stdscr):
-    editor = Editor() 
+def myMain(stdscr,args):
+    i = 0
+    file = None
+    diagram = None
+    while i<len(args):
+        arg = args[i]
+        i += 1
+
+        if arg=="--file":
+            file = args[i]
+            i += 1
+
+        if arg=="--diagram":
+            diagram = args[i]
+            i += 1
+
+    fileParser = FileParser()
+    diagram = fileParser.loadFromFile(file,diagram)
+
+    editor = Editor(diagram) 
     editor.run()
 
 def setShorterEscDelayInOs():
@@ -24,7 +44,7 @@ sys.stderr = mystdout
 
 try:
     setShorterEscDelayInOs()
-    wrapper(myMain)
+    wrapper(myMain,sys.argv[1:])
 finally:
 
     sys.stdout = sys.__stdout__

@@ -2,13 +2,19 @@ from Component import *
 from Menu import *
 
 class DiagramComponent(Component):
-    def __init__(self,editor,diagramElement):
+    def __init__(self,editor,element):
         super().__init__(None)
         self.editor = editor
-        self.diagramElement = diagramElement
+        self.element = element
         self.components = []
         self.invalidatedRect = Rect()
         self.selectionRect = None
+
+    def addComponent(self,component):
+        if "element" in dir(component):
+            self.element.elements.append(component.element)
+
+        self.components.append(component)
 
     def invalidateAll(self):
         for component in self.components:

@@ -1,4 +1,5 @@
 import curses
+import re
 
 from DiagramComponent import *
 from Menu import *
@@ -10,7 +11,6 @@ from TextComponent import *
 from OpenPath import *
 from ClosedPath import *
 from Context import *
-
 from RectComponent import *
 
 def createTestDiagram():
@@ -76,13 +76,12 @@ def createDiagramComponent(editor,diagramElement):
 
 
 class Editor:
-    def __init__(self):
+    def __init__(self,diagram):
         self.screen = curses.initscr()
         curses.curs_set(0)
         curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
         self.screen.clear()
-        diagram = createTestDiagram()
-        self.diagramComponent = self.diagramComponent = createDiagramComponent(self,diagram)
+        self.diagramComponent = DiagramComponent(self,diagram)
         self.context = Context(self.screen)
 
     def getContext(self):
@@ -135,6 +134,8 @@ class Editor:
                 self.screen.nodelay(False)
                 if nextKey==-1:
                     break;
+            elif event == ord('s'):
+                self._save()
             elif event == ord('q'):
                 break
             elif event == curses.KEY_PPAGE:
@@ -146,9 +147,7 @@ class Editor:
             elif event == curses.KEY_END:
                 diagram.moveSelectedToBack()
             elif event == curses.KEY_MOUSE:
-                #ch = 'Y'
                 _ , mx, my, _, bstate = curses.getmouse()
-                #print("bstate="+str(bstate))
                 if bstate & curses.BUTTON1_CLICKED != 0:
                     self.state.mouseClicked(mx,my)
                 elif bstate & curses.BUTTON1_PRESSED != 0:
