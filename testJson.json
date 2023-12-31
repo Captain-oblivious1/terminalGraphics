@@ -1,0 +1,49 @@
+{
+ "The diagram": {
+  "_type": "Diagram",
+  "elements": [
+   {
+    "_type": "PathElement",
+    "corners": "SQUARE",
+    "endArrow": "TRIANGLE",
+    "fill": "OPAQUE",
+    "pathType": "OPEN",
+    "startArrow": "LINES",
+    "startOrientation": "VERTICAL",
+    "turns": [
+     15,
+     40,
+     20,
+     50,
+     30,
+     60
+    ]
+   },
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "fill": "OPAQUE",
+    "pathType": "CLOSED",
+    "startOrientation": "VERTICAL",
+    "turns": [
+     5,
+     5,
+     15,
+     25,
+     30,
+     30
+    ]
+   },
+   {
+    "_type": "TextElement",
+    "justification": "CENTER",
+    "location": [
+     20,
+     10
+    ],
+    "text": "Duane was here.\nYet\nagain."
+   }
+  ],
+  "name": "The diagram"
+ }
+}

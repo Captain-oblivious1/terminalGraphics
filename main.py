@@ -17,6 +17,7 @@ def myMain(stdscr,args):
     i = 0
     file = None
     diagram = None
+    format = '\\${diagram:(.*)}'
     while i<len(args):
         arg = args[i]
         i += 1
@@ -29,8 +30,12 @@ def myMain(stdscr,args):
             diagram = args[i]
             i += 1
 
-    fileParser = FileParser()
-    diagram = fileParser.loadFromFile(file,diagram)
+        if arg=="--format":
+            format = args[i]
+            i += 1
+
+    fileParser = FileParser(format)
+    diagram = fileParser.loadFromFile(file,diagram,format)
 
     editor = Editor(diagram) 
     editor.run()

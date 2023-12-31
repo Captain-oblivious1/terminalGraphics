@@ -1,5 +1,8 @@
 from Component import *
 from Menu import *
+from PathComponent import *
+from TextComponent import *
+from RectComponent import *
 
 class DiagramComponent(Component):
     def __init__(self,editor,element):
@@ -9,6 +12,7 @@ class DiagramComponent(Component):
         self.components = []
         self.invalidatedRect = Rect()
         self.selectionRect = None
+        self.createDiagramComponent(element)
 
     def addComponent(self,component):
         if "element" in dir(component):
@@ -22,6 +26,19 @@ class DiagramComponent(Component):
 
     def getEditor(self):
         return self.editor
+
+    def createDiagramComponent(self,diagramElement):
+        for element in diagramElement.elements:
+            if type(element) is TextElement:
+                component = TextComponent(self,element)
+            elif type(element) is PathElement:
+                component = PathComponent(self,element)
+            elif type(element) is RectElement:
+                component = RectComponent(self,element)
+            else:
+                raise Exception("Unsupported element type '"+element.type+"'")
+
+            self.components.append(component)
 
     #def invalidateRect(self,rect):
     #    self.invalidatedRect.unionWith(rect)

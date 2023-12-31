@@ -3,12 +3,9 @@ import re
 from Model import *
 
 class FileParser:
-    def __init__(self):
-        self.diagramRe = re.compile("\\$diagram",re.IGNORECASE)
-        self.nameRe = re.compile("name:",re.IGNORECASE)
-        self.hashRe = re.compile("hash:",re.IGNORECASE)
-        self.openRe = re.compile("\\s*{")
-        self.closeRe = re.compile("}")
+    def __init__(self,format='\\${diagram:(.*)}'):
+        self.formatRe = re.compile(format,re.IGNORECASE)
+        self.diagramRe = re.compile('//\\s*⦃\\s*(.*)')
 
     def loadFromFile(self,fileName,diagramName=None):
         try:
@@ -24,13 +21,12 @@ class FileParser:
             if not line:
                 break
 
+            formatTag = self.formatRe.search(line)
+
             diagramTag = self.diagramRe.search(line)
             if diagramTag!=None:
                 diagramBlock = FileParser._parseDiagramBlock(line,file)
 
-                    
-
-                    
 
                 #line = line[diagramTag.span()[1]:]
                 #print("dia start="+str(diagramTag.start))

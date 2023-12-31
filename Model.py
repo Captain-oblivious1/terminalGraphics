@@ -8,7 +8,6 @@ class Orientation(Enum):
 class Element:
     def __init__(self):
         pass
-        #self.parent = None
 
     def _attrToStr(self,attributeNames):
         result = ""
@@ -27,11 +26,11 @@ class Element:
     def __str__(self):
         return self._genString(list(filter(lambda x: not x.startswith("_"), self.__dir__())))
 
-class TextElement:
+class TextElement(Element):
     def __init__(self):
         super().__init__()
         self.text = None
-        self.position = None
+        self.location = None
         self.justification = Justification.CENTER
 
 #class BoxElement(Element):
@@ -45,6 +44,7 @@ class TextElement:
 class Diagram(Element):
     def __init__(self):
         Element.__init__(self)
+        self.name = ""
         self.elements = [] # front to back
 
 class Justification(Enum):
