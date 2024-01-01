@@ -1,12 +1,14 @@
 import json
+
 from Model import *
 from Point import *
 
 class JsonPorter:
     @staticmethod
     def importDiagram(fileName,diagramName):
+        print("importing file='"+fileName+"'")
         fileData = JsonPorter._loadJsonFile(fileName)
-        diagramData = fileData[diagramName]
+        diagramData = fileData.get(diagramName)
         if diagramData is None:
             raise Exception("Could not find diagram '"+diagramName+"' in file '"+fileName+"'.")
 
@@ -59,8 +61,7 @@ class JsonPorter:
         if jsonData["_type"]!="Diagram":
             raise Exception("Inpropertly constucted data file.  Expect Diagram componenent to have _type of 'Diagram'")
 
-        diagram = Diagram()
-        diagram.name = jsonData["name"]
+        diagram = Diagram(jsonData["name"])
         for elementData in jsonData["elements"]:
             diagram.elements.append(JsonPorter._convertToElement(elementData))
 

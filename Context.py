@@ -1,4 +1,3 @@
-import curses
 from Rect import *
 
 # The following is so that I can more easily do more advanced drawing.
@@ -111,11 +110,26 @@ def andChars(char1,char2):
     return hexToChar( charToHex(char1) & charToHex(char2) )
 
 class Context:
-    def __init__(self,window):
-        self.window = window
+    def __init__(self):
         self.invalidatedRect = Rect()
 
-    def invalidateRect(self,rect):
+    def writeString(self,x,y,text,bold=False,reverse=False):
+        raise Exception("Called abstract method")
+
+    def clearWindow(self):
+        raise Exception("Called abstract method")
+
+    def readChar(self,x,y):
+        raise Exception("Called abstract method")
+
+    def getMaxXy(self):
+        raise Exception("Called abstract method")
+
+    def invalidateRect(self,rect=None):
+        if rect is None:
+            maxX,maxY = self.getMaxXy()
+            #rect = Rect(0,0,maxX+1,maxY+1)
+            rect = Rect(0,0,maxX,maxY)
         self.invalidatedRect.unionWith(rect)
 
     def validateAll(self):
@@ -124,35 +138,13 @@ class Context:
     def getInvalidatedRect(self):
         return self.invalidatedRect
 
-    def addString(self,x,y,text,bold=False,reverse=False):
-        # TODO: make his adhere to invalidatedRect
-        if bold or reverse:
-            pair = curses.color_pair(1)
-            if bold:
-                #pair |= curses.A_BOLD # doesn't work for some reason
-                pair |= curses.A_REVERSE
-            if reverse:
-                pair |= curses.A_REVERSE
-            #print("in bold="+str(bold)+" pair="+str(pair))
-            #text = "A"
-            #print("text="+text)
-            self.window.addstr(y,x,text,pair)
-        else:
-            #print("in non bold="+str(bold))
-            self.window.addstr(y,x,text)
-
-    def readChar(self,x,y):
-        #print("inch="+str(self.window.inch(y,x)))
-        return chr(0xFFFF & self.window.inch(y,x))
-        #return chr(0xFF & self.window.inch(y,x))
-
     def clearRect(self,rect=None):
         if rect == None:
-            self.window.clear()
+            self.clearWindow()
         elif not rect.isNullRect() :
             for i in range(0,rect.width()):
                 for j in range(0,rect.height()):
-                    self.addString(rect.x()+i,rect.y()+j," ")
+                    self.writeString(rect.x()+i,rect.y()+j," ")
 
     def orChar(self,x,y,char,isBold=False):
         if self.invalidatedRect.isInsidePoint(Point(x,y)):
@@ -163,18 +155,18 @@ class Context:
                 writeMe = orChars(existing,char)
             else:
                 writeMe = char
-            self.addString(x,y,writeMe,isBold)
+            self.writeString(x,y,writeMe,isBold)
 
     def andChar(self,x,y,char,isBold=False):
         if self.invalidatedRect.isInsidePoint(Point(x,y)):
             if char!="█":
                 existing = self.readChar(x,y)
                 writeMe = andChars(existing,char)
-                self.addString(x,y,writeMe,isBold)
+                self.writeString(x,y,writeMe,isBold)
 
     def drawVerticalLine(self,x,fro=0,to=None,isBold=False):
         if to==None:
-            to,_ = self.window.getmaxyx()
+            _,to = self.getMaxXy()
             to -= 1
         maxY = max(fro,to)
         minY = min(fro,to)
@@ -183,7 +175,7 @@ class Context:
 
     def drawHorizontalLine(self,y,fro=0,to=None,isBold=False):
         if to==None:
-            _,to = self.window.getmaxyx()
+            to,_ = self.getMaxXy()
             to -= 1
         maxX = max(fro,to)
         minX = min(fro,to)

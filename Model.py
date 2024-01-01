@@ -42,9 +42,9 @@ class TextElement(Element):
 #        self.height = 0
 
 class Diagram(Element):
-    def __init__(self):
+    def __init__(self,name):
         Element.__init__(self)
-        self.name = ""
+        self.name = name
         self.elements = [] # front to back
 
 class Justification(Enum):

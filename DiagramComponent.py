@@ -71,7 +71,7 @@ class DiagramComponent(Component):
                 for row in range(self.selectionRect.t,self.selectionRect.b):
                     char = context.readChar(col,row)
                     #print("char='"+char+"' ord="+hex(ord(char)))
-                    context.addString(col,row,char,False,True)
+                    context.writeString(col,row,char,False,True)
 
     def children(self):
         return self.components

@@ -3,8 +3,9 @@ import sys
 from curses import wrapper
 
 from Editor import *
-from FileParser import *
 from JsonPorter import *
+from SourcePorter import *
+from MemoryContext import *
 
 def createTestDiagram():
     diagramElement = Diagram()
@@ -58,7 +59,7 @@ class StdOutWrapper:
     text = ""
     def write(self,txt):
         self.text += txt
-        self.text = '\n'.join(self.text.split('\n')[-1000:])
+        self.text = '\n'.join(self.text.split('\n')[-10000:])
     def get_text(self,beg=0,end=-1):
         return '\n'.join(self.text.split('\n')[beg:end])
 
@@ -70,8 +71,17 @@ def myMain(stdscr,args):
     #import pprint
     #pprint.pprint(JsonPorter._convertToDictionary(diagram))
 
-    editor = Editor(diagram) 
-    editor.run()
+    diagramComponent = DiagramComponent(None,diagram)
+    memContext = MemoryContext(80,50)
+    memContext.invalidateRect()
+    diagramComponent.draw(memContext)
+    memContext.print('// ')
+
+    #sourcePorter = SourcePorter()
+    #sourcePorter.writeToFile('TestDiagram.cpp',diagram,'One')
+
+    #editor = Editor(diagram) 
+    #editor.run()
 
 def setShorterEscDelayInOs():
         os.environ.setdefault('ESCDELAY', '25')

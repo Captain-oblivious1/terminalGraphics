@@ -3,7 +3,8 @@ import sys
 from curses import wrapper
 
 from Editor import *
-from FileParser import *
+from JsonPorter import *
+from SourcePorter import *
 
 class StdOutWrapper:
     text = ""
@@ -22,23 +23,33 @@ def myMain(stdscr,args):
         arg = args[i]
         i += 1
 
-        if arg=="--file":
-            file = args[i]
-            i += 1
-
-        if arg=="--diagram":
-            diagram = args[i]
-            i += 1
-
-        if arg=="--format":
+        if arg=="--help":
+            print("edit.sh [--format <regular Expression with one group>] <file name>:<diagram name>")
+            sys.exit(0)
+        elif arg=="--format":
             format = args[i]
             i += 1
+        else:
+            split = arg.split(':')
+            file = split[0]
+            diagram = split[1]
 
-    fileParser = FileParser(format)
-    diagram = fileParser.loadFromFile(file,diagram,format)
+    jsonName = file+".json"
+    if os.path.exists(jsonName):
+        diagram = JsonPorter.importDiagram(jsonName,diagram)
+    else:
+        diagram = Diagram(diagram)
 
-    editor = Editor(diagram) 
+    editor = Editor(diagram, lambda : save(file,diagram) ) 
     editor.run()
+
+def save(file,diagram):
+    print("saving file '"+file+"' diagram='"+diagram.name+"'")
+    JsonPorter.exportDiagram(file+".json",diagram)
+    sourcePorter = SourcePorter()
+    sourcePorter.writeToFile(file,diagram)
+    print("saved")
+
 
 def setShorterEscDelayInOs():
         os.environ.setdefault('ESCDELAY', '25')

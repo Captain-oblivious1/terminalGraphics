@@ -24,7 +24,7 @@ class TextComponent(Component):
         for line in range(len(self.lineInfo)):
             lineInfo = self.lineInfo[line]
             start = self._startForLine(line)
-            context.addString(start.x,start.y,lineInfo.text,selected)
+            context.writeString(start.x,start.y,lineInfo.text,selected)
 
     # Default is for entier rectangle to be true
     def isOnMe(self,point):

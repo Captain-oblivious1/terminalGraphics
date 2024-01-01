@@ -30,7 +30,7 @@ class Menu(Component):
         y = self.topLeft.y + 1
         x = self.topLeft.x + 1
         for option in self.options:
-            context.addString(x,y,option)
+            context.writeString(x,y,option)
             y += 1
 
     def getRect(self):

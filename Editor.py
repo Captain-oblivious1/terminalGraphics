@@ -1,17 +1,17 @@
 import curses
-import re
 
 from DiagramComponent import *
-from Context import *
+from CursesContext import *
 
 class Editor:
-    def __init__(self,diagram):
+    def __init__(self,diagram,saveCallback):
         self.screen = curses.initscr()
         curses.curs_set(0)
         curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
         self.screen.clear()
         self.diagramComponent = DiagramComponent(self,diagram)
-        self.context = Context(self.screen)
+        self.context = CursesContext(self.screen)
+        self.saveCallback = saveCallback
 
     def getContext(self):
         return self.context
@@ -65,7 +65,7 @@ class Editor:
                 if nextKey==-1:
                     break;
             elif event == ord('s'):
-                self._save()
+                self.saveCallback()
             elif event == ord('q'):
                 break
             elif event == curses.KEY_PPAGE:

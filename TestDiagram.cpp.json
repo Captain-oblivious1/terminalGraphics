@@ -1,5 +1,5 @@
 {
- "The diagram": {
+ "One": {
   "_type": "Diagram",
   "elements": [
    {
@@ -25,6 +25,6 @@
     "text": "New text"
    }
   ],
-  "name": "The diagram"
+  "name": "One"
  }
 }

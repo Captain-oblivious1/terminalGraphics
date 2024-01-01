@@ -2,22 +2,25 @@
 
 // --diagramFormat \${diagram:(.*)}
 
+// from:
 /*
- * ${diagram:One}
- */
+${diagram:One}
+*/
 
+// to:
 /*
-⦃ Two
+⦃ One:
 boxes
 and
 shit
 ⦄
 */
 
-// ${diagram:Three}
+// from:
+// ${diagram:Two}
 
 // to:
-// ⦃ Four
+// ⦃ One:
 // boxes
 // and
 // shit
