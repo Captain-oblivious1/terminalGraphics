@@ -1,5 +1,6 @@
 The purpose of this application is to allow developers to add decent text based diagrams to their
-source code.  For example:
+source code.  For example (warning.. looks like ass on github.  But looks good in vim or other
+actual editor that supports a legit font):
 
 ⦃ My_diagram
 ╭────────────────────────╮
@@ -40,5 +41,3 @@ paths, arrows, text, etc.  When the diagram is saved, the tag within the source 
 with the diagram.  The diagram can be subsquently edited and saved by invoking the edit command
 again over and over.  This is possible by the creation of a supplemental MyFile.cpp.json file
 containing meta-data about the diagrams that isn't contained in the diagram itself.
-
-Obviously your editor would need to support font that handles the characters being used.
