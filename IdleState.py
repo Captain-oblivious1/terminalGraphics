@@ -74,7 +74,7 @@ class IdleState(State):
             textElement.text = "New text"
             textElement.location = menu.topLeft
             textElement.justification = Justification.LEFT
-            self.diagramComponent.addComponent(TextComponent(self.diagramComponent,textElement))
+            self.diagramComponent.addElement(textElement)
         elif option=="Add path":
             pathElement = PathElement()
             pathElement.pathType = PathType.CLOSED
@@ -83,4 +83,4 @@ class IdleState(State):
             p = menu.topLeft
             pathElement.turns = [p.x,p.y,p.x+5,p.y+3]
             pathElement.corners = Corners.ROUND
-            self.diagramComponent.addComponent(PathComponent(self.diagramComponent,pathElement))
+            self.diagramComponent.addElement(pathElement)

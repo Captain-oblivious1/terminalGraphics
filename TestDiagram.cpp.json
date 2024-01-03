@@ -3,6 +3,28 @@
   "_type": "Diagram",
   "elements": [
    {
+    "_type": "TextElement",
+    "justification": "LEFT",
+    "location": [
+     15,
+     11
+    ],
+    "text": "New text"
+   },
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "fill": "OPAQUE",
+    "pathType": "CLOSED",
+    "startOrientation": "HORIZONTAL",
+    "turns": [
+     34,
+     8,
+     39,
+     11
+    ]
+   },
+   {
     "_type": "PathElement",
     "corners": "ROUND",
     "fill": "OPAQUE",
@@ -19,8 +41,8 @@
     "_type": "TextElement",
     "justification": "LEFT",
     "location": [
-     22,
-     7
+     20,
+     8
     ],
     "text": "New text"
    }

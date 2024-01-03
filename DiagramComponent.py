@@ -9,19 +9,30 @@ class DiagramComponent(Component):
         super().__init__(None)
         self.editor = editor
         self.element = element
-        self.components = []
+        self.components = {}
         self.invalidatedRect = Rect()
         self.selectionRect = None
         self.createDiagramComponent(element)
+        self.menu = None
 
-    def addComponent(self,component):
-        if "element" in dir(component):
-            self.element.elements.append(component.element)
+    def addElement(self,element,addToElement=True):
+        print("adding element="+str(element))
+        if type(element) is TextElement:
+            component = TextComponent(self,element)
+        elif type(element) is PathElement:
+            component = PathComponent(self,element)
+        elif type(element) is RectElement:
+            component = RectComponent(self,element)
+        else:
+            raise Exception("Unsupported element type '"+element.type+"'")
 
-        self.components.append(component)
+        if addToElement:
+            self.element.elements.append(element)
+        self.components[element] = component
 
     def invalidateAll(self):
-        for component in self.components:
+        for element in self.element.elements:
+            component = self.components[element]
             component.invalidate()
 
     def getEditor(self):
@@ -29,16 +40,7 @@ class DiagramComponent(Component):
 
     def createDiagramComponent(self,diagramElement):
         for element in diagramElement.elements:
-            if type(element) is TextElement:
-                component = TextComponent(self,element)
-            elif type(element) is PathElement:
-                component = PathComponent(self,element)
-            elif type(element) is RectElement:
-                component = RectComponent(self,element)
-            else:
-                raise Exception("Unsupported element type '"+element.type+"'")
-
-            self.components.append(component)
+            self.addElement(element,False)
 
     #def invalidateRect(self,rect):
     #    self.invalidatedRect.unionWith(rect)
@@ -58,7 +60,8 @@ class DiagramComponent(Component):
         context.clearRect(invalidatedRect)
 
         #print("About to draw all components")
-        for component in self.components:
+        for element in self.element.elements:
+            component = self.components[element]
             #print("   Testing component intersection for="+str(component))
             #print("testing intesection of "+str(component.getRect())+" and "+str(invalidatedRect))
             if component.getRect().doesIntersect(invalidatedRect):
@@ -73,8 +76,11 @@ class DiagramComponent(Component):
                     #print("char='"+char+"' ord="+hex(ord(char)))
                     context.writeString(col,row,char,False,True)
 
+        if self.menu!=None and self.menu.getRect().doesIntersect(invalidatedRect):
+            self.menu.draw(context)
+
     def children(self):
-        return self.components
+        return self.components.values()
 
     def setSelectionRect(self,rect):
         self.selectionRect = rect
@@ -98,6 +104,8 @@ class DiagramComponent(Component):
         #    #print("testing child="+str(child)+" found="+str(found))
         #    if found!=None:
         #        return found
+        if self.menu!=None and self.menu.getRect().isInsidePoint(point):
+            return self.menu
 
         for child in self.children():
             if child.getRect().isInsidePoint(point) and child.isOnMe(point):
@@ -112,26 +120,27 @@ class DiagramComponent(Component):
         topList = []
         bottomList = []
         selected = self.allSelected()
-        for component in self.components:
+        for element in self.element.elements:
+            component = self.components[element]
             if component in selected:
-                bottomList.append(component)
+                bottomList.append(element)
                 component.invalidate()
             else:
-                topList.append(component)
-        self.components = topList + bottomList
+                topList.append(element)
+        self.element.elements = topList + bottomList
 
     def moveSelectedToBack(self):
         topList = []
         bottomList = []
         selected = self.allSelected()
-        for component in self.components:
+        for element in self.element.elements:
+            component = self.components[element]
             if component in selected:
-                topList.append(component)
+                topList.append(element)
                 component.invalidate()
             else:
-                bottomList.append(component)
-        self.components = topList + bottomList
-        pass
+                bottomList.append(element)
+        self.element.elements = topList + bottomList
 
     def moveSelectedForward(self):
         pass
@@ -140,14 +149,8 @@ class DiagramComponent(Component):
         pass
 
     def showMenu(self,menu):
-        self.components.append(menu)
+        self.menu = menu
         menu.invalidate()
 
     def clearMenu(self):
-        newComponentList = []
-        for component in self.components:
-            if not issubclass(type(component),Menu):
-                newComponentList.append(component)
-
-        self.components = newComponentList
-
+        self.menu = None
