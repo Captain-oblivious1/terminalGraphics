@@ -16,7 +16,6 @@ class DiagramComponent(Component):
         self.menu = None
 
     def addElement(self,element,addToElement=True):
-        print("adding element="+str(element))
         if type(element) is TextElement:
             component = TextComponent(self,element)
         elif type(element) is PathElement:

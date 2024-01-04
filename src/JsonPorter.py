@@ -6,7 +6,6 @@ from Point import *
 class JsonPorter:
     @staticmethod
     def importDiagram(fileName,diagramName):
-        print("importing file='"+fileName+"'")
         fileData = JsonPorter._loadJsonFile(fileName)
         diagramData = fileData.get(diagramName)
         if diagramData is None:
