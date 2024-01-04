@@ -1,5 +1,0 @@
-#/bin/bash
-
-export TERM=xterm-1003
-python main.py
-#python -m cProfile View.py

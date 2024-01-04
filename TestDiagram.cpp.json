@@ -3,25 +3,16 @@
   "_type": "Diagram",
   "elements": [
    {
-    "_type": "TextElement",
-    "justification": "LEFT",
-    "location": [
-     15,
-     11
-    ],
-    "text": "New text"
-   },
-   {
     "_type": "PathElement",
     "corners": "ROUND",
     "fill": "OPAQUE",
     "pathType": "CLOSED",
     "startOrientation": "HORIZONTAL",
     "turns": [
-     34,
+     19,
      8,
      39,
-     11
+     18
     ]
    },
    {
@@ -32,7 +23,7 @@
     "startOrientation": "HORIZONTAL",
     "turns": [
      15,
-     6,
+     5,
      37,
      9
     ]
@@ -45,6 +36,58 @@
      8
     ],
     "text": "New text"
+   },
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "endArrow": "TRIANGLE",
+    "fill": "TRANSPARENT",
+    "pathType": "OPEN",
+    "startArrow": "NONE",
+    "startOrientation": "HORIZONTAL",
+    "turns": [
+     37,
+     6,
+     36
+    ]
+   },
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "endArrow": "TRIANGLE",
+    "fill": "TRANSPARENT",
+    "pathType": "OPEN",
+    "startArrow": "NONE",
+    "startOrientation": "HORIZONTAL",
+    "turns": [
+     37,
+     7,
+     42,
+     10
+    ]
+   },
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "endArrow": "TRIANGLE",
+    "fill": "TRANSPARENT",
+    "pathType": "OPEN",
+    "startArrow": "NONE",
+    "startOrientation": "VERTICAL",
+    "turns": [
+     9,
+     17,
+     14
+    ]
+   },
+   {
+    "_type": "TextElement",
+    "justification": "LEFT",
+    "location": [
+     27,
+     10
+    ],
+    "text": "abcde"
    }
   ],
   "name": "One"

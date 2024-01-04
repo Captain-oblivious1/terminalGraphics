@@ -64,18 +64,19 @@ class IdleState(State):
             self.showContextMenu(point)
 
     def showContextMenu(self,point):
-        options = ["Add text","Add path"]
+        options = ["add text","add closed path","add HH path","add HV path","add VV path"]
         self.diagramComponent.showMenu(Menu(self.diagramComponent,options,point,self.menuResult))
 
     def menuResult(self,menu):
         option = menu.getSelectedOption()
-        if option=="Add text":
+        print("option="+option)
+        if option=="add text":
             textElement = TextElement()
             textElement.text = "New text"
             textElement.location = menu.topLeft
             textElement.justification = Justification.LEFT
             self.diagramComponent.addElement(textElement)
-        elif option=="Add path":
+        elif option=="add closed path":
             pathElement = PathElement()
             pathElement.pathType = PathType.CLOSED
             pathElement.fill = Fill.OPAQUE
@@ -83,4 +84,34 @@ class IdleState(State):
             p = menu.topLeft
             pathElement.turns = [p.x,p.y,p.x+5,p.y+3]
             pathElement.corners = Corners.ROUND
+            self.diagramComponent.addElement(pathElement)
+        elif option=="add HH path":
+            pathElement = PathElement()
+            pathElement.pathType = PathType.OPEN
+            pathElement.startOrientation = Orientation.HORIZONTAL
+            p = menu.topLeft
+            pathElement.turns = [p.x,p.y,p.x+5]
+            pathElement.corners = Corners.ROUND
+            pathElement.startArrow = Arrow.NONE
+            pathElement.endArrow = Arrow.TRIANGLE
+            self.diagramComponent.addElement(pathElement)
+        elif option=="add HV path":
+            pathElement = PathElement()
+            pathElement.pathType = PathType.OPEN
+            pathElement.startOrientation = Orientation.HORIZONTAL
+            p = menu.topLeft
+            pathElement.turns = [p.x,p.y,p.x+5,p.y+3]
+            pathElement.corners = Corners.ROUND
+            pathElement.startArrow = Arrow.NONE
+            pathElement.endArrow = Arrow.TRIANGLE
+            self.diagramComponent.addElement(pathElement)
+        elif option=="add VV path":
+            pathElement = PathElement()
+            pathElement.pathType = PathType.OPEN
+            pathElement.startOrientation = Orientation.VERTICAL
+            p = menu.topLeft
+            pathElement.turns = [p.y,p.x,p.y+5]
+            pathElement.corners = Corners.ROUND
+            pathElement.startArrow = Arrow.NONE
+            pathElement.endArrow = Arrow.TRIANGLE
             self.diagramComponent.addElement(pathElement)

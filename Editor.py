@@ -12,6 +12,7 @@ class Editor:
         self.diagramComponent = DiagramComponent(self,diagram)
         self.context = CursesContext(self.screen)
         self.saveCallback = saveCallback
+        self.listeners = set([])
 
     def getContext(self):
         return self.context
@@ -35,6 +36,11 @@ class Editor:
         import SelectComponentState
         self.state = SelectComponentState.SelectComponentState(self.diagramComponent,eventListener)
 
+    def addKeyListener(self,listener):
+        self.listeners.add(listener)
+
+    def removeKeyListener(self,listener):
+        self.listeners.remove(listener)
 
     def run(self):
         #screen.addstr(0,0,"Hello",curses.color_pair(1)|curses.A_BOLD)
@@ -57,8 +63,12 @@ class Editor:
         while(True):
             event = self.screen.getch()
             #print("event='"+str(curses.keyname(event))+"'")
+            #print("event='"+str(bin(event))+"'")
             #ch = 'N'
-            if event == 27:
+            if len(self.listeners)>0 and event>=0 and event<=255:
+                for listener in self.listeners:
+                    listener.keyEvent(chr(event))
+            elif event == 27:
                 self.screen.nodelay(True)
                 nextKey = self.screen.getch()
                 self.screen.nodelay(False)

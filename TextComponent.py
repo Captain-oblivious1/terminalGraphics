@@ -12,6 +12,7 @@ class TextComponent(Component):
         self.lineInfo = []
         self.maxLength = None
         self._updateLineInfo()
+        self.editing = False
 
     def getRect(self):
         rect = Rect()
@@ -35,12 +36,30 @@ class TextComponent(Component):
 
     def move(self,fromPoint,offset,context):
         self.element.location += offset
+
     def showContextMenu(self,point,context):
-        options = ["stop editing","","split","join"]
+        if self.editing:
+            options = ["stop editing"]
+        else:
+            options = ["edit"]
         self.getDiagramComponent().showMenu(Menu(self,options,point,self.menuResult))
 
     def menuResult(self,menu):
-        print("Chose menu option '"+menu.getSelectedOption()+"'")
+        self.editing = menu.getSelectedOption()=="edit"
+        editor = self.getEditor()
+        if self.editing:
+            editor.addKeyListener(self)
+            self.invalidate()
+            self._updateLineInfo()
+            self.invalidate()
+            self.element.text = ''
+        else:
+            editor.removeKeyListener(self)
+
+    def keyEvent(self,key):
+        self.element.text += key
+        self._updateLineInfo()
+        self.invalidate()
 
     def _updateLineInfo(self):
         self.lineInfo = []
