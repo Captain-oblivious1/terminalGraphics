@@ -10,7 +10,7 @@ class MemoryContext(Context):
         self.smallestRect = None
         self.clearWindow()
 
-    def writeString(self,x,y,text,bold=False,reverse=False):
+    def _writeString(self,x,y,text,bold=False,reverse=False):
         textLen = len(text)
         self._checkBounds(x,y,textLen)
         for i in range(len(text)):

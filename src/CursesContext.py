@@ -7,8 +7,7 @@ class CursesContext(Context):
         super().__init__()
         self.window = window
 
-    def writeString(self,x,y,text,bold=False,reverse=False):
-        # TODO: make his adhere to invalidatedRect
+    def _writeString(self,x,y,text,bold=False,reverse=False):
         if bold or reverse:
             pair = curses.color_pair(1)
             if bold:

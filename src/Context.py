@@ -125,6 +125,33 @@ class Context:
     def getMaxXy(self):
         raise Exception("Called abstract method")
 
+    def _writeString(self,x,y,text,bold=False,reverse=False):
+        raise Exception("Called abstract method")
+
+    def writeString(self,x,y,text,bold=False,reverse=False):
+        maxX, maxY = self.getMaxXy()
+        
+        # Check if row is even on the screen
+        if y<0 or y>=maxY:
+            return
+
+        # Trim off left if bleeds off left side
+        if x<0:
+            text = text[-x:]
+            x=0
+
+        # Trim off right if bleeds off of right side
+        textLen = len(text)
+        right = x+textLen
+        if right>=maxX:
+            trim = -(right-maxX+1)
+            text = text[:trim]
+
+        if text=='':
+            return
+
+        self._writeString(x,y,text,bold,reverse)
+
     def invalidateRect(self,rect=None):
         if rect is None:
             maxX,maxY = self.getMaxXy()
