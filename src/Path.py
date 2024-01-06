@@ -7,10 +7,27 @@ class Path:
     _squareCorners  = [ "┌", "┐", "└", "┘" ]
     _roundCorners = [ "╭", "╮", "╰", "╯" ]
 
-    def __init__(self,initialOrientation=None,elbowRefs=None):
+    def __init__(self,initialOrientation,turnListReference):
         self.initialOrientation = initialOrientation
-        self.elbowRefs = elbowRefs
         self.corners = Corners.ROUND
+
+        if isinstance(turnListReference,list):
+            refArray = []
+            self.turnListReference = None
+            for val in turnListReference:
+                refArray.append(ConstReference(val))
+            self.elbowRefs = refArray
+        else:
+            self.turnListReference = turnListReference
+            turns = turnListReference.get()
+            self._initTurnReference(turns)
+
+
+    def _initTurnReference(self,turns):
+        refArray = []
+        for i in range(len(turns)):
+            refArray.append( ArrayElementReference(turns,i) )
+        self.elbowRefs = refArray
 
     def _setCorners(self,value):
         if value==Corners.SQUARE:
@@ -199,7 +216,6 @@ class Path:
             self.fromElbow = None
             self.toElbow = None
             self.orientation = None
-            self.listeners = set({})
 
         class Snapshot:
             def __init__(self,pos,fro,to):
@@ -262,47 +278,26 @@ class Path:
             ref = self.getPosRef()
             oldPos = ref.get()
             ref.set(oldPos+myOffset)
-
-        def addListener(self,listener):
-            self.listeners.add(listener)
-
-        def removeListener(self,listener):
-            self.listeners.remove(listener)
-
  
         def split(self,pos):
             segmentIndex = self.getMySegmentIndex()
 
-            elbowRefs = self.parent.elbowRefs
-            currentElbowRefLen = len(elbowRefs)
+            turnListReference = self.parent.turnListReference
+            turnList = turnListReference.get()
+            currentElbowRefLen = len(turnList)
             splitIndex = (segmentIndex+1)%currentElbowRefLen
             insertIndex = (segmentIndex+2)%currentElbowRefLen
-            elbowRefs.insert(insertIndex,VarReference(elbowRefs[splitIndex].get()))
-            elbowRefs.insert(insertIndex,VarReference(pos))
-
-            oldSegments = self.parent.segments
-            newSegments = self.parent.segments = self.parent.createSegmentList(elbowRefs)
-
-            for index in range(segmentIndex):
-                newSegments[index].listeners = oldSegments[index].listeners
-
-            for index in range(segmentIndex+1,len(oldSegments)):
-                newSegments[index+2].listeners = oldSegments[index].listeners
-
-            for listener in self.listeners:
-                listener.segmentSplit(self,newSegments[segmentIndex],newSegments[segmentIndex+1],newSegments[segmentIndex+2])
+            turnList.insert(insertIndex,turnList[splitIndex])
+            turnList.insert(insertIndex,pos)
+            turnListReference.set(turnList)
+            self.parent._initTurnReference(turnList)
 
         def join(self,pos):
-            elbowRefs = self.parent.elbowRefs
-
+            turnListReference = self.parent.turnListReference
+            turnList = turnListReference.get()
             segmentIndex = self.getMySegmentIndex()
             for _ in range(3):
-                del elbowRefs[(segmentIndex)%len(elbowRefs)]
-            elbowRefs.insert((segmentIndex)%len(elbowRefs),VarReference(pos))
-
-            oldSegments = self.parent.segments
-            newSegments = self.parent.segments = self.parent.createSegmentList(elbowRefs)
-
-            for listener in self.listeners:
-                listener.segmentJoined(oldSegments[segmentIndex-1],oldSegments[segmentIndex],oldSegments[segmentIndex+1],self)
-
+                del turnList[(segmentIndex)%len(turnList)]
+            turnList.insert((segmentIndex)%len(turnList),pos)
+            turnListReference.set(turnList)
+            self.parent._initTurnReference(turnList)

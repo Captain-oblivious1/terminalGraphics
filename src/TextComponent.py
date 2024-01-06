@@ -21,11 +21,11 @@ class TextComponent(Component):
         return rect
 
     def draw(self,context):
-        selected = self.isSelected()
+        highlight = self.isSelected() or self.editing
         for line in range(len(self.lineInfo)):
             lineInfo = self.lineInfo[line]
             start = self._startForLine(line)
-            context.writeString(start.x,start.y,lineInfo.text,selected)
+            context.writeString(start.x,start.y,lineInfo.text,highlight)
 
     # Default is for entier rectangle to be true
     def isOnMe(self,point):
@@ -49,16 +49,32 @@ class TextComponent(Component):
         editor = self.getEditor()
         if self.editing:
             editor.addKeyListener(self)
-            self.invalidate()
-            self._updateLineInfo()
-            self.invalidate()
-            self.element.text = ''
+            self._changeText('')
         else:
-            editor.removeKeyListener(self)
+            self._stopEditing()
 
-    def keyEvent(self,key):
-        self.element.text += key
+    def keyEvent(self,event):
+        if event>=0 and event<=255:
+            if(event==27):
+                self._stopEditing()
+            else:
+                self._changeText( chr(event), True )
+        else:
+            if event==263: # Backspace
+                self._changeText( self.element.text[0:-1], False )
+
+    def _changeText(self,text,append=False):
+        self.invalidate()
+        if append:
+            self.element.text += text
+        else:
+            self.element.text = text
         self._updateLineInfo()
+        self.invalidate()
+
+    def _stopEditing(self):
+        self.getEditor().removeKeyListener(self)
+        self.editing = False
         self.invalidate()
 
     def _updateLineInfo(self):

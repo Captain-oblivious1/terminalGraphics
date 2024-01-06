@@ -62,13 +62,12 @@ class Editor:
         oldY=-1
         while(True):
             event = self.screen.getch()
-            #print("event='"+str(curses.keyname(event))+"'")
-            #print("event='"+str(bin(event))+"'")
-            #ch = 'N'
-            if len(self.listeners)>0 and event>=0 and event<=255:
-                for listener in self.listeners:
-                    listener.keyEvent(chr(event))
-            elif event == 27:
+            #if event!=curses.KEY_MOUSE:
+            #    print("event="+str(event))
+            if len(self.listeners)>0 and event!=curses.KEY_MOUSE:
+                for listener in self.listeners.copy():
+                    listener.keyEvent(event)
+            elif event == 27: # ESC key
                 self.screen.nodelay(True)
                 nextKey = self.screen.getch()
                 self.screen.nodelay(False)
@@ -97,16 +96,13 @@ class Editor:
                 elif bstate & curses.BUTTON3_RELEASED != 0:
                     self.state.rightReleased(mx,my)
                 else:
-                    #if mx!=oldX or my!=oldY: #This added the weird G characters when hilighting
                     self.state.mouseMoved(mx,my)
-                    #    oldX = mx
-                    #    oldY = my
             else:
                 self.state.keyPressed(event)
-                #print("key pressed="+str(event))
 
-            diagram.draw(self.context)
-            self.context.validateAll()
-            self.screen.refresh()
+            if not self.context.invalidatedRect.isNullRect():
+                diagram.draw(self.context)
+                self.context.validateAll()
+                self.screen.refresh()
 
         curses.endwin()

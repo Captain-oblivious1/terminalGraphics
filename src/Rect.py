@@ -72,6 +72,13 @@ class Rect:
     #def area(self):
     #    return self.width()*self.height()
 
+    def __eq__(self,other):
+        return other is not None and \
+               self.l==other.l and \
+               self.r==other.r and \
+               self.t==other.t and \
+               self.b==other.b
+
     def __str__(self):
         return "Rect:{x="+str(self.l)+",y="+str(self.t)+",width="+str(self.width())+",height="+str(self.height())+"}"
 

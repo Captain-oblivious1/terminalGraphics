@@ -1,8 +1,8 @@
 from Path import *
 
 class ClosedPath(Path):
-    def __init__(self,initialOrientation=None,elbowRefs=None,filled=False):
-         super().__init__(initialOrientation,elbowRefs)
+    def __init__(self,initialOrientation,turnListReference,filled):
+         super().__init__(initialOrientation,turnListReference)
          self.filled = filled
 
     def __setattr__(self,name,value):

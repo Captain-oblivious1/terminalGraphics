@@ -19,14 +19,13 @@ class PathComponent(Component):
         self.updateElement(element)
 
     def updateElement(self,element):
-        refArray = []
-        for i in range(len(element.turns)):
-            refArray.append( ArrayElementReference(element.turns,i) )
+
+        turnArrayReference = AttrReference(element,"turns")
 
         if element.pathType == PathType.CLOSED:
-            self.renderer = ClosedPath(element.startOrientation,refArray,element.fill == Fill.OPAQUE)
+            self.renderer = ClosedPath(element.startOrientation,turnArrayReference,element.fill == Fill.OPAQUE)
         else:
-            self.renderer = OpenPath(element.startOrientation,refArray)
+            self.renderer = OpenPath(element.startOrientation,turnArrayReference)
             self.renderer.startArrow = element.startArrow
             self.renderer.endArrow = element.endArrow
 

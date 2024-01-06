@@ -7,8 +7,8 @@ class OpenPath(Path):
     _linesArrowArray =    [ "<", ">", "∧", "∨" ]
     _triangleArrowArray = [ "◁", "▷", "△", "▽" ]
 
-    def __init__(self,initialOrientation,elbowRefs):
-        super().__init__(initialOrientation,elbowRefs)
+    def __init__(self,initialOrientation,turnListReference):
+        super().__init__(initialOrientation,turnListReference)
         self.startArrow = Arrow.LINES
         self.endArrow = Arrow.LINES
 
