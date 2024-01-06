@@ -4,90 +4,95 @@
   "elements": [
    {
     "_type": "PathElement",
-    "corners": "ROUND",
+    "corners": "SQUARE",
+    "endArrow": "TRIANGLE",
     "fill": "OPAQUE",
-    "pathType": "CLOSED",
-    "startOrientation": "HORIZONTAL",
-    "turns": [
-     19,
-     8,
-     39,
-     18
-    ]
-   },
-   {
-    "_type": "PathElement",
-    "corners": "ROUND",
-    "fill": "OPAQUE",
-    "pathType": "CLOSED",
-    "startOrientation": "HORIZONTAL",
-    "turns": [
-     15,
-     5,
-     37,
-     9
-    ]
-   },
-   {
-    "_type": "TextElement",
-    "justification": "LEFT",
-    "location": [
-     20,
-     8
-    ],
-    "text": "New text"
-   },
-   {
-    "_type": "PathElement",
-    "corners": "ROUND",
-    "endArrow": "TRIANGLE",
-    "fill": "TRANSPARENT",
     "pathType": "OPEN",
-    "startArrow": "NONE",
-    "startOrientation": "HORIZONTAL",
-    "turns": [
-     37,
-     6,
-     36
-    ]
-   },
-   {
-    "_type": "PathElement",
-    "corners": "ROUND",
-    "endArrow": "TRIANGLE",
-    "fill": "TRANSPARENT",
-    "pathType": "OPEN",
-    "startArrow": "NONE",
-    "startOrientation": "HORIZONTAL",
-    "turns": [
-     37,
-     7,
-     42,
-     10
-    ]
-   },
-   {
-    "_type": "PathElement",
-    "corners": "ROUND",
-    "endArrow": "TRIANGLE",
-    "fill": "TRANSPARENT",
-    "pathType": "OPEN",
-    "startArrow": "NONE",
+    "startArrow": "LINES",
     "startOrientation": "VERTICAL",
     "turns": [
-     9,
-     17,
-     14
+     6,
+     25,
+     14,
+     35,
+     19,
+     23
+    ]
+   },
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "fill": "OPAQUE",
+    "pathType": "CLOSED",
+    "startOrientation": "VERTICAL",
+    "turns": [
+     2,
+     2,
+     13,
+     22,
+     7,
+     27
     ]
    },
    {
     "_type": "TextElement",
     "justification": "LEFT",
     "location": [
-     27,
-     10
+     8,
+     7
     ],
-    "text": "abcde"
+    "text": "Test text."
+   },
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "endArrow": "TRIANGLE",
+    "fill": "TRANSPARENT",
+    "pathType": "OPEN",
+    "startArrow": "NONE",
+    "startOrientation": "HORIZONTAL",
+    "turns": [
+     22,
+     11,
+     31,
+     18,
+     23
+    ]
+   },
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "fill": "OPAQUE",
+    "pathType": "CLOSED",
+    "startOrientation": "HORIZONTAL",
+    "turns": [
+     4,
+     12,
+     9,
+     22
+    ]
+   },
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "fill": "OPAQUE",
+    "pathType": "CLOSED",
+    "startOrientation": "HORIZONTAL",
+    "turns": [
+     6,
+     17,
+     22,
+     21
+    ]
+   },
+   {
+    "_type": "TextElement",
+    "justification": "CENTER",
+    "location": [
+     14,
+     19
+    ],
+    "text": "Foo Bar."
    }
   ],
   "name": "One"
