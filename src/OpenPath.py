@@ -6,6 +6,10 @@ class OpenPath(Path):
     _noneArrowArray =     [ [ "╶", "╴", "╷", "╵" ],
                             [ "╺", "╸", "╻", "╹" ] ]
     _linesArrowArray =      [ "<", ">", "∧", "∨" ] 
+    #_linesArrowArray =      [ "<", ">", "⮝", "∨" ] # these all look like shit
+    #_linesArrowArray =      [ "<", ">", "🡩", "∨" ] 
+    #_linesArrowArray =      [ "<", ">", "🡱", "∨" ] 
+    #_linesArrowArray =      [ "<", ">", "🢁", "∨" ] 
     _triangleArrowArray =   [ "◁", "▷", "△", "▽" ] 
 
     def __init__(self,initialOrientation,turnListReference,thickness,style):
