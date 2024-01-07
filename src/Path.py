@@ -4,11 +4,23 @@ from Rect import *
 
 class Path:
 
-    _squareCorners  = [ "┌", "┐", "└", "┘" ]
+    _squareCorners  = [ [ "┌", "┐", "└", "┘" ],
+                        [ "┏", "┓", "┗", "┛" ] ]
     _roundCorners = [ "╭", "╮", "╰", "╯" ]
 
-    def __init__(self,initialOrientation,turnListReference):
+    _horizontalLines = [ ['─', '╌'],
+                         ['━', '╍'] ]
+
+    _verticalLines = [ ['│', '╎'],
+                       ['┃', '╏'] ]
+
+    _halfLines = [ [ "╴", "╶", "╵", "╷" ],
+                   [ "╸", "╺", "╹", "╻" ] ]
+
+    def __init__(self,initialOrientation,turnListReference,thickness,style):
         self.initialOrientation = initialOrientation
+        self.thickness = thickness
+        self.style = style
         self.corners = Corners.ROUND
 
         if isinstance(turnListReference,list):
@@ -30,21 +42,31 @@ class Path:
         self.elbowRefs = refArray
 
     def _setCorners(self,value):
+        thickInt = int(self.thickness)
+        styleInt = int(self.style)
+        halfLineArray = Path._halfLines[thickInt]
         if value==Corners.SQUARE:
-            array = Path._squareCorners
+            cornerArray = Path._squareCorners[thickInt]
         else:
-            array = Path._roundCorners
-        setattr(self,"cornerCharArray", array )
-        tl = array[0]
-        tr = array[1]
-        bl = array[2]
-        br = array[3]
+            cornerArray = Path._roundCorners
+        setattr(self,"cornerCharArray", cornerArray )
+        tl = cornerArray[0]
+        tr = cornerArray[1]
+        bl = cornerArray[2]
+        br = cornerArray[3]
+        l = halfLineArray[0]
+        r = halfLineArray[1]
+        t = halfLineArray[2]
+        b = halfLineArray[3]
+        h = Path._horizontalLines[thickInt][styleInt]
+        v = Path._verticalLines[thickInt][styleInt]
+        s = ' '
         self.elbowSymbol = \
-              [ [" ","╶","╷","╴","╵"],
-                ["╴","─", tr," ", br],  \
-                ["╵", bl,"│", br," "],  \
-                ["╶"," ", tl,"─", bl],  \
-                ["╷", tl," ", tr,"│"] ]
+              [ [  s,  r,  b,  l,  t],
+                [  l,  h, tr,  s, br],  \
+                [  t, bl,  v, br,  s],  \
+                [  r,  s, tl,  h, bl],  \
+                [  b, tl,  s, tr,  v] ]
 
     def __setattr__(self,name,value):
         super().__setattr__(name,value)

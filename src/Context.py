@@ -1,4 +1,5 @@
 from Rect import *
+from Stroke import *
 
 # The following is so that I can more easily do more advanced drawing.
 #
@@ -65,7 +66,13 @@ def intializeMaps():
                     charToHexMap[char] = value
                     hexToCharMap[value] = char
 
-    # insert half blocks into charToHexMap for masking stuff (don't put in hextToCharMap)
+    # treat dashed lines like solid for the purpose of or/and. (chars don't exist for that)
+    charToHexMap['╌'] = charToHexMap['─'] 
+    charToHexMap['╍'] = charToHexMap['━'] 
+    charToHexMap['╎'] = charToHexMap['│'] 
+    charToHexMap['╏'] = charToHexMap['┃'] 
+
+    # insert half blocks into charToHexMap for masking stuff (don't put in hexToCharMap)
     charToHexMap["▀"]=0x1FFF00
     charToHexMap["▄"]=0x1FFF
     charToHexMap["▌"]=0x1B9CE6
@@ -104,9 +111,15 @@ def hexToChar(hex):
         return minChar
 
 def orChars(char1,char2):
+    #if char1=='╌' and char2=='╎' or \
+    #   char2=='╌' and char1=='╎':
+    #print("char1="+char1+" char2="+char2+" hex1="+str(charToHex(char1))+" hex2="+str(charToHex(char2))+" result="+str(charToHex(char1) | charToHex(char2))+" char='"+hexToChar( charToHex(char1) | charToHex(char2) ))
     return hexToChar( charToHex(char1) | charToHex(char2) )
 
 def andChars(char1,char2):
+    #if char1=='╌' and char2=='╎' or \
+    #   char2=='╌' and char1=='╎':
+    #print("char1="+char1+" char2="+char2+" hex1="+str(charToHex(char1))+" hex2="+str(charToHex(char2))+" result="+str(charToHex(char1) & charToHex(char2))+" char='"+hexToChar( charToHex(char1) & charToHex(char2) ))
     return hexToChar( charToHex(char1) & charToHex(char2) )
 
 class Context:
@@ -175,10 +188,11 @@ class Context:
 
     def orChar(self,x,y,char,isBold=False):
         if self.invalidatedRect.isInsidePoint(Point(x,y)):
-            charOrd = ord(char)
-            if (charOrd>=0x2500 and charOrd<=0x254b) or (charOrd>=0x2574 and charOrd<=0x257f):
+            #charOrd = ord(char)
+            #if (charOrd>=0x2500 and charOrd<=0x254b) or (charOrd>=0x2574 and charOrd<=0x257f):
+            existing = self.readChar(x,y)
+            if existing!=' ' and char in charToHexMap:
                 #if is a box char
-                existing = self.readChar(x,y)
                 writeMe = orChars(existing,char)
             else:
                 writeMe = char
@@ -191,21 +205,25 @@ class Context:
                 writeMe = andChars(existing,char)
                 self.writeString(x,y,writeMe,isBold)
 
-    def drawVerticalLine(self,x,fro=0,to=None,isBold=False):
-        if to==None:
-            _,to = self.getMaxXy()
-            to -= 1
+    verticalLines = [ ['│', '╎'],
+                      ['┃', '╏'] ]
+
+    def drawVerticalLine(self,x,fro,to,thickness,style,isBold):
+    #def drawVerticalLine(self,x,fro=0,to=None,isBold=False):
         maxY = max(fro,to)
         minY = min(fro,to)
+        ch = Context.verticalLines[int(thickness)][int(style)]
         for i in range(minY,maxY+1):
-            self.orChar(x,i,"│",isBold)
+            self.orChar(x,i,ch,isBold)
 
-    def drawHorizontalLine(self,y,fro=0,to=None,isBold=False):
-        if to==None:
-            to,_ = self.getMaxXy()
-            to -= 1
+    horizontalLines = [ ['─', '╌'],
+                        ['━', '╍'] ]
+
+    def drawHorizontalLine(self,y,fro,to,thickness,style,isBold):
+    #def drawHorizontalLine(self,y,fro=0,to=None,isBold=False):
         maxX = max(fro,to)
         minX = min(fro,to)
+        ch = Context.horizontalLines[int(thickness)][int(style)]
         for i in range(minX,maxX+1):
-            self.orChar(i,y,"─",isBold)
+            self.orChar(i,y,ch,isBold)
 

@@ -23,9 +23,9 @@ class PathComponent(Component):
         turnArrayReference = AttrReference(element,"turns")
 
         if element.pathType == PathType.CLOSED:
-            self.renderer = ClosedPath(element.startOrientation,turnArrayReference,element.fill == Fill.OPAQUE)
+            self.renderer = ClosedPath(element.startOrientation,turnArrayReference,element.fill == Fill.OPAQUE,element.thickness,element.style)
         else:
-            self.renderer = OpenPath(element.startOrientation,turnArrayReference)
+            self.renderer = OpenPath(element.startOrientation,turnArrayReference,element.thickness,element.style)
             self.renderer.startArrow = element.startArrow
             self.renderer.endArrow = element.endArrow
 

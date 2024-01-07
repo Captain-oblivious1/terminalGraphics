@@ -1,8 +1,11 @@
 from Path import *
 
+
 class ClosedPath(Path):
-    def __init__(self,initialOrientation,turnListReference,filled):
-         super().__init__(initialOrientation,turnListReference)
+    _plus  = [ "┼", "╋" ]
+
+    def __init__(self,initialOrientation,turnListReference,filled,thickness,style):
+         super().__init__(initialOrientation,turnListReference,thickness,style)
          self.filled = filled
 
     def __setattr__(self,name,value):
@@ -16,23 +19,31 @@ class ClosedPath(Path):
 
     def _setCorners(self,value):
         super()._setCorners(value)
+
+        thickInt = int(self.thickness)
+        styleInt = int(self.style)
         if value==Corners.SQUARE:
-            array = Path._squareCorners
+            cornerArray = Path._squareCorners[thickInt]
         else:
-            array = Path._roundCorners
-        tl = array[0]
-        tr = array[1]
-        bl = array[2]
-        br = array[3]
+            cornerArray = Path._roundCorners
+        tl = cornerArray[0]
+        tr = cornerArray[1]
+        bl = cornerArray[2]
+        br = cornerArray[3]
+        h = Path._horizontalLines[thickInt][styleInt]
+        v = Path._verticalLines[thickInt][styleInt]
+        p = ClosedPath._plus[thickInt]
+        s = ' '
+
         self.border = \
-            [ [ [ [None, tl  ],    \
-                  [  tr, "─" ] ],  \
-                [ [  bl, "│" ],    \
-                  [ "┼", br] ], ], \
-              [ [ [  br, "┼" ],    \
-                  [ "│", bl  ] ],  \
-                [ [ "─", tr  ],    \
-                  [  tl, " " ] ] ] ]
+            [ [ [ [None, tl ],    
+                  [ tr,  h ] ],  
+                [ [ bl,  v ],    
+                  [  p, br ] ], ], 
+              [ [ [ br,  p ],    
+                  [  v, bl ] ],  
+                [ [  h, tr ],    
+                  [ tl,  s ] ] ] ]
 
     def createElbowList(self,refList):
         if not self.testIfClosed(refList):
@@ -136,9 +147,9 @@ class ClosedPath(Path):
             snapshot = segment.getSnapshot()
             if snapshot.fro<=snapshot.to:
                 if segment.orientation==Orientation.HORIZONTAL:
-                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,bold)
+                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,self.thickness,self.style,bold)
                 else:
-                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,bold)
+                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,self.thickness,self.style,bold)
             oldDirection = direction
 
     def move(self,offset,context):

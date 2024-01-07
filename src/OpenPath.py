@@ -3,12 +3,13 @@ from Path import *
 
 class OpenPath(Path):
 
-    _noneArrowArray =     [ "╶", "╴", "╷", "╵" ]
-    _linesArrowArray =    [ "<", ">", "∧", "∨" ]
-    _triangleArrowArray = [ "◁", "▷", "△", "▽" ]
+    _noneArrowArray =     [ [ "╶", "╴", "╷", "╵" ],
+                            [ "╺", "╸", "╻", "╹" ] ]
+    _linesArrowArray =      [ "<", ">", "∧", "∨" ] 
+    _triangleArrowArray =   [ "◁", "▷", "△", "▽" ] 
 
-    def __init__(self,initialOrientation,turnListReference):
-        super().__init__(initialOrientation,turnListReference)
+    def __init__(self,initialOrientation,turnListReference,thickness,style):
+        super().__init__(initialOrientation,turnListReference,thickness,style)
         self.startArrow = Arrow.LINES
         self.endArrow = Arrow.LINES
 
@@ -28,7 +29,7 @@ class OpenPath(Path):
 
     def _setArrow(self,name,value):
         if value==Arrow.NONE:
-            array = OpenPath._noneArrowArray
+            array = OpenPath._noneArrowArray[int(self.thickness)]
         elif value==Arrow.LINES:
             array = OpenPath._linesArrowArray
         elif value==Arrow.TRIANGLE:
@@ -85,9 +86,9 @@ class OpenPath(Path):
             snapshot = segment.getSnapshot()
             if snapshot.fro<=snapshot.to:
                 if segment.orientation==Orientation.HORIZONTAL:
-                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,bold)
+                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,self.thickness,self.style,bold)
                 else:
-                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,bold)
+                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,self.thickness,self.style,bold)
             oldDirection = direction
         self.drawArrow(context,segment,False,bold)
 

@@ -5,18 +5,42 @@
    {
     "_type": "PathElement",
     "corners": "SQUARE",
-    "endArrow": "TRIANGLE",
-    "fill": "OPAQUE",
-    "pathType": "OPEN",
-    "startArrow": "LINES",
+    "fill": "TRANSPARENT",
+    "pathType": "CLOSED",
     "startOrientation": "VERTICAL",
+    "style": "1",
+    "thickness": "1",
     "turns": [
-     6,
-     25,
-     14,
+     5,
+     27,
+     16,
+     47,
+     10,
+     52
+    ]
+   },
+   {
+    "_type": "TextElement",
+    "justification": "LEFT",
+    "location": [
+     31,
+     7
+    ],
+    "text": "Thick dashed\nline (left\njustified\ntext)"
+   },
+   {
+    "_type": "PathElement",
+    "corners": "SQUARE",
+    "fill": "OPAQUE",
+    "pathType": "CLOSED",
+    "startOrientation": "HORIZONTAL",
+    "style": "1",
+    "thickness": "0",
+    "turns": [
+     30,
+     15,
      35,
-     19,
-     23
+     25
     ]
    },
    {
@@ -24,24 +48,24 @@
     "corners": "ROUND",
     "fill": "OPAQUE",
     "pathType": "CLOSED",
-    "startOrientation": "VERTICAL",
+    "startOrientation": "HORIZONTAL",
+    "style": "0",
+    "thickness": "0",
     "turns": [
-     2,
-     1,
-     13,
-     21,
-     7,
-     26
+     32,
+     20,
+     49,
+     24
     ]
    },
    {
     "_type": "TextElement",
-    "justification": "LEFT",
+    "justification": "CENTER",
     "location": [
-     8,
-     7
+     41,
+     21
     ],
-    "text": "Test text."
+    "text": "Thin solid\nline (centered\ntext)"
    },
    {
     "_type": "PathElement",
@@ -51,48 +75,34 @@
     "pathType": "OPEN",
     "startArrow": "NONE",
     "startOrientation": "HORIZONTAL",
+    "style": "1",
+    "thickness": "0",
     "turns": [
-     21,
-     11,
-     31,
-     18,
-     23
-    ]
-   },
-   {
-    "_type": "PathElement",
-    "corners": "ROUND",
-    "fill": "OPAQUE",
-    "pathType": "CLOSED",
-    "startOrientation": "HORIZONTAL",
-    "turns": [
-     4,
-     12,
-     9,
-     22
-    ]
-   },
-   {
-    "_type": "PathElement",
-    "corners": "ROUND",
-    "fill": "OPAQUE",
-    "pathType": "CLOSED",
-    "startOrientation": "HORIZONTAL",
-    "turns": [
-     6,
-     17,
-     22,
-     21
-    ]
-   },
-   {
-    "_type": "TextElement",
-    "justification": "CENTER",
-    "location": [
+     47,
      14,
-     19
-    ],
-    "text": "Foo Bar."
+     57,
+     21,
+     50
+    ]
+   },
+   {
+    "_type": "PathElement",
+    "corners": "SQUARE",
+    "endArrow": "TRIANGLE",
+    "fill": "OPAQUE",
+    "pathType": "OPEN",
+    "startArrow": "LINES",
+    "startOrientation": "VERTICAL",
+    "style": "1",
+    "thickness": "1",
+    "turns": [
+     11,
+     51,
+     19,
+     61,
+     23,
+     50
+    ]
    }
   ],
   "name": "One"

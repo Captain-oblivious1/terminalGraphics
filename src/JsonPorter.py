@@ -76,7 +76,9 @@ class JsonPorter:
         "turns": lambda t: JsonPorter._strListToIntList(t),
         "justification": lambda t : Justification[t],
         "location": lambda t : JsonPorter._arrayToPoint(t),
-        "text": lambda t : t }
+        "style": lambda t : t,
+        "text": lambda t : t,
+        "thickness": lambda t : t }
 
     @staticmethod
     def _convertToElement(jsonData):
