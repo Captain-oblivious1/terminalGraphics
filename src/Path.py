@@ -2,6 +2,8 @@ from Util import *
 from Model import *
 from Rect import *
 
+# This class has no idea it's part of any GUI.  It knows nothing about Editor, Events, Components,
+# and whatnot.  It only know of the element object and the Context it uses to draw.
 class Path:
 
     _squareCorners  = [ [ "┌", "┐", "└", "┘" ],
@@ -17,35 +19,16 @@ class Path:
     _halfLines = [ [ "╴", "╶", "╵", "╷" ],
                    [ "╸", "╺", "╹", "╻" ] ]
 
-    def __init__(self,initialOrientation,turnListReference,thickness,style):
-        self.initialOrientation = initialOrientation
-        self.thickness = thickness
-        self.style = style
-        self.corners = Corners.ROUND
+    def __init__(self,element):
+        self.element = element
+        self.updateStroke()
+        self.updateShape()
 
-        if isinstance(turnListReference,list):
-            refArray = []
-            self.turnListReference = None
-            for val in turnListReference:
-                refArray.append(ConstReference(val))
-            self.elbowRefs = refArray
-        else:
-            self.turnListReference = turnListReference
-            turns = turnListReference.get()
-            self._initTurnReference(turns)
-
-
-    def _initTurnReference(self,turns):
-        refArray = []
-        for i in range(len(turns)):
-            refArray.append( ArrayElementReference(turns,i) )
-        self.elbowRefs = refArray
-
-    def _setCorners(self,value):
-        thickInt = int(self.thickness)
-        styleInt = int(self.style)
+    def updateStroke(self):
+        thickInt = int(self.element.thickness)
+        styleInt = int(self.element.style)
         halfLineArray = Path._halfLines[thickInt]
-        if value==Corners.SQUARE:
+        if self.element.corners==Corners.SQUARE:
             cornerArray = Path._squareCorners[thickInt]
         else:
             cornerArray = Path._roundCorners
@@ -68,12 +51,8 @@ class Path:
                 [  r,  s, tl,  h, bl],  \
                 [  b, tl,  s, tr,  v] ]
 
-    def __setattr__(self,name,value):
-        super().__setattr__(name,value)
-        if name=="corners":
-            self._setCorners(value)
-        elif name=="elbowRefs":
-            self.segments = self.createSegmentList(value)
+    def updateShape(self):
+        self.segments = self.createSegmentList(self.element.turns)
 
     def createElbow(self,path,index,xRefIndex,yRefIndex):
         return Path.Elbow(self,path,index,xRefIndex,yRefIndex)
@@ -86,7 +65,7 @@ class Path:
 
     def createElbowList(self,refList):
         elbowList = []
-        horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
+        horizontalOrienation = self.element.startOrientation==Orientation.HORIZONTAL
         first = True
 
         elbowIndex = 0
@@ -114,7 +93,7 @@ class Path:
         elbows = self.createElbowList(elbowRefs)
         segmentList = []
         prevElbow = None
-        horizontalOrienation = self.initialOrientation==Orientation.HORIZONTAL
+        horizontalOrienation = self.element.startOrientation==Orientation.HORIZONTAL
         for elbow in elbows:
             if prevElbow:
                 segment = Path.Segment(self)
@@ -139,18 +118,19 @@ class Path:
         return self.segments
 
     def move(self,offset,context):
-        if self.initialOrientation == Orientation.HORIZONTAL:
+        element = self.element
+        if element.startOrientation == Orientation.HORIZONTAL:
             xElement = 0
         else:
             xElement = 1
 
         arrayElement = 0
-        for ref in self.elbowRefs:
+        for ref in element.turns:
             if arrayElement%2 == xElement:
                 elementOffset = offset.x
             else:
                 elementOffset = offset.y
-            ref.set( ref.get() + elementOffset )
+            element.turns[arrayElement] = ref + elementOffset
             arrayElement += 1
 
     def isPointInPath(self,point):
@@ -169,12 +149,6 @@ class Path:
             return lastElbow
         else:
             return None
-
-    #def draw(self,context):
-    #    self.drawSegmentList(context,self.segments)
-
-    #def drawSegmentList(self,context,createSegmentList):
-    #    pass  #subclass draws how it sees fit
 
     class Elbow:
 
@@ -196,23 +170,19 @@ class Path:
         def _allElbowRefs(self):
             return self.path.elbowRefs
 
-        def getXRef(self):
-            return self._allElbowRefs()[self.xRefIndex]
-
         def getX(self):
-            return self.getXRef().get()
+            turns = self.parent.element.turns
+            return turns[self.xRefIndex % len(turns)]
 
         def setX(self,value):
-            return self.getXRef().set(value)
-
-        def getYRef(self):
-            return self._allElbowRefs()[self.yRefIndex]
+            self.parent.element.turns[self.xRefIndex] = value
 
         def getY(self):
-            return self.getYRef().get()
+            turns = self.parent.element.turns
+            return turns[self.yRefIndex % len(turns)]
 
         def setY(self,value):
-            return self.getYRef().set(value)
+            self.parent.element.turns[self.yRefIndex] = value
 
         def point(self):
             return Point(self.getX(),self.getY())
@@ -245,11 +215,11 @@ class Path:
                 self.fro = fro
                 self.to = to
 
-        def getPosRef(self):
+        def getPosIndex(self):
             if self.orientation==Orientation.HORIZONTAL:
-                return self.parent.elbowRefs[self.fromElbow.yRefIndex]
+                return self.fromElbow.yRefIndex
             else:
-                return self.parent.elbowRefs[self.fromElbow.xRefIndex]
+                return self.fromElbow.xRefIndex
 
         def getSnapshot(self,fullLength=False):
             if self.orientation==Orientation.HORIZONTAL:
@@ -296,30 +266,24 @@ class Path:
                 myOffset = offset.y
             else:
                 myOffset = offset.x
+            index = self.getPosIndex()
+            self.parent.element.turns[index] += myOffset
 
-            ref = self.getPosRef()
-            oldPos = ref.get()
-            ref.set(oldPos+myOffset)
- 
         def split(self,pos):
             segmentIndex = self.getMySegmentIndex()
 
-            turnListReference = self.parent.turnListReference
-            turnList = turnListReference.get()
-            currentElbowRefLen = len(turnList)
+            turns = self.parent.element.turns
+            currentElbowRefLen = len(turns)
             splitIndex = (segmentIndex+1)%currentElbowRefLen
             insertIndex = (segmentIndex+2)%currentElbowRefLen
-            turnList.insert(insertIndex,turnList[splitIndex])
-            turnList.insert(insertIndex,pos)
-            turnListReference.set(turnList)
-            self.parent._initTurnReference(turnList)
+            turns.insert(insertIndex,turns[splitIndex])
+            turns.insert(insertIndex,pos)
+            self.parent.updateShape()
 
         def join(self,pos):
-            turnListReference = self.parent.turnListReference
-            turnList = turnListReference.get()
+            turns = self.parent.element.turns
             segmentIndex = self.getMySegmentIndex()
             for _ in range(3):
-                del turnList[(segmentIndex)%len(turnList)]
-            turnList.insert((segmentIndex)%len(turnList),pos)
-            turnListReference.set(turnList)
-            self.parent._initTurnReference(turnList)
+                del turns[(segmentIndex)%len(turns)]
+            turns.insert((segmentIndex)%len(turns),pos)
+            self.parent.updateShape()

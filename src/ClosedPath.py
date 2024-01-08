@@ -1,28 +1,28 @@
 from Path import *
 
-
 class ClosedPath(Path):
     _plus  = [ "┼", "╋" ]
 
-    def __init__(self,initialOrientation,turnListReference,filled,thickness,style):
-         super().__init__(initialOrientation,turnListReference,thickness,style)
-         self.filled = filled
+    def __init__(self,element):
+         super().__init__(element)
 
-    def __setattr__(self,name,value):
-        if name=="corners":
-            self._setCorners(value)
-        elif name=="elbowRefs":
-            elbowRefs = self.closePath(value)
-            super().__setattr__(name,elbowRefs)
-        else:
-            super().__setattr__(name,value)
+    #def __setattr__(self,name,value):
+    #    if name=="corners":
+    #        self._setCorners(value)
+    #    elif name=="elbowRefs":
+    #        elbowRefs = self.closePath(value)
+    #        super().__setattr__(name,elbowRefs)
+    #    else:
+    #        super().__setattr__(name,value)
 
-    def _setCorners(self,value):
-        super()._setCorners(value)
+    #def _setCorners(self,value):
+    def updateStroke(self):
+        super().updateStroke()
 
-        thickInt = int(self.thickness)
-        styleInt = int(self.style)
-        if value==Corners.SQUARE:
+        element = self.element
+        thickInt = int(element.thickness)
+        styleInt = int(element.style)
+        if element.corners==Corners.SQUARE:
             cornerArray = Path._squareCorners[thickInt]
         else:
             cornerArray = Path._roundCorners
@@ -84,7 +84,7 @@ class ClosedPath(Path):
         return refList
 
     def draw(self,context,bold):
-        if self.filled:
+        if self.element.fill == Fill.OPAQUE:
             self.drawFilled(context,self.segments,bold)
         else:
             self.drawUnfilled(context,self.segments,bold)
@@ -100,6 +100,7 @@ class ClosedPath(Path):
             [ [ "▄", "▖" ],     \
               [ "▗", " " ] ] ] ]
 
+    @staticmethod
     def maskCharFor(topLeft,topRight,bottomLeft,bottomRight):
         return ClosedPath.mask[topLeft][topRight][bottomLeft][bottomRight]
 
@@ -145,29 +146,31 @@ class ClosedPath(Path):
             context.orChar(elbow.getX(),elbow.getY(),elbowChar,bold)
 
             snapshot = segment.getSnapshot()
+            element = self.element
             if snapshot.fro<=snapshot.to:
                 if segment.orientation==Orientation.HORIZONTAL:
-                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,self.thickness,self.style,bold)
+                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,element.thickness,element.style,bold)
                 else:
-                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,self.thickness,self.style,bold)
+                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,element.thickness,element.style,bold)
             oldDirection = direction
 
     def move(self,offset,context):
         #print("ClosedPath.move offset x="+str(offset.x)+" y="+str(offset.y))
-        if self.initialOrientation == Orientation.HORIZONTAL:
+        element = self.element
+        if element.startOrientation == Orientation.HORIZONTAL:
             xElement = 0
         else:
             xElement = 1
 
-        arrayElement = 0
-        for ref in self.elbowRefs:
-            if arrayElement>=2:
-                if arrayElement%2 == xElement:
-                    elementOffset = offset.x
-                else:
-                    elementOffset = offset.y
-                ref.set( ref.get() + elementOffset )
-            arrayElement += 1
+        turns = element.turns
+        for i in range(len(turns)):
+            #if i>=2:
+            if i%2 == xElement:
+                elementOffset = offset.x
+            else:
+                elementOffset = offset.y
+            turns[i] += elementOffset
+                #ref.set( ref.get() + elementOffset )
 
     # I am not sure I want this behavior
     #def isPointInPath(self,point):

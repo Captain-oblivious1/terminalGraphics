@@ -8,9 +8,6 @@ class Orientation(Enum):
     VERTICAL = 1
 
 class Element:
-    def __init__(self):
-        pass
-
     def _attrToStr(self,attributeNames):
         result = ""
         first = True

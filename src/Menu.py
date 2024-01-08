@@ -13,9 +13,11 @@ class Menu(Component):
         for option in options:
             maxLen = max(len(option),maxLen)
 
-        valArray = [topLeft.x,topLeft.y,topLeft.x+maxLen+1,topLeft.y+len(options)+1]
-
-        self.path = ClosedPath(Orientation.HORIZONTAL,valArray,True,Thickness.THIN,Style.SOLID)
+        pathElement = PathElement()
+        pathElement.turns = [topLeft.x,topLeft.y,topLeft.x+maxLen+1,topLeft.y+len(options)+1]
+        pathElement.fill = Fill.OPAQUE
+        pathElement.startOrientation = Orientation.HORIZONTAL
+        self.path = ClosedPath(pathElement)
 
         self.rect = Rect(topLeft.x,topLeft.y,maxLen+2,len(options)+2)
         self.selectedOption = None

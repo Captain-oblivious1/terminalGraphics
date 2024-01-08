@@ -1,6 +1,5 @@
 from Component import *
 
-from Util import *
 from Rect import *
 from Menu import *
 from Model import *

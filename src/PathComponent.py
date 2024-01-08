@@ -2,12 +2,11 @@ from Component import *
 from Path import *
 from OpenPath import *
 from ClosedPath import *
-#from Connector import *
-#from Shape import *
-from Util import *
 from Rect import *
 from Menu import *
 
+# Unlike the Path component (and it's children), this class is aware it part of a GUI.  It handles
+# events and whatnot.
 class PathComponent(Component):
 
     def __init__(self,parent,element):
@@ -20,22 +19,14 @@ class PathComponent(Component):
 
     def updateElement(self,element):
 
-        turnArrayReference = AttrReference(element,"turns")
-
         if element.pathType == PathType.CLOSED:
-            self.renderer = ClosedPath(element.startOrientation,turnArrayReference,element.fill == Fill.OPAQUE,element.thickness,element.style)
+            self.renderer = ClosedPath(element)
         else:
-            self.renderer = OpenPath(element.startOrientation,turnArrayReference,element.thickness,element.style)
+            self.renderer = OpenPath(element)
             self.renderer.startArrow = element.startArrow
             self.renderer.endArrow = element.endArrow
 
         self.renderer.corners = element.corners
-
-    #def setEditing(self,editing):
-    #    self.editing = editing
-
-    #def isEditing(self):
-    #    return self.editingPoint!=None
 
     def isOnMe(self,point):
         return self.renderer.isPointInPath(point)
@@ -62,31 +53,44 @@ class PathComponent(Component):
 
     def editShape(self,fromPoint,offset,context):
         self.invalidate()
-
-        #pathElement = self.renderer.pathElementAt(fromPoint)
-        #if pathElement==None:
-        #    print("Warning pathElement was None for some reason")
-        #else: # is elbow
-        #    pathElement.edit(offset)
         self.pathElementEditing.edit(offset)
 
-    def showContextMenu(self,point,context):
+    def showContextMenu(self,point,_):
         self.rightClickPoint = point
         if self.editing:
-            options = ["stop editing","","split","join"]
+            options = ["stop editing","split","join"]
         else:
             options = ["edit shape"]
+        pathElement = self.renderer.pathElementAt(point)
+        if isinstance(pathElement,OpenPath.ArrowElbow):
+            options += [ "──", "─>", "─▷" ]
+        else:
+            options += ["toggle thickness","toggle style","toggle corners"]
         self.getDiagramComponent().showMenu(Menu(self,options,point,self.menuResult))
 
     def menuResult(self,menu):
-        if menu.getSelectedOption()=="split":
+        selected = menu.getSelectedOption()
+        if selected=="split":
             self.split(self.rightClickPoint)
-        elif menu.getSelectedOption()=="join":
+        elif selected=="join":
             self.join(self.rightClickPoint)
-        elif menu.getSelectedOption()=="stop editing":
+        elif selected=="toggle thickness":
+            self._setThickness(1-int(self.element.thickness))
+        elif selected=="toggle style":
+            self._setStyle(1-int(self.element.style))
+        elif selected=="toggle corners":
+            corners = self.element.corners
+            self._setCorners( Corners.SQUARE if corners==Corners.ROUND else Corners.ROUND )
+        elif selected=="stop editing":
             self.editing = False
-        elif menu.getSelectedOption()=="edit shape":
+        elif selected=="edit shape":
             self.editing = True
+        elif selected=="──":
+            self._setArrow(Arrow.NONE)
+        elif selected=="─>":
+            self._setArrow(Arrow.LINES)
+        elif selected=="─▷":
+            self._setArrow(Arrow.TRIANGLE)
 
     def split(self,point):
         pathElement = self.renderer.pathElementAt(point)
@@ -96,10 +100,8 @@ class PathComponent(Component):
             else:
                 splitPos = point.y
             pathElement.split(splitPos)
-        #self.createChildren()
 
     def join(self,point):
-        #self.parent.invalidate()
         self.invalidate()
         pathElement = self.renderer.pathElementAt(point)
         if pathElement.orientation==Orientation.HORIZONTAL:
@@ -107,7 +109,36 @@ class PathComponent(Component):
         else:
             joinPos = point.y
         pathElement.join(joinPos)
-        #self.parent.createChildren()
+        self.invalidate()
+
+    def _setThickness(self,thickness):
+        self.element.thickness = thickness
+        self._updateStroke()
+
+    def _setStyle(self,style):
+        self.element.style = style
+        self._updateStroke()
+
+    def _setCorners(self,corners):
+        element = self.element
+        self.element.corners = corners
+        self._updateStroke()
+
+    def _updateStroke(self):
+        self.renderer.updateStroke()
+        self.invalidate()
+
+    def _setArrow(self,arrow):
+        print("setting arrow to="+str(arrow))
+        pathElement = self.renderer.pathElementAt(self.rightClickPoint)
+        element = self.element
+        renderer = self.renderer
+        if pathElement.index==0:
+            element.startArrow = arrow
+            renderer.updateArrow(True)
+        else:
+            element.endArrow = arrow
+            renderer.updateArrow(False)
         self.invalidate()
 
     def __str__(self):

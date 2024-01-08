@@ -6,19 +6,14 @@ class OpenPath(Path):
     _noneArrowArray =     [ [ "╶", "╴", "╷", "╵" ],
                             [ "╺", "╸", "╻", "╹" ] ]
     _linesArrowArray =      [ "<", ">", "∧", "∨" ] 
-    #_linesArrowArray =      [ "<", ">", "⮝", "∨" ] # these all look like shit
-    #_linesArrowArray =      [ "<", ">", "🡩", "∨" ] 
-    #_linesArrowArray =      [ "<", ">", "🡱", "∨" ] 
-    #_linesArrowArray =      [ "<", ">", "🢁", "∨" ] 
     _triangleArrowArray =   [ "◁", "▷", "△", "▽" ] 
 
-    def __init__(self,initialOrientation,turnListReference,thickness,style):
-        super().__init__(initialOrientation,turnListReference,thickness,style)
-        self.startArrow = Arrow.LINES
-        self.endArrow = Arrow.LINES
+    def __init__(self,element):
+        super().__init__(element)
+        self.updateArrows()
 
     def createElbow(self,path,index,xRefIndex,yRefIndex):
-        if index==0 or index==len(self.elbowRefs)-2:
+        if index==0 or index==len(self.element.turns)-2:
             return OpenPath.ArrowElbow(self,path,index,xRefIndex,yRefIndex)
         else:
             return super().createElbow(path,index,xRefIndex,yRefIndex)
@@ -31,19 +26,36 @@ class OpenPath(Path):
         rect.unionWith(self.segments[-1].toElbow.getRect())
         return rect
 
-    def _setArrow(self,name,value):
+    def updateArrows(self):
+        self.updateArrow(True)
+        self.updateArrow(False)
+
+    def updateArrow(self,isBeginArrow):
+        if isBeginArrow:
+            value = self.element.startArrow
+        else:
+            value = self.element.endArrow
+
         if value==Arrow.NONE:
-            array = OpenPath._noneArrowArray[int(self.thickness)]
+            array = OpenPath._noneArrowArray[int(self.element.thickness)]
         elif value==Arrow.LINES:
             array = OpenPath._linesArrowArray
         elif value==Arrow.TRIANGLE:
             array = OpenPath._triangleArrowArray
-        setattr(self,name+"CharArray", array)
+        else:
+            raise Exception("Unknown arrow type '"+str(value)+"'")
 
-    def __setattr__(self,name,value):
-        super().__setattr__(name,value)
-        if name=="startArrow" or name=="endArrow":
-            self._setArrow(name,value)
+        if isBeginArrow:
+            self.startArrowCharArray = array
+        else:
+            self.endArrowCharArray = array
+
+    #def __setattr__(self,name,value):
+    #    super().__setattr__(name,value)
+    #    if name=="startArrow":
+
+    #    if name in ["startArrow","endArrow"]:
+    #        self._updateSymbology()
 
     def drawArrow(self,context,segment,isFrom,bold):
         if isFrom:
@@ -78,6 +90,7 @@ class OpenPath(Path):
     def draw(self,context,bold):
         #segmentList = self.createSegmentList(self.elbowRefs)
         first = True
+        element = self.element
         for segment in self.segments:
             direction = segment.direction()
             if first:
@@ -90,9 +103,9 @@ class OpenPath(Path):
             snapshot = segment.getSnapshot()
             if snapshot.fro<=snapshot.to:
                 if segment.orientation==Orientation.HORIZONTAL:
-                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,self.thickness,self.style,bold)
+                    context.drawHorizontalLine(snapshot.pos,snapshot.fro,snapshot.to,element.thickness,element.style,bold)
                 else:
-                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,self.thickness,self.style,bold)
+                    context.drawVerticalLine(snapshot.pos,snapshot.fro,snapshot.to,element.thickness,element.style,bold)
             oldDirection = direction
         self.drawArrow(context,segment,False,bold)
 
@@ -138,7 +151,10 @@ class OpenPath(Path):
             elbowRefs[yIndex]= yRef
 
         def edit(self,offset):
-            xRef = self.parent.elbowRefs[self.xRefIndex]
-            xRef.set( xRef.get() + offset.x )
-            yRef = self.parent.elbowRefs[self.yRefIndex]
-            yRef.set( yRef.get() + offset.y )
+            #xRef = self.parent.elbowRefs[self.xRefIndex]
+            #xRef.set( xRef.get() + offset.x )
+            #yRef = self.parent.elbowRefs[self.yRefIndex]
+            #yRef.set( yRef.get() + offset.y )
+            turns = self.parent.element.turns
+            turns[self.xRefIndex] += offset.x
+            turns[self.yRefIndex] += offset.y

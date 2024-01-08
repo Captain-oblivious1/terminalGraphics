@@ -148,6 +148,8 @@ class DiagramComponent(Component):
         pass
 
     def showMenu(self,menu):
+        if self.menu is not None:
+            self.menu.invalidate()
         self.menu = menu
         menu.invalidate()
 
