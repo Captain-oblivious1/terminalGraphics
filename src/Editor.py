@@ -87,7 +87,7 @@ class Editor:
                 diagram.moveSelectedToBack()
             elif event == curses.KEY_MOUSE:
                 _ , mx, my, _, bstate = curses.getmouse()
-                print("Button state="+hex(bstate)+" (b1 click="+hex(curses.BUTTON1_CLICKED)+" b1 press="+hex(curses.BUTTON1_PRESSED)+" b1 release="+hex(curses.BUTTON1_RELEASED)+" b3 press="+hex(curses.BUTTON3_PRESSED)+" b3 release="+hex(curses.BUTTON3_RELEASED)+")")
+                #print("Button state="+hex(bstate)+" (b1 click="+hex(curses.BUTTON1_CLICKED)+" b1 press="+hex(curses.BUTTON1_PRESSED)+" b1 release="+hex(curses.BUTTON1_RELEASED)+" b3 press="+hex(curses.BUTTON3_PRESSED)+" b3 release="+hex(curses.BUTTON3_RELEASED)+")")
                 if bstate & curses.BUTTON1_CLICKED != 0:
                     self.state.mouseClicked(mx,my)
                 elif bstate & curses.BUTTON1_PRESSED != 0:

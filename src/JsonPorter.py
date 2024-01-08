@@ -9,9 +9,9 @@ class JsonPorter:
         fileData = JsonPorter._loadJsonFile(fileName)
         diagramData = fileData.get(diagramName)
         if diagramData is None:
-            raise Exception("Could not find diagram '"+diagramName+"' in file '"+fileName+"'.")
-
-        return JsonPorter._convertToDiagram(diagramData)
+            return Diagram(diagramName)
+        else:
+            return JsonPorter._convertToDiagram(diagramData)
 
     @staticmethod
     def exportDiagram(fileName,diagram):
