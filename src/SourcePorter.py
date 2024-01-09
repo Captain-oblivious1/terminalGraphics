@@ -16,13 +16,13 @@ class SourcePorter:
             diagramName = diagram.name
 
         try:
-            file = open(fileName,'r')
+            file = open(fileName,'r', encoding='utf8')
         except FileNotFoundError:
             print("File '"+fileName+"' not found.")
             exit(1)
 
         tempFileName = fileName+".tmp"
-        tempFile = open(tempFileName,'w') 
+        tempFile = open(tempFileName,'w', encoding='utf8') 
 
         while True:
             line = file.readline()

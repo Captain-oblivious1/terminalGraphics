@@ -57,6 +57,8 @@ class ClosedPath(Path):
     def createSegmentList(self,refList):
         segmentList = super().createSegmentList(refList)
         segmentList[0].fromElbow = segmentList[-1].toElbow
+        segmentList[0].fromElbow.toSegment = segmentList[0]
+        segmentList[-1].toElbow.fromSegment = segmentList[-1]
         return segmentList
 
     def testIfClosed(self,refList):

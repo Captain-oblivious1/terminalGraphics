@@ -65,7 +65,7 @@ class PathComponent(Component):
         if isinstance(pathElement,OpenPath.ArrowElbow):
             options += [ "──", "─>", "─▷" ]
         else:
-            options += ["toggle thickness","toggle style","toggle corners"]
+            options += [ "toggle thickness","toggle style","toggle corners","toggle transparency"]
         self.getDiagramComponent().showMenu(Menu(self,options,point,self.menuResult))
 
     def menuResult(self,menu):
@@ -91,6 +91,9 @@ class PathComponent(Component):
             self._setArrow(Arrow.LINES)
         elif selected=="─▷":
             self._setArrow(Arrow.TRIANGLE)
+        elif selected=="toggle transparency":
+            corners = self.element.fill
+            self._setFill( Fill.TRANSPARENT if corners==Fill.OPAQUE else Fill.OPAQUE )
 
     def split(self,point):
         pathElement = self.renderer.pathElementAt(point)
@@ -120,8 +123,11 @@ class PathComponent(Component):
         self._updateStroke()
 
     def _setCorners(self,corners):
-        element = self.element
         self.element.corners = corners
+        self._updateStroke()
+
+    def _setFill(self,fill):
+        self.element.fill = fill
         self._updateStroke()
 
     def _updateStroke(self):

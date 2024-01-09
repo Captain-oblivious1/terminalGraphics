@@ -30,7 +30,12 @@ class IdleState(State):
                 component.setSelected(False)
                 component.invalidate()
 
-        if clickedOn!=None:
+        if clickedOn==None:
+            menu = self.diagramComponent.menu
+            if menu is not None:
+                menu.invalidate()
+                self.diagramComponent.menu = None
+        else:
             if "clickedOn" in dir(clickedOn):
                 self.clickedOn = clickedOn
 
@@ -69,7 +74,6 @@ class IdleState(State):
 
     def menuResult(self,menu):
         option = menu.getSelectedOption()
-        print("option="+option)
         if option=="add text":
             textElement = TextElement()
             textElement.text = "New text"
@@ -82,7 +86,7 @@ class IdleState(State):
             pathElement.fill = Fill.OPAQUE
             pathElement.startOrientation = Orientation.HORIZONTAL
             p = menu.topLeft
-            pathElement.turns = [p.x,p.y,p.x+5,p.y+3]
+            pathElement.turns = [p.x,p.y,p.x+10,p.y+3]
             pathElement.corners = Corners.ROUND
             self.diagramComponent.addElement(pathElement)
         elif option=="add HH path":

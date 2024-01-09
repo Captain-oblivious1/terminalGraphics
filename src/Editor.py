@@ -85,6 +85,8 @@ class Editor:
                 diagram.moveSelectedToFront()
             elif event == curses.KEY_END:
                 diagram.moveSelectedToBack()
+            elif event == 330:  # del key
+                diagram.delete()
             elif event == curses.KEY_MOUSE:
                 _ , mx, my, _, bstate = curses.getmouse()
                 #print("Button state="+hex(bstate)+" (b1 click="+hex(curses.BUTTON1_CLICKED)+" b1 press="+hex(curses.BUTTON1_PRESSED)+" b1 release="+hex(curses.BUTTON1_RELEASED)+" b3 press="+hex(curses.BUTTON3_PRESSED)+" b3 release="+hex(curses.BUTTON3_RELEASED)+")")

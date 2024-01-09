@@ -147,6 +147,19 @@ class DiagramComponent(Component):
     def moveSelectedBackward(self):
         pass
 
+    def delete(self):
+        theList = []
+        selected = self.allSelected()
+        for element in self.element.elements:
+            component = self.components[element]
+            if component in selected:
+                component.invalidate()
+                del component
+            else:
+                theList.append(element)
+
+        self.element.elements = theList
+
     def showMenu(self,menu):
         if self.menu is not None:
             self.menu.invalidate()

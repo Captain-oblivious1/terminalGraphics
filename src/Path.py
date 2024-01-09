@@ -217,9 +217,10 @@ class Path:
 
         def getPosIndex(self):
             if self.orientation==Orientation.HORIZONTAL:
-                return self.fromElbow.yRefIndex
+                index = self.fromElbow.yRefIndex
             else:
-                return self.fromElbow.xRefIndex
+                index = self.fromElbow.xRefIndex
+            return index % len(self.parent.element.turns)
 
         def getSnapshot(self,fullLength=False):
             if self.orientation==Orientation.HORIZONTAL:
