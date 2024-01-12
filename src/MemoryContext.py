@@ -33,7 +33,7 @@ class MemoryContext(Context):
         return self.buffer[y][x]
 
     def getMaxXy(self):
-        return self.width-1,self.height-1
+        return self.width,self.height
 
     def print(self,prefix="",shrinkToSize=True):
         self.writeToStream(sys.stdout,prefix,shrinkToSize)

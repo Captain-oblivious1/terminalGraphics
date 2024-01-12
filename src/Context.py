@@ -126,9 +126,6 @@ class Context:
     def __init__(self):
         self.invalidatedRect = Rect()
 
-    def writeString(self,x,y,text,bold=False,reverse=False):
-        raise Exception("Called abstract method")
-
     def clearWindow(self):
         raise Exception("Called abstract method")
 
@@ -143,6 +140,7 @@ class Context:
 
     def writeString(self,x,y,text,bold=False,reverse=False):
         maxX, maxY = self.getMaxXy()
+        #print("trying to write   '"+text+"' at x="+str(x)+" y="+str(y)+" maxX="+str(maxX)+" maxY="+str(maxY))
         
         # Check if row is even on the screen
         if y<0 or y>=maxY:
@@ -153,10 +151,11 @@ class Context:
             text = text[-x:]
             x=0
 
+        debugText=text
         # Trim off right if bleeds off of right side
         textLen = len(text)
         right = x+textLen
-        if right>=maxX:
+        if right>maxX:
             trim = -(right-maxX+1)
             text = text[:trim]
 

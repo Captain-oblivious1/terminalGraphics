@@ -8,6 +8,15 @@ class CursesContext(Context):
         self.window = window
 
     def _writeString(self,x,y,text,bold=False,reverse=False):
+
+        # Weird bug where curses throws an exception when drawing on the bottom right char.
+        # Not the right column, or the bottom row... but just the bottom right char for some
+        # reason.
+        maxX,maxY = self.getMaxXy()
+        textRight = x+len(text)
+        if y==maxY-1 and textRight>=maxX:
+            text = text[0:maxX-1-x]
+
         if bold or reverse:
             pair = curses.color_pair(1)
             if bold:

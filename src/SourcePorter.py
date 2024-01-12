@@ -82,7 +82,9 @@ class SourcePorter:
     @staticmethod
     def _writeDiagramToFile(diagram,file,prefix):
         diagramComponent = DiagramComponent(None,diagram)
-        memContext = MemoryContext(80,50)
-        memContext.invalidateRect()
+        childrenRect = diagramComponent.rectOfAllChildren()
+        print("childrenRect="+str(childrenRect))
+        memContext = MemoryContext(childrenRect.r,childrenRect.b)
+        memContext.invalidateRect(childrenRect)
         diagramComponent.draw(memContext)
         memContext.writeToStream(file,prefix)

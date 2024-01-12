@@ -168,3 +168,11 @@ class DiagramComponent(Component):
 
     def clearMenu(self):
         self.menu = None
+
+    def rectOfAllChildren(self):
+        rect = Rect()
+        for element in self.element.elements:
+            component = self.components[element]
+            rect.unionWith(component.getRect())
+
+        return rect
