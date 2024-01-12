@@ -16,23 +16,39 @@ class StdOutWrapper:
 
 def myMain(stdscr,args):
     i = 0
+    help = False
     file = None
-    diagram = None
+    diagram = ""
     format = '\\${diagram:(.*)}'
     while i<len(args):
         arg = args[i]
         i += 1
 
         if arg=="--help":
-            print("edit.sh [--format <regular Expression with one group>] <file name>:<diagram name>")
-            sys.exit(0)
+            help = True
         elif arg=="--format":
             format = args[i]
             i += 1
         else:
             split = arg.split(':')
-            file = split[0]
-            diagram = split[1]
+            splitLen = len(split)
+            if splitLen>=1:
+                file = split[0]
+            if splitLen==2:
+                diagram = split[1]
+            elif splitLen>2:
+                print("Expect only one diagram name")
+                help = True
+                break
+
+
+    if file==None:
+        print("Expect file to be specified")
+        help = True
+
+    if help:
+        print("edit.sh [--format <regular Expression with one group>] <file name>[:<diagram name>]")
+        sys.exit(0)
 
     jsonName = file+".json"
     if os.path.exists(jsonName):

@@ -1,5 +1,5 @@
 {
- "One": {
+ "": {
   "_type": "Diagram",
   "elements": [
    {
@@ -107,6 +107,27 @@
     ]
    }
   ],
-  "name": "One"
+  "name": ""
+ },
+ "Blah": {
+  "_type": "Diagram",
+  "elements": [
+   {
+    "_type": "PathElement",
+    "corners": "ROUND",
+    "fill": "OPAQUE",
+    "pathType": "CLOSED",
+    "startOrientation": "HORIZONTAL",
+    "style": 0,
+    "thickness": 0,
+    "turns": [
+     67,
+     6,
+     77,
+     9
+    ]
+   }
+  ],
+  "name": "Blah"
  }
 }

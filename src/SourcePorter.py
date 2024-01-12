@@ -6,7 +6,7 @@ from DiagramComponent import *
 from MemoryContext import *
 
 class SourcePorter:
-    def __init__(self,format='\\${diagram:(.*)}'):
+    def __init__(self,format='\\${diagram(?::(.+))?}'):
         self.formatRe = re.compile(format,re.IGNORECASE)
         self.openRe = re.compile('⦃\\s*(.*)')
         self.closeRe = re.compile('⦄')
@@ -33,7 +33,12 @@ class SourcePorter:
             openTag = self.openRe.search(line)
 
             if formatTag!=None:
+                print("Is formatTag")
                 currentDiagName = formatTag.group(1)
+                if currentDiagName is None:
+                    currentDiagName = ''
+
+                print("currentDiagName="+currentDiagName)
                 if currentDiagName!=diagramName:
                     tempFile.write(line)
                 else:

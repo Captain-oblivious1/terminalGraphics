@@ -1,9 +1,9 @@
 #include <iostream>
 
-// --diagramFormat \${diagram:(.*)}
+// Using default format which is: \${diagram(?::(.+))?}
 
 /*
- * ⦃ One
+ * ⦃ 
  * ┏╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍┓
  * ╏                        ╏
  * ╏   Thick dashed         ╏
@@ -28,21 +28,11 @@
  * ⦄
  */
 
-/*
-⦃ Two
-boxes
-and
-shit
-⦄
-*/
-
-// ${diagram:Three}
-
-// to:
-// ⦃ Four
-// boxes
-// and
-// shit
+// ⦃ Blah
+// ╭─────────╮
+// │         │
+// │         │
+// ╰─────────╯
 // ⦄
 
 int main() { std::cout << "Hello world" << std::endl; }
