@@ -13,7 +13,6 @@ class PathComponent(Component):
         super().__init__(parent)
         self.element = element
         self.rightClickPoint = None
-        self.editing = False
         self.pathElementEditing = None
         self.updateElement(element)
 
@@ -38,18 +37,16 @@ class PathComponent(Component):
         self.renderer.draw(context,self.isSelected())
 
     def startMove(self,point,context):
-        if self.editing:
-            self.pathElementEditing = self.renderer.pathElementAt(point)
+        self.pathElementEditing = self.renderer.pathElementAt(point)
 
     def move(self,fromPoint,offset,context):
-        if self.editing:
+        if isinstance(self.pathElementEditing,Path.Elbow):
             self.editShape(fromPoint,offset,context)
         else:
             self.renderer.move(offset,context)
 
     def finishMove(self,point,context):
-        if self.editing:
-            self.pathElementEditing = None
+        self.pathElementEditing = None
 
     def editShape(self,fromPoint,offset,context):
         self.invalidate()
@@ -57,10 +54,7 @@ class PathComponent(Component):
 
     def showContextMenu(self,point,_):
         self.rightClickPoint = point
-        if self.editing:
-            options = ["stop editing","split","join"]
-        else:
-            options = ["edit shape"]
+        options = ["split","join"]
         pathElement = self.renderer.pathElementAt(point)
         if isinstance(pathElement,OpenPath.ArrowElbow):
             options += [ "──", "─>", "─▷" ]
@@ -81,10 +75,6 @@ class PathComponent(Component):
         elif selected=="toggle corners":
             corners = self.element.corners
             self._setCorners( Corners.SQUARE if corners==Corners.ROUND else Corners.ROUND )
-        elif selected=="stop editing":
-            self.editing = False
-        elif selected=="edit shape":
-            self.editing = True
         elif selected=="──":
             self._setArrow(Arrow.NONE)
         elif selected=="─>":
