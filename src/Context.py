@@ -1,5 +1,6 @@
 from Rect import *
 from Stroke import *
+from Model import *
 
 # The following is so that I can more easily do more advanced drawing.
 #
@@ -163,6 +164,25 @@ class Context:
             return
 
         self._writeString(x,y,text,bold,reverse)
+
+    def writeJustifiedText(self,x,y,text,justification,bold=False,reverse=False,boundingRect=None):
+        lines = text.split('\n')
+
+        #longestLine = 0
+        if justification==Justification.LEFT:
+            offsetCalc = lambda _ : 0
+        else:
+            #for line in lines:
+            #    longestLine = max(longestLine,len(t))
+            if justification==Justification.RIGHT:
+                offsetCalc = lambda t : -len(t)
+            else:
+                offsetCalc = lambda t : -int(len(t)/2)
+
+        for i in range(len(lines)):
+            self.writeString(x+offsetCalc(lines[i]),y,lines[i])
+            y += 1
+
 
     def invalidateRect(self,rect=None):
         if rect is None:

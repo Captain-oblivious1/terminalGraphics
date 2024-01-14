@@ -105,6 +105,40 @@
      23,
      50
     ]
+   },
+   {
+    "_type": "TableElement",
+    "columnWidths": [
+     10,
+     7,
+     15
+    ],
+    "dataRows": [
+     [
+      "<Model.TableField object at 0x7fb676dcdb10>",
+      "<Model.TableField object at 0x7fb676dcdb50>",
+      "<Model.TableField object at 0x7fb676dcdb90>"
+     ],
+     [
+      "<Model.TableField object at 0x7fb676dcdc10>",
+      "<Model.TableField object at 0x7fb676dcdc50>",
+      "<Model.TableField object at 0x7fb676dcdc90>"
+     ],
+     [
+      "<Model.TableField object at 0x7fb676dcdd10>",
+      "<Model.TableField object at 0x7fb676dcdd50>",
+      "<Model.TableField object at 0x7fb676dcdd90>"
+     ]
+    ],
+    "location": [
+     60,
+     5
+    ],
+    "rowHeights": [
+     2,
+     4,
+     3
+    ]
    }
   ],
   "name": ""

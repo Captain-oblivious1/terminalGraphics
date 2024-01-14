@@ -25,18 +25,18 @@ class Element:
     def __str__(self):
         return self._genString(list(filter(lambda x: not x.startswith("_"), self.__dir__())))
 
+class Diagram(Element):
+    def __init__(self,name):
+        Element.__init__(self)
+        self.name = name
+        self.elements = [] # front to back
+
 class TextElement(Element):
     def __init__(self):
         super().__init__()
         self.text = None
         self.location = None
         self.justification = Justification.CENTER
-
-class Diagram(Element):
-    def __init__(self,name):
-        Element.__init__(self)
-        self.name = name
-        self.elements = [] # front to back
 
 class Justification(Enum):
     LEFT = 0
@@ -82,3 +82,15 @@ class Arrow(Enum):
     NONE = 0
     LINES = 1
     TRIANGLE = 2
+
+class TableElement(Element):
+    def __init__(self):
+        self.location = None
+        self.columnWidths = []
+        self.rowHeights = []
+        self.dataRows = []
+
+class TableField:
+    def __init__(self):
+        self.justification = Justification.LEFT
+        self.text = ''

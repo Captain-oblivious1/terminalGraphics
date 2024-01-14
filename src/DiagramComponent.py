@@ -3,6 +3,7 @@ from Menu import *
 from PathComponent import *
 from TextComponent import *
 from RectComponent import *
+from TableComponent import *
 
 class DiagramComponent(Component):
     def __init__(self,editor,element):
@@ -22,6 +23,8 @@ class DiagramComponent(Component):
             component = PathComponent(self,element)
         elif type(element) is RectElement:
             component = RectComponent(self,element)
+        elif type(element) is TableElement:
+            component = TableComponent(self,element)
         else:
             raise Exception("Unsupported element type '"+element.type+"'")
 

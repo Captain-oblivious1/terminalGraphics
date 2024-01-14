@@ -78,7 +78,11 @@ class JsonPorter:
         "location": lambda t : JsonPorter._arrayToPoint(t),
         "style": lambda t : t,
         "text": lambda t : t,
-        "thickness": lambda t : t }
+        "thickness": lambda t : t,
+        "columnWidths": lambda t: JsonPorter._strListToIntList(t),
+        "rowHeights": lambda t: JsonPorter._strListToIntList(t),
+        "dataRows": lambda t: JsonPorter._listToTableData(t),
+        }
 
     @staticmethod
     def _convertToElement(jsonData):
@@ -87,6 +91,8 @@ class JsonPorter:
             element = PathElement()
         elif dataType=="TextElement":
             element = TextElement()
+        elif dataType=="TableElement":
+            element = TableElement()
         else:
             raise Exception("Unrecognized element type '"+dataType+"'")
 
@@ -103,6 +109,22 @@ class JsonPorter:
     @staticmethod
     def _arrayToPoint(array):
         return Point(array[0],array[1])
+
+    @staticmethod
+    def _listToTableData(array):
+        rowList = []
+        for row in array:
+            colList = []
+            for field in row:
+                tableField = TableField()
+                text = field.get("text")
+                if text is not None:
+                    tableField.text = text
+                justification = field.get("justification")
+                tableField.justification = Justification[justification] if justification is not None else Justification.LEFT
+                colList.append(tableField)
+            rowList.append(colList)
+        return rowList
 
     @staticmethod
     def _loadJsonFile(fileName):
