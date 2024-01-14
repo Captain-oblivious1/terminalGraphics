@@ -32,16 +32,7 @@ class JsonPorter:
 
     @staticmethod
     def _convertToDictionary(thing):
-        if isinstance(thing,Element):
-            jsonData = {}
-            jsonData['_type'] = type(thing).__name__
-            for attr in dir(thing):
-                if not attr.startswith('_'):
-                    attrValue = getattr(thing,attr)
-                    attrData = JsonPorter._convertToDictionary(attrValue)
-                    jsonData[attr] = attrData
-            return jsonData
-        elif isinstance(thing,list):
+        if isinstance(thing,list):
             attrData = []
             for it in thing:
                 attrData.append(JsonPorter._convertToDictionary(it))
@@ -53,7 +44,14 @@ class JsonPorter:
         elif isinstance(thing,Point):
             return [thing.x,thing.y]
         else:
-            return str(thing)
+            jsonData = {}
+            jsonData['_type'] = type(thing).__name__
+            for attr in dir(thing):
+                if not attr.startswith('_'):
+                    attrValue = getattr(thing,attr)
+                    attrData = JsonPorter._convertToDictionary(attrValue)
+                    jsonData[attr] = attrData
+            return jsonData
 
     @staticmethod
     def _convertToDiagram(jsonData):
@@ -117,7 +115,7 @@ class JsonPorter:
             colList = []
             for field in row:
                 tableField = TableField()
-                text = field.get("text")
+                text = field["text"]
                 if text is not None:
                     tableField.text = text
                 justification = field.get("justification")

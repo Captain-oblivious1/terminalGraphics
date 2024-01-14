@@ -115,24 +115,60 @@
     ],
     "dataRows": [
      [
-      "<Model.TableField object at 0x7fb676dcdb10>",
-      "<Model.TableField object at 0x7fb676dcdb50>",
-      "<Model.TableField object at 0x7fb676dcdb90>"
+      {
+       "_type": "TableField",
+       "justification": "LEFT",
+       "text": "one\nfoo"
+      },
+      {
+       "_type": "TableField",
+       "justification": "CENTER",
+       "text": "two\nbar"
+      },
+      {
+       "_type": "TableField",
+       "justification": "RIGHT",
+       "text": "three"
+      }
      ],
      [
-      "<Model.TableField object at 0x7fb676dcdc10>",
-      "<Model.TableField object at 0x7fb676dcdc50>",
-      "<Model.TableField object at 0x7fb676dcdc90>"
+      {
+       "_type": "TableField",
+       "justification": "LEFT",
+       "text": "four\nf"
+      },
+      {
+       "_type": "TableField",
+       "justification": "CENTER",
+       "text": "five\no"
+      },
+      {
+       "_type": "TableField",
+       "justification": "RIGHT",
+       "text": "six\no"
+      }
      ],
      [
-      "<Model.TableField object at 0x7fb676dcdd10>",
-      "<Model.TableField object at 0x7fb676dcdd50>",
-      "<Model.TableField object at 0x7fb676dcdd90>"
+      {
+       "_type": "TableField",
+       "justification": "LEFT",
+       "text": "seven\nb"
+      },
+      {
+       "_type": "TableField",
+       "justification": "CENTER",
+       "text": "eight\na"
+      },
+      {
+       "_type": "TableField",
+       "justification": "RIGHT",
+       "text": "nine\nr"
+      }
      ]
     ],
     "location": [
-     60,
-     5
+     22,
+     29
     ],
     "rowHeights": [
      2,
