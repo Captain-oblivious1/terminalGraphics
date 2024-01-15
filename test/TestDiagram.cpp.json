@@ -109,9 +109,9 @@
    {
     "_type": "TableElement",
     "columnWidths": [
-     10,
-     7,
-     15
+     13,
+     5,
+     5
     ],
     "dataRows": [
      [
@@ -152,7 +152,7 @@
       {
        "_type": "TableField",
        "justification": "LEFT",
-       "text": "seven\nb"
+       "text": "abcdl\nsdfasfd\nsdfsadfsdf\nsdfsa\n\nsadfsdfs"
       },
       {
        "_type": "TableField",
@@ -167,13 +167,13 @@
      ]
     ],
     "location": [
-     22,
-     29
+     25,
+     30
     ],
     "rowHeights": [
      2,
      4,
-     3
+     6
     ]
    }
   ],
