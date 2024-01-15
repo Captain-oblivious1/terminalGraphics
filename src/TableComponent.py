@@ -71,7 +71,7 @@ class TableComponent(Component):
         context.drawHorizontalLine(y,l+1,r-1,Thickness.THIN,Style.SOLID,selected)
         for i in range(nHeights):
             y += heights[i] + 1
-            if i<nWidths-1:
+            if i<nHeights-1:
                 context.orChar(l,y,'├',selected)
                 context.orChar(r,y,'┤',selected)
             context.drawHorizontalLine(y,l+1,r-1,Thickness.THIN,Style.SOLID,selected)
@@ -102,14 +102,13 @@ class TableComponent(Component):
         self.tableElement.location += offset
 
     def showContextMenu(self,point,context):
-        if self.editing is not None:
-            options = ["stop editing"]
-        else:
-            options = ["edit"]
-        options += [""]
-
+        options = []
         col,row = self._fieldAt(point)
-        if col is not None and row is not None:
+        legitCol = col is not None
+        legitRow = row is not None
+
+        if legitCol and legitRow:
+            options += ["edit text"]
             just = self.tableElement.dataRows[row][col].justification 
             if just!=Justification.LEFT:
                 options += ["left justify"]
@@ -117,6 +116,14 @@ class TableComponent(Component):
                 options += ["center justify"]
             if just!=Justification.RIGHT:
                 options += ["right justify"]
+            options += [""]
+
+        if legitRow:
+            options += ["add row above", "add row below", "delete row"]
+            options += [""]
+
+        if legitCol:
+            options += ["add column left", "add column right", "delete column"]
 
         self.getDiagramComponent().showMenu(Menu(self,options,point,self.menuResult))
 
@@ -131,20 +138,38 @@ class TableComponent(Component):
         else:
             just = None
 
+        tableElement = self.tableElement
         col,row = self._fieldAt(menu.getTopLeft())
+        #legitCol = col is not None
+        #legitRow = row is not None
         if just is not None:
-            self.tableElement.dataRows[row][col].justification = just
+            tableElement.dataRows[row][col].justification = just
             self.invalidate()
         else:
             editor = self.getEditor()
-            if option=="edit":
-                if row is not None and col is not None:
-                    self.editing = [row,col]
-                    editor.addKeyListener(self)
-                    self._changeText('')
-                    self.invalidate()
+            if option=="edit text":
+                #if legitCol and legitRow:
+                self.editing = [row,col]
+                editor.addKeyListener(self)
+                self._changeText('')
+            elif option=="add column left":
+                self._insertColumn(col)
+            elif option=="add column right":
+                self._insertColumn(col+1)
+            elif option=="delete column":
+                del tableElement.columnWidths[col]
+                for row in tableElement.dataRows:
+                    del row[col]
+            elif option=="add row above":
+                self._insertRow(row)
+            elif option=="add row below":
+                self._insertRow(row+1)
+            elif option=="delete row":
+                del tableElement.rowHeights[row]
+                del tableElement.dataRows[row]
             else:
                 self._stopEditing()
+            self.invalidate()
 
     def keyEvent(self,event):
         if event>=0 and event<=255:
@@ -155,6 +180,30 @@ class TableComponent(Component):
         else:
             if event==263: # Backspace
                 self._changeText( self._editingField().text[0:-1], False )
+
+    def _insertColumn(self,col):
+        tableElement = self.tableElement
+        tableElement.columnWidths.insert(col,3)
+        newFieldText = "new"
+        for row in tableElement.dataRows:
+            tableField = TableField()
+            tableField.text = newFieldText
+            tableField.justification = Justification.LEFT
+            row.insert(col,tableField)
+            newFieldText = ""
+
+    def _insertRow(self,row):
+        tableElement = self.tableElement
+        tableElement.rowHeights.insert(row,1)
+        newRow = []
+        newFieldText = "new"
+        for _ in range(len(tableElement.columnWidths)):
+            tableField = TableField()
+            tableField.text = newFieldText
+            tableField.justification = Justification.LEFT
+            newRow.append(tableField)
+            newFieldText = ""
+        tableElement.dataRows.insert(row,newRow)
 
     def _editingField(self):
         if self.editing==None:
@@ -181,14 +230,14 @@ class TableComponent(Component):
             editingField.text = ch
 
         widestCell = 0
-        for i in range(len(tableElement.columnWidths)):
+        for i in range(len(tableElement.rowHeights)):
             longestLine,_ = longestLineAndNumberLines(tableElement.dataRows[i][col].text)
             #print("longestLine for '"+tableElement.dataRows[i]
             if longestLine>widestCell:
                 widestCell = longestLine
 
         tallestCell = 0
-        for i in range(len(tableElement.rowHeights)):
+        for i in range(len(tableElement.columnWidths)):
             _,nLines = longestLineAndNumberLines(tableElement.dataRows[row][i].text)
             if nLines>tallestCell:
                 tallestCell = nLines
@@ -201,8 +250,9 @@ class TableComponent(Component):
 
     def _fieldAt(self,point):
         rect = self.getRect()
-        x = rect.l
         element = self.tableElement
+
+        x = rect.l
         widths =  element.columnWidths
         nWidths = len(widths)
         col = None
@@ -212,10 +262,9 @@ class TableComponent(Component):
                 col = i
                 break
 
+        y = rect.t
         heights =  element.rowHeights
         nHeights = len(heights)
-        y = rect.t
-
         row = None
         for i in range(nHeights):
             y += heights[i] + 1

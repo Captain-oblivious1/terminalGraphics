@@ -109,60 +109,21 @@
    {
     "_type": "TableElement",
     "columnWidths": [
-     13,
-     5,
-     5
+     34
     ],
     "dataRows": [
      [
       {
        "_type": "TableField",
-       "justification": "LEFT",
-       "text": "one\nfoo"
-      },
-      {
-       "_type": "TableField",
        "justification": "CENTER",
-       "text": "two\nbar"
-      },
-      {
-       "_type": "TableField",
-       "justification": "RIGHT",
-       "text": "three"
+       "text": "<interface>\nMyInterface"
       }
      ],
      [
       {
        "_type": "TableField",
        "justification": "LEFT",
-       "text": "four\nf"
-      },
-      {
-       "_type": "TableField",
-       "justification": "CENTER",
-       "text": "five\no"
-      },
-      {
-       "_type": "TableField",
-       "justification": "RIGHT",
-       "text": "six\no"
-      }
-     ],
-     [
-      {
-       "_type": "TableField",
-       "justification": "LEFT",
-       "text": "abcdl\nsdfasfd\nsdfsadfsdf\nsdfsa\n\nsadfsdfs"
-      },
-      {
-       "_type": "TableField",
-       "justification": "CENTER",
-       "text": "eight\na"
-      },
-      {
-       "_type": "TableField",
-       "justification": "RIGHT",
-       "text": "nine\nr"
+       "text": "+func1(val:int):float\n+func2(val1:float,val2:float):void"
       }
      ]
     ],
@@ -172,8 +133,7 @@
     ],
     "rowHeights": [
      2,
-     4,
-     6
+     2
     ]
    }
   ],

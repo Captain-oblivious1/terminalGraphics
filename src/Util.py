@@ -15,6 +15,9 @@ def longestLineFor(text):
     return longest
 
 def longestLineAndNumberLines(text):
+    if text=="":
+        return 0,0
+
     longest = 0
     current = 0
     nLines = 1
