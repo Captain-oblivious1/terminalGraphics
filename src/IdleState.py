@@ -69,7 +69,7 @@ class IdleState(State):
             self.showContextMenu(point)
 
     def showContextMenu(self,point):
-        options = ["add text","add closed path","add HH path","add HV path","add VV path"]
+        options = ["add text","add closed path","add HH path","add HV path","add VV path","add table"]
         self.diagramComponent.showMenu(Menu(self.diagramComponent,options,point,self.menuResult))
 
     def menuResult(self,menu):
@@ -119,3 +119,17 @@ class IdleState(State):
             pathElement.startArrow = Arrow.NONE
             pathElement.endArrow = Arrow.TRIANGLE
             self.diagramComponent.addElement(pathElement)
+        elif option=="add table":
+            p = menu.topLeft
+            tableElement = TableElement()
+            tableElement.location = p
+            tableElement.columnWidths = [4,5]
+            tableElement.rowHeights = [1]
+            one = TableField()
+            one.text = "Your"
+            one.justification = Justification.CENTER
+            two = TableField()
+            two.text = "table"
+            two.justification = Justification.CENTER
+            tableElement.dataRows = [ [ one, two ] ]
+            self.diagramComponent.addElement(tableElement)
