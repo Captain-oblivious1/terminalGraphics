@@ -94,3 +94,21 @@ class TableField:
     def __init__(self):
         self.justification = Justification.LEFT
         self.text = ''
+
+class SequenceElement(Element):
+    def __init__(self):
+        self.top = None
+        self.actors = []
+        self.lines = []
+
+class Actor:
+    def __init__(self):
+        self.x = None
+        self.label = None
+
+class Line:
+    def __init__(self):
+        self.y = None
+        self.dashed = False
+        self.fro = None
+        self.to = None

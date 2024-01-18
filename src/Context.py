@@ -246,3 +246,30 @@ class Context:
         for i in range(minX,maxX+1):
             self.orChar(i,y,ch,isBold)
 
+    def drawFilledBox(self,rect,selected):
+        l = rect.l
+        r = rect.r
+        t = rect.t
+        b = rect.b
+        self.andChar(l,t,'▛',selected)
+        self.andChar(r,t,'▜',selected)
+        self.andChar(l,b,'▙',selected)
+        self.andChar(r,b,'▟',selected)
+        for i in range(l+1,r):
+            self.andChar(i,t,'▀',selected)
+            self.andChar(i,b,'▄',selected)
+        for i in range(t+1,b):
+            self.andChar(l,i,'▌',selected)
+            self.andChar(r,i,'▐',selected)
+        for i in range(t+1,b):
+            for j in range(l+1,r):
+                self.andChar(j,i,' ',selected) 
+        self.orChar(l,t,'┌',selected)
+        self.orChar(r,t,'┐',selected)
+        self.orChar(l,b,'└',selected)
+        self.orChar(r,b,'┘',selected)
+        self.drawHorizontalLine(t,l+1,r-1,Thickness.THIN,Style.SOLID,selected)
+        self.drawHorizontalLine(b,l+1,r-1,Thickness.THIN,Style.SOLID,selected)
+        self.drawVerticalLine(l,t+1,b-1,Thickness.THIN,Style.SOLID,selected)
+        self.drawVerticalLine(r,t+1,b-1,Thickness.THIN,Style.SOLID,selected)
+

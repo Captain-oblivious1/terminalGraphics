@@ -2,6 +2,7 @@ import json
 
 from Model import *
 from Point import *
+from Rect import *
 
 class JsonPorter:
     @staticmethod
@@ -80,6 +81,9 @@ class JsonPorter:
         "columnWidths": lambda t: JsonPorter._strListToIntList(t),
         "rowHeights": lambda t: JsonPorter._strListToIntList(t),
         "dataRows": lambda t: JsonPorter._listToTableData(t),
+        "top": lambda t: int(t),
+        "actors": lambda t: JsonPorter._strListToActorData(t),
+        "lines": lambda t: JsonPorter._strListToLineData(t),
         }
 
     @staticmethod
@@ -91,6 +95,8 @@ class JsonPorter:
             element = TextElement()
         elif dataType=="TableElement":
             element = TableElement()
+        elif dataType=="SequenceElement":
+            element = SequenceElement()
         else:
             raise Exception("Unrecognized element type '"+dataType+"'")
 
@@ -109,6 +115,10 @@ class JsonPorter:
         return Point(array[0],array[1])
 
     @staticmethod
+    def _arrayToRect(array):
+        return Rect(array[0],array[1],array[2],array[3])
+
+    @staticmethod
     def _listToTableData(array):
         rowList = []
         for row in array:
@@ -123,6 +133,28 @@ class JsonPorter:
                 colList.append(tableField)
             rowList.append(colList)
         return rowList
+
+    @staticmethod
+    def _strListToActorData(array):
+        actorList = []
+        for jsonStruct in array:
+            actor = Actor()
+            actor.x = int(jsonStruct["x"])
+            actor.label = jsonStruct["label"]
+            actorList.append(actor)
+        return actorList
+
+    @staticmethod
+    def _strListToLineData(array):
+        lineList = []
+        for jsonStruct in array:
+            line = Line()
+            line.y = int(jsonStruct["y"])
+            line.dashed = bool(jsonStruct["dashed"])
+            line.fro = int(jsonStruct["from"])
+            line.to = int(jsonStruct["to"])
+            lineList.append(line)
+        return lineList
 
     @staticmethod
     def _loadJsonFile(fileName):

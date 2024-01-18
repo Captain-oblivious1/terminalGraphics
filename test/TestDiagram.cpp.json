@@ -135,6 +135,43 @@
      2,
      2
     ]
+   },
+   {
+    "_type": "SequenceElement",
+    "top": 20,
+    "actors": [
+     {
+      "_type": "Actor",
+      "x": 74,
+      "label": "User"
+     },
+     {
+      "_type": "Actor",
+      "x": 85,
+      "label": "Foo"
+     },
+     {
+      "_type": "Actor",
+      "x": 96,
+      "label": "Bar"
+     }
+    ], 
+    "lines": [
+     {
+      "_type": "Line",
+      "y": 25,
+      "dashed": "True",
+      "from": 0,
+      "to": 1
+     },
+     {
+      "_type": "Line",
+      "y": 30,
+      "dashed": "True",
+      "from": 2,
+      "to": 1
+     }
+    ] 
    }
   ],
   "name": ""
