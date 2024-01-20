@@ -138,40 +138,54 @@
    },
    {
     "_type": "SequenceElement",
-    "top": 20,
     "actors": [
      {
       "_type": "Actor",
-      "x": 74,
-      "label": "User"
+      "label": "User",
+      "x": 74
      },
      {
       "_type": "Actor",
-      "x": 85,
-      "label": "Foo"
+      "label": "Foo",
+      "x": 85
      },
      {
       "_type": "Actor",
-      "x": 96,
-      "label": "Bar"
+      "label": "Bar",
+      "x": 96
      }
-    ], 
+    ],
     "lines": [
      {
       "_type": "Line",
-      "y": 25,
-      "dashed": "True",
+      "dashed": true,
       "from": 0,
-      "to": 1
+      "to": 1,
+      "y": 25
      },
      {
       "_type": "Line",
-      "y": 30,
-      "dashed": "True",
+      "dashed": true,
       "from": 2,
-      "to": 1
+      "to": 1,
+      "y": 30
+     },
+     {
+      "_type": "Line",
+      "dashed": false,
+      "from": 2,
+      "to": 0,
+      "y": 27
+     },
+     {
+      "_type": "Line",
+      "dashed": false,
+      "from": 2,
+      "to": 1,
+      "y": 24
      }
-    ] 
+    ],
+    "top": 20
    }
   ],
   "name": ""

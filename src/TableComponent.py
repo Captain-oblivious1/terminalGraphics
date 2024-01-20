@@ -177,9 +177,13 @@ class TableComponent(Component):
                 self._stopEditing()
             else:
                 self._changeText( chr(event), True )
+            return True
         else:
             if event==263: # Backspace
                 self._changeText( self._editingField().text[0:-1], False )
+                return True
+            else:
+                return False
 
     def _insertColumn(self,col):
         tableElement = self.tableElement

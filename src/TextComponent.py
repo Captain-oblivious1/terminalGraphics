@@ -58,9 +58,13 @@ class TextComponent(Component):
                 self._stopEditing()
             else:
                 self._changeText( chr(event), True )
+            return True
         else:
             if event==263: # Backspace
                 self._changeText( self.element.text[0:-1], False )
+                return True
+            else:
+                return False
 
     def _changeText(self,text,append=False):
         self.invalidate()

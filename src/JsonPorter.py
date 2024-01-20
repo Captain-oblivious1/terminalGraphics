@@ -51,6 +51,8 @@ class JsonPorter:
                 if not attr.startswith('_'):
                     attrValue = getattr(thing,attr)
                     attrData = JsonPorter._convertToDictionary(attrValue)
+                    if attr=="fro":
+                        attr="from"
                     jsonData[attr] = attrData
             return jsonData
 
