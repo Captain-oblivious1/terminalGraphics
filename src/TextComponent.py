@@ -11,25 +11,34 @@ class TextComponent(Component):
         self.lineInfo = []
         self.maxLength = None
         self._updateLineInfo()
-        self.editing = False
+        self.editLocation = None
 
     def getRect(self):
         rect = Rect()
-        for line in range(len(self.lineInfo)):
-            rect.unionWith(self._rectForLine(line))
+        for row in range(len(self.lineInfo)):
+            rect.unionWith(self._rectForRow(row))
         return rect
 
     def draw(self,context):
-        highlight = self.isSelected() or self.editing
-        for line in range(len(self.lineInfo)):
-            lineInfo = self.lineInfo[line]
-            start = self._startForLine(line)
-            context.writeString(start.x,start.y,lineInfo.text,highlight)
+        #highlight = self.isSelected() or self.editLocation is not None
+        index = 0
+        for row in range(len(self.lineInfo)):
+            lineInfo = self.lineInfo[row]
+            start = self._startForRow(row)
+            x = start.x
+            for ch in lineInfo.text:
+                highlight = self.editLocation is not None and self.editLocation==index
+                context.writeString(x,start.y,ch,highlight)
+                x += 1
+                index += 1 
+            if index==self.editLocation:
+                context.writeString(x,start.y,' ',True)
+            index += 1 # for \n
 
     # Default is for entier rectangle to be true
     def isOnMe(self,point):
-        for line in range(len(self.lineInfo)):
-            if self._rectForLine(line).isInsidePoint(point):
+        for row in range(len(self.lineInfo)):
+            if self._rectForRow(row).isInsidePoint(point):
                 return True
         return False
 
@@ -37,47 +46,72 @@ class TextComponent(Component):
         self.element.location += offset
 
     def showContextMenu(self,point,context):
-        if self.editing:
+        if self.editLocation is not None:
             options = ["stop editing"]
         else:
             options = ["edit"]
         self.getDiagramComponent().showMenu(Menu(self,options,point,self.menuResult))
 
     def menuResult(self,menu):
-        self.editing = menu.getSelectedOption()=="edit"
+        if menu.getSelectedOption()=="edit":
+            self.editLocation = 0
+        else:
+            self.editLocation = None
         editor = self.getEditor()
-        if self.editing:
+        if self.editLocation is not None:
             editor.addKeyListener(self)
-            self._changeText('')
+            #self._changeText('')
         else:
             self._stopEditing()
 
     def keyEvent(self,event):
-        if event>=0 and event<=255:
-            if(event==27):
-                self._stopEditing()
-            else:
-                self._changeText( chr(event), True )
-            return True
-        else:
-            if event==263: # Backspace
-                self._changeText( self.element.text[0:-1], False )
+        self.invalidate()
+        try:
+            if event>=0 and event<=255:
+                if(event==27):
+                    self._stopEditing()
+                else:
+                    oldText = self.element.text
+                    self._changeText( oldText[0:self.editLocation]+chr(event)+oldText[self.editLocation:] )
+                    self.editLocation += 1
                 return True
             else:
-                return False
+                if event==263: # Backspace
+                    oldText = self.element.text
+                    self._changeText( oldText[0:self.editLocation-1] + oldText[self.editLocation:] )
+                    self.editLocation -= 1
+                    return True
+                elif event==258: # down
+                    row,col = self._rowAndColForCharPosition( self.editLocation )
+                    #print("before row="+str(row)+" col="+str(col))
+                    if row<len(self.lineInfo):
+                        self.editLocation = self._positionForRowAndCol(row+1,col)
+                elif event==259: # up
+                    row,col = self._rowAndColForCharPosition( self.editLocation )
+                    if row>0:
+                        self.editLocation = self._positionForRowAndCol(row-1,col)
+                elif event==260: # left
+                    if self.editLocation>0:
+                        self.editLocation -= 1
+                elif event==261: # right
+                    if self.editLocation<len(self.element.text):
+                        self.editLocation += 1
+                else:
+                    return False
+            r,c = self._rowAndColForCharPosition(self.editLocation)
+            #print("after  row="+str(r)+" col="+str(c))
+        finally:
+            self.invalidate()
 
-    def _changeText(self,text,append=False):
+    def _changeText(self,text):
         self.invalidate()
-        if append:
-            self.element.text += text
-        else:
-            self.element.text = text
+        self.element.text = text
         self._updateLineInfo()
         self.invalidate()
 
     def _stopEditing(self):
         self.getEditor().removeKeyListener(self)
-        self.editing = False
+        self.editLocation = None
         self.invalidate()
 
     def _updateLineInfo(self):
@@ -100,20 +134,52 @@ class TextComponent(Component):
             maxLength = length
         self.maxLength = maxLength
 
-    def _startForLine(self,line): #zero based
+    def _startForRow(self,row): #zero based
         location = self.element.location
-        justification = self.element.justification
-        y = location.y+line
-        if justification==Justification.LEFT:
-            return Point(location.x,y)
-        elif justification==Justification.RIGHT:
-            return Point(location.x+self.maxLength-self.lineInfo[line].length,y)
-        else:
-            return Point(int(location.x-self.lineInfo[line].length/2),y)
+        x = location.x+self._offsetForRow(row)
+        y = location.y+row
+        return Point(x,y)
 
-    def _rectForLine(self,line):
-        start = self._startForLine(line)
-        return Rect(start.x,start.y,self.lineInfo[line].length,1)
+    def _offsetForRow(self,row):
+        justification = self.element.justification
+        if justification==Justification.LEFT:
+            return 0
+        elif justification==Justification.RIGHT:
+            return self.maxLength-self.lineInfo[row].length
+        else:
+            return int(-self.lineInfo[row].length/2)
+
+    def _rectForRow(self,row):
+        start = self._startForRow(row)
+        return Rect(start.x,start.y,self.lineInfo[row].length+1,1)
+
+    def _rowAndColForCharPosition(self,pos):
+        #debugPos=pos
+        row = 0
+        for line in self.lineInfo:
+            if pos <= line.length:
+                offset = self._offsetForRow(row)
+                col = pos + offset
+                #print("_rowAndColForCharPosition("+str(debugPos)+")="+str(row)+","+str(col))
+                return row,col
+            else:
+                pos -= line.length + 1
+                row += 1
+        return None
+
+    def _positionForRowAndCol(self,row,col):
+        pos = 0
+        for i in range(row):
+            pos += self.lineInfo[i].length + 1 # 1 for the \n
+        left = self._offsetForRow(row)
+        right = left + self.lineInfo[row].length# - 1
+        if col<left:
+            col = left
+        elif col>=right:
+            col = right
+        pos += col - left
+        #print("_positionForRowAndCol("+str(row)+","+str(col)+")="+str(pos))
+        return pos
 
     class LineInfo:
         def __init__(self,text,length):

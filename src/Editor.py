@@ -72,11 +72,10 @@ class Editor:
             #if event!=curses.KEY_MOUSE:
             #    print("event="+str(event))
             if event!=curses.KEY_MOUSE:
-                print("Got event="+str(event)+" nListeners="+str(len(self.keyListeners)))
+                #print("Got event="+str(event)+" nListeners="+str(len(self.keyListeners)))
                 handled = False
                 if len(self.keyListeners)>0:
                     for listener in self.keyListeners.copy():
-                        print("about to fire event to component")
                         if listener.keyEvent(event):
                             handled = True
 
