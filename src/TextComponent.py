@@ -68,40 +68,54 @@ class TextComponent(Component):
         self.invalidate()
         try:
             if event>=0 and event<=255:
-                if(event==27):
+                if(event==27): # ESC
                     self._stopEditing()
                 else:
-                    oldText = self.element.text
-                    self._changeText( oldText[0:self.editLocation]+chr(event)+oldText[self.editLocation:] )
-                    self.editLocation += 1
-                return True
+                    self._charTyped(event)
             else:
                 if event==263: # Backspace
-                    oldText = self.element.text
-                    self._changeText( oldText[0:self.editLocation-1] + oldText[self.editLocation:] )
-                    self.editLocation -= 1
-                    return True
+                    self._backspace()
                 elif event==258: # down
-                    row,col = self._rowAndColForCharPosition( self.editLocation )
-                    #print("before row="+str(row)+" col="+str(col))
-                    if row<len(self.lineInfo):
-                        self.editLocation = self._positionForRowAndCol(row+1,col)
+                    self._down()
                 elif event==259: # up
-                    row,col = self._rowAndColForCharPosition( self.editLocation )
-                    if row>0:
-                        self.editLocation = self._positionForRowAndCol(row-1,col)
+                    self._up()
                 elif event==260: # left
-                    if self.editLocation>0:
-                        self.editLocation -= 1
+                    self._left()
                 elif event==261: # right
-                    if self.editLocation<len(self.element.text):
-                        self.editLocation += 1
+                    self._right()
                 else:
                     return False
-            r,c = self._rowAndColForCharPosition(self.editLocation)
-            #print("after  row="+str(r)+" col="+str(c))
+            return True
         finally:
             self.invalidate()
+
+    def _backspace(self):
+        oldText = self.element.text
+        self._changeText( oldText[0:self.editLocation-1] + oldText[self.editLocation:] )
+        self.editLocation -= 1
+
+    def _down(self):
+        row,col = self._rowAndColForCharPosition( self.editLocation )
+        if row<len(self.lineInfo):
+            self.editLocation = self._positionForRowAndCol(row+1,col)
+
+    def _up(self):
+        row,col = self._rowAndColForCharPosition( self.editLocation )
+        if row>0:
+            self.editLocation = self._positionForRowAndCol(row-1,col)
+
+    def _left(self):
+        if self.editLocation>0:
+            self.editLocation -= 1
+
+    def _right(self):
+        if self.editLocation<len(self.element.text):
+            self.editLocation += 1
+
+    def _charTyped(self,event):
+        oldText = self.element.text
+        self._changeText( oldText[0:self.editLocation]+chr(event)+oldText[self.editLocation:] )
+        self.editLocation += 1
 
     def _changeText(self,text):
         self.invalidate()
