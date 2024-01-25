@@ -1,11 +1,13 @@
 from Component import *
 from Menu import *
+from TextEditor import *
 
 class TableComponent(Component):
     def __init__(self,parent,tableElement):
         super().__init__(parent)
         self.tableElement = tableElement
         self.editing = None
+        self.textEditor = None
 
     def getRect(self):
         element = self.tableElement
@@ -93,7 +95,12 @@ class TableComponent(Component):
                 else:
                     offset = int(width/2)
                 context.writeJustifiedText(x+offset,y,text,justification)
+                if self.editing==[i,j]:
+                    cursor = self.textEditor.cursorOffset() + Point(x+offset,y)
+                    ch = context.readChar(cursor.x,cursor.y)
+                    context.writeString(cursor.x,cursor.y,ch,False,True)
                 x += width + 1
+                    
             y += height + 1
 
         
@@ -150,8 +157,10 @@ class TableComponent(Component):
             if option=="edit text":
                 #if legitCol and legitRow:
                 self.editing = [row,col]
-                editor.addKeyListener(self)
-                self._changeText('')
+                field = tableElement.dataRows[row][col]
+                self.textEditor = TextEditor(field.text,field.justification,self)
+                editor.addKeyListener(self.textEditor)
+                #self.changeText('')
             elif option=="add column left":
                 self._insertColumn(col)
             elif option=="add column right":
@@ -168,22 +177,22 @@ class TableComponent(Component):
                 del tableElement.rowHeights[row]
                 del tableElement.dataRows[row]
             else:
-                self._stopEditing()
+                self.stopEditing()
             self.invalidate()
 
-    def keyEvent(self,event):
-        if event>=0 and event<=255:
-            if(event==27):
-                self._stopEditing()
-            else:
-                self._changeText( chr(event), True )
-            return True
-        else:
-            if event==263: # Backspace
-                self._changeText( self._editingField().text[0:-1], False )
-                return True
-            else:
-                return False
+        #def keyEvent(self,event):
+        #    if event>=0 and event<=255:
+        #        if(event==27):
+        #            self._stopEditing()
+        #        else:
+        #            self._changeText( chr(event), True )
+        #        return True
+        #    else:
+        #        if event==263: # Backspace
+        #            self._changeText( self._editingField().text[0:-1], False )
+        #            return True
+        #        else:
+        #            return False
 
     def _insertColumn(self,col):
         tableElement = self.tableElement
@@ -217,12 +226,13 @@ class TableComponent(Component):
             col = self.editing[1]
             return self.tableElement.dataRows[row][col]
 
-    def _stopEditing(self):
-        self.getEditor().removeKeyListener(self)
+    def stopEditing(self):
+        self.getEditor().removeKeyListener(self.textEditor)
         self.editing = None
+        self.textEditor = None
         self.invalidate()
 
-    def _changeText(self,ch,append=False):
+    def changeText(self,ch,append=False):
         self.invalidate()
         tableElement = self.tableElement
         row = self.editing[0]
