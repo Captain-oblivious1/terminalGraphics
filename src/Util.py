@@ -1,5 +1,6 @@
 from Model import *
 from Point import *
+from Rect import *
 
 _vToDArray = [ [ None          , Direction.UP  , None            ], \
                [ Direction.LEFT, Direction.NONE, Direction.RIGHT ], \
@@ -34,3 +35,23 @@ def longestLineAndNumberLines(text):
 
     return longest,nLines
 
+
+def rectForJustifiedText(x,y,text,justification):
+    rect = Rect()
+    executeLambdaForJustifiedText(x,y,text,justification, lambda x,y,text : rect.unionWith( Rect(x,y,len(text),1) ) )
+    return rect
+
+def executeLambdaForJustifiedText(x,y,text,justification,funct):
+    lines = text.split('\n')
+
+    if justification==Justification.LEFT:
+        offsetCalc = lambda _ : 0
+    else:
+        if justification==Justification.RIGHT:
+            offsetCalc = lambda t : -len(t)
+        else:
+            offsetCalc = lambda t : -int(len(t)/2)
+
+    for i in range(len(lines)):
+        funct(x+offsetCalc(lines[i]),y,lines[i])
+        y += 1
