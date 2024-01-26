@@ -12,13 +12,13 @@ class TextEditor():
         self.editLocation = 0
 
     def keyEvent(self,event):
-        if event>=0 and event<=255:
+        if event>=0 and event<=255 and event!=8:
             if(event==27): # ESC
                 self._stopEditing()
             else:
                 self._charTyped(event)
         else:
-            if event==263: # Backspace
+            if event==263 or event==8: # Backspace
                 self._backspace()
             elif event==330: # del
                 self._del()
@@ -39,22 +39,23 @@ class TextEditor():
         return Point(col,row)
 
     def _backspace(self):
-        self.listener.invalidate()
-        oldText = self.text
-        self._changeText( oldText[0:self.editLocation-1] + oldText[self.editLocation:] )
-        self.editLocation -= 1
-        self.listener.invalidate()
+        if self.editLocation>0:
+            oldText = self.text
+            self.listener.invalidate()
+            self._changeText( oldText[0:self.editLocation-1] + oldText[self.editLocation:] )
+            self.editLocation -= 1
+            self.listener.invalidate()
 
     def _del(self):
-        self.listener.invalidate()
         oldText = self.text
+        self.listener.invalidate()
         self._changeText( oldText[0:self.editLocation] + oldText[self.editLocation+1:] )
         self.listener.invalidate()
 
     def _down(self):
         self.listener.invalidate()
         row,col = self.rowAndColForCharPosition( self.editLocation )
-        if row<len(self.lineInfo):
+        if row<len(self.lineInfo)-1:
             self.editLocation = self.positionForRowAndCol(row+1,col)
         self.listener.invalidate()
 
