@@ -81,7 +81,7 @@ class TextEditor():
 
     def _home(self):
         row,col = self.rowAndColForCharPosition( self.editLocation )
-        col = 0
+        col = self._offsetForRow(row)
         self.editLocation = self.positionForRowAndCol(row,col)
 
     def _end(self):

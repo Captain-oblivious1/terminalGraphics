@@ -231,30 +231,33 @@ class Context:
         for i in range(minX,maxX+1):
             self.orChar(i,y,ch,isBold)
 
-    def drawFilledBox(self,rect,selected):
+    def drawFilledBox(self,rect,linesSelected,interiorSelected=None):
+        if interiorSelected is None:
+            interiorSelected = linesSelected
+
         l = rect.l
         r = rect.r
         t = rect.t
         b = rect.b
-        self.andChar(l,t,'▛',selected)
-        self.andChar(r,t,'▜',selected)
-        self.andChar(l,b,'▙',selected)
-        self.andChar(r,b,'▟',selected)
+        self.andChar(l,t,'▛',linesSelected)
+        self.andChar(r,t,'▜',linesSelected)
+        self.andChar(l,b,'▙',linesSelected)
+        self.andChar(r,b,'▟',linesSelected)
         for i in range(l+1,r):
-            self.andChar(i,t,'▀',selected)
-            self.andChar(i,b,'▄',selected)
+            self.andChar(i,t,'▀',linesSelected)
+            self.andChar(i,b,'▄',linesSelected)
         for i in range(t+1,b):
-            self.andChar(l,i,'▌',selected)
-            self.andChar(r,i,'▐',selected)
+            self.andChar(l,i,'▌',linesSelected)
+            self.andChar(r,i,'▐',linesSelected)
         for i in range(t+1,b):
             for j in range(l+1,r):
-                self.andChar(j,i,' ',selected) 
-        self.orChar(l,t,'┌',selected)
-        self.orChar(r,t,'┐',selected)
-        self.orChar(l,b,'└',selected)
-        self.orChar(r,b,'┘',selected)
-        self.drawHorizontalLine(t,l+1,r-1,Thickness.THIN,Style.SOLID,selected)
-        self.drawHorizontalLine(b,l+1,r-1,Thickness.THIN,Style.SOLID,selected)
-        self.drawVerticalLine(l,t+1,b-1,Thickness.THIN,Style.SOLID,selected)
-        self.drawVerticalLine(r,t+1,b-1,Thickness.THIN,Style.SOLID,selected)
+                self.andChar(j,i,' ',interiorSelected) 
+        self.orChar(l,t,'┌',linesSelected)
+        self.orChar(r,t,'┐',linesSelected)
+        self.orChar(l,b,'└',linesSelected)
+        self.orChar(r,b,'┘',linesSelected)
+        self.drawHorizontalLine(t,l+1,r-1,Thickness.THIN,Style.SOLID,linesSelected)
+        self.drawHorizontalLine(b,l+1,r-1,Thickness.THIN,Style.SOLID,linesSelected)
+        self.drawVerticalLine(l,t+1,b-1,Thickness.THIN,Style.SOLID,linesSelected)
+        self.drawVerticalLine(r,t+1,b-1,Thickness.THIN,Style.SOLID,linesSelected)
 

@@ -4,6 +4,7 @@ from Component import *
 from Rect import *
 from Menu import *
 from Model import *
+from TextEditor import *
 
 class SequenceComponent(Component):
     def __init__(self,parent,element):
@@ -12,6 +13,7 @@ class SequenceComponent(Component):
         self.selectedActor = None
         self.selectedLine = None
         self.drawingLine = None
+        self.textEditor = None
 
     def setSelected(self,newSelected):
         super().setSelected(newSelected)
@@ -59,8 +61,14 @@ class SequenceComponent(Component):
             rect = self._rectForBox(actor)
             meSelected = self.selectedActor==actor or self.selectedActor==None and selected
             context.drawVerticalLine(actor.x,rect.b,bottom,Thickness.THIN,Style.SOLID,meSelected)
-            context.drawFilledBox(rect,meSelected)
-            context.writeString(rect.l+1,rect.t+1,actor.label)
+            context.drawFilledBox(rect,meSelected,False)
+            x = int((rect.l+1+rect.r)/2)
+            y = rect.t+1
+            context.writeJustifiedText(x,y,actor.label,Justification.CENTER)
+            if actor==self.selectedActor and self.textEditor is not None:
+                cursor = self.textEditor.cursorOffset() + Point(x,y)
+                ch = context.readChar(cursor.x,cursor.y)
+                context.writeString(cursor.x,cursor.y,ch,False,True)
 
         for line in lines:
             meSelected = self.selectedLine==line or self.selectedLine==None and selected
@@ -85,12 +93,11 @@ class SequenceComponent(Component):
         context.drawHorizontalLine(y,fx,tx,Thickness.THIN,Style.SOLID,selected)
 
     def _rectForBox(self,actor):
-        lenLabel = len(actor.label)
-        l = actor.x - int(lenLabel/2) - 1
-        r = l + lenLabel + 1
+        width,height = longestLineAndNumberLines(actor.label)
+        l = actor.x - int(width/2) - 1
+        r = l + width + 1
         t = self.element.top
-        _,n = longestLineAndNumberLines(actor.label)
-        b = t + n + 1
+        b = t + height + 1
         rect = Rect()
         rect.l = l
         rect.r = r
@@ -186,8 +193,7 @@ class SequenceComponent(Component):
             return False
 
     def keyEvent(self,event):
-        print("got key event="+str(event))
-        if event == 330:  # del key
+        if event == 330 and self.textEditor is not None:  # del key
             self._delete()
             return True
         else:
@@ -217,7 +223,8 @@ class SequenceComponent(Component):
     def showContextMenu(self,point,context):
         actor = self._actorAt(point)
         if actor != None:
-            options = ["add line from"]
+            self.selectedActor = actor
+            options = ["edit text","add line from"]
         else:
             options = ["add actor"]
         self.getDiagramComponent().showMenu(Menu(self,options,point,self.menuResult))
@@ -239,3 +246,16 @@ class SequenceComponent(Component):
             drawingLine.to = index
             self.selectedLine = self.drawingLine = drawingLine
             self.getEditor().addMouseListener(self)
+        elif option=="edit text":
+            self.invalidate()
+            self.textEditor = TextEditor(self.selectedActor.label,Justification.CENTER,self)
+            self.getEditor().addKeyListener(self.textEditor)
+
+    def changeText(self,text):
+        self.invalidate()
+        self.selectedActor.label= text
+        self.invalidate()
+
+    def stopEditing(self):
+        self.getEditor().removeKeyListener(self.textEditor)
+        self.textEditor = None
