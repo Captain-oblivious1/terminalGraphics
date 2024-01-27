@@ -15,7 +15,10 @@ class TextComponent(Component):
     def getRect(self):
         element = self.element
         location = element.location
-        return rectForJustifiedText(location.x,location.y,element.text,element.justification)
+        rect = rectForJustifiedText(location.x,location.y,element.text,element.justification)
+        if self.textEditor is not None:
+            rect.r += 1
+        return rect
 
     def draw(self,context):
         element = self.element
