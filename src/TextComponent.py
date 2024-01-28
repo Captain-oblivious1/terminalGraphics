@@ -55,18 +55,57 @@ class TextComponent(Component):
             options = ["stop editing"]
         else:
             options = ["edit"]
+
+        options += [""]
+        just = self.element.justification 
+        if just!=Justification.LEFT:
+            options += ["left justify"]
+        if just!=Justification.CENTER:
+            options += ["center justify"]
+        if just!=Justification.RIGHT:
+            options += ["right justify"]
         self.getDiagramComponent().showMenu(Menu(self,options,point,self.menuResult))
     
     def menuResult(self,menu):
-        if menu.getSelectedOption()=="edit":
+        option = menu.getSelectedOption()
+        if option=="edit":
             self.textEditor = TextEditor(self.element.text,self.element.justification,self)
-        else:
-            self.textEditor = None
-        editor = self.getEditor()
-        if self.textEditor is not None:
+            editor = self.getEditor()
             editor.addKeyListener(self.textEditor)
-        else:
+        elif option=="stop editing":
             self.stopEditing()
+
+        else:
+            halfWidth = longestLineFor(self.element.text)/2
+            oldJust = self.element.justification
+            location = self.element.location
+            x = location.x
+            if oldJust == Justification.LEFT:
+                center = x + halfWidth
+            elif oldJust == Justification.CENTER:
+                center = x
+            elif oldJust == Justification.RIGHT:
+                center = x - halfWidth
+            else:
+                raise Exception("Justification unset")
+
+            if option=="left justify":
+                just = Justification.LEFT
+                x = center - halfWidth
+            elif option=="center justify":
+                just = Justification.CENTER
+                x = center
+            elif option=="right justify":
+                just = Justification.RIGHT
+                x = center + halfWidth
+            else:
+                just = None
+
+            if just is not None:
+                self.invalidate()
+                self.element.justification = just
+                self.element.location.x = int(x)
+                self.invalidate()
 
     def keyEvent(self,event):
         self.invalidate()

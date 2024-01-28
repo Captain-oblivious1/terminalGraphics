@@ -123,13 +123,13 @@ class IdleState(State):
             p = menu.topLeft
             tableElement = TableElement()
             tableElement.location = p
-            tableElement.columnWidths = [4,5]
-            tableElement.rowHeights = [1]
+            tableElement.columnWidths = [5]
+            tableElement.rowHeights = [1,1]
             one = TableField()
             one.text = "Your"
             one.justification = Justification.CENTER
             two = TableField()
             two.text = "table"
             two.justification = Justification.CENTER
-            tableElement.dataRows = [ [ one, two ] ]
+            tableElement.dataRows = [ [ one ] , [ two ] ]
             self.diagramComponent.addElement(tableElement)
