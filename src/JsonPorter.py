@@ -103,7 +103,7 @@ class JsonPorter:
             raise Exception("Unrecognized element type '"+dataType+"'")
 
         for key,value in jsonData.items():
-            if key!="_type":
+            if key!="_type" and key!="isEqual":
                 setattr(element,key, JsonPorter.nameToTypes[key](value))
 
         return element

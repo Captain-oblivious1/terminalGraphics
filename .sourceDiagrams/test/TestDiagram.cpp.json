@@ -6,6 +6,9 @@
     "_type": "PathElement",
     "corners": "SQUARE",
     "fill": "TRANSPARENT",
+    "isEqual": {
+     "_type": "method"
+    },
     "pathType": "CLOSED",
     "startOrientation": "VERTICAL",
     "style": 1,
@@ -21,6 +24,9 @@
    },
    {
     "_type": "TextElement",
+    "isEqual": {
+     "_type": "method"
+    },
     "justification": "LEFT",
     "location": [
      31,
@@ -32,6 +38,9 @@
     "_type": "PathElement",
     "corners": "SQUARE",
     "fill": "OPAQUE",
+    "isEqual": {
+     "_type": "method"
+    },
     "pathType": "CLOSED",
     "startOrientation": "HORIZONTAL",
     "style": 0,
@@ -47,6 +56,9 @@
     "_type": "PathElement",
     "corners": "ROUND",
     "fill": "OPAQUE",
+    "isEqual": {
+     "_type": "method"
+    },
     "pathType": "CLOSED",
     "startOrientation": "HORIZONTAL",
     "style": "0",
@@ -62,6 +74,9 @@
    },
    {
     "_type": "TextElement",
+    "isEqual": {
+     "_type": "method"
+    },
     "justification": "CENTER",
     "location": [
      41,
@@ -74,6 +89,9 @@
     "corners": "SQUARE",
     "endArrow": "TRIANGLE",
     "fill": "TRANSPARENT",
+    "isEqual": {
+     "_type": "method"
+    },
     "pathType": "OPEN",
     "startArrow": "NONE",
     "startOrientation": "HORIZONTAL",
@@ -92,6 +110,9 @@
     "corners": "ROUND",
     "endArrow": "TRIANGLE",
     "fill": "OPAQUE",
+    "isEqual": {
+     "_type": "method"
+    },
     "pathType": "OPEN",
     "startArrow": "LINES",
     "startOrientation": "VERTICAL",
@@ -115,6 +136,9 @@
      [
       {
        "_type": "TableField",
+       "isEqual": {
+        "_type": "method"
+       },
        "justification": "CENTER",
        "text": "<interface>\nMyInterface"
       }
@@ -122,11 +146,17 @@
      [
       {
        "_type": "TableField",
+       "isEqual": {
+        "_type": "method"
+       },
        "justification": "LEFT",
        "text": "+func1(val:int):float\n+func2(val1:float,val2:float):void"
       }
      ]
     ],
+    "isEqual": {
+     "_type": "method"
+    },
     "location": [
      25,
      30
@@ -141,25 +171,40 @@
     "actors": [
      {
       "_type": "Actor",
+      "isEqual": {
+       "_type": "method"
+      },
       "label": "User",
-      "x": 74
+      "x": 73
      },
      {
       "_type": "Actor",
+      "isEqual": {
+       "_type": "method"
+      },
       "label": "Foo",
       "x": 85
      },
      {
       "_type": "Actor",
+      "isEqual": {
+       "_type": "method"
+      },
       "label": "Bar",
       "x": 96
      }
     ],
+    "isEqual": {
+     "_type": "method"
+    },
     "lines": [
      {
       "_type": "Line",
       "dashed": true,
       "from": 0,
+      "isEqual": {
+       "_type": "method"
+      },
       "to": 1,
       "y": 25
      },
@@ -167,6 +212,9 @@
       "_type": "Line",
       "dashed": true,
       "from": 2,
+      "isEqual": {
+       "_type": "method"
+      },
       "to": 1,
       "y": 30
      },
@@ -174,6 +222,9 @@
       "_type": "Line",
       "dashed": false,
       "from": 2,
+      "isEqual": {
+       "_type": "method"
+      },
       "to": 0,
       "y": 27
      },
@@ -181,6 +232,9 @@
       "_type": "Line",
       "dashed": false,
       "from": 2,
+      "isEqual": {
+       "_type": "method"
+      },
       "to": 1,
       "y": 24
      }
@@ -188,6 +242,9 @@
     "top": 20
    }
   ],
+  "isEqual": {
+   "_type": "method"
+  },
   "name": ""
  },
  "Blah": {

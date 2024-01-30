@@ -191,7 +191,7 @@ class Path:
             return Rect().includePoint(self.point())
 
         def isAtPoint(self,point):
-            return point.isEqual(self.getX(), self.getY())
+            return point==Point(self.getX(), self.getY())
 
         def edit(self,offset):
             if self.fromSegment!=None:

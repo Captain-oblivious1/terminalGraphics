@@ -1,4 +1,6 @@
 import curses
+import sys
+import copy
 
 from DiagramComponent import *
 from CursesContext import *
@@ -14,6 +16,7 @@ class Editor:
         self.saveCallback = saveCallback
         self.keyListeners = set([])
         self.mouseListeners = set([])
+        self.lastSavedDiagram = copy.deepcopy(diagram)
 
     def getContext(self):
         return self.context
@@ -70,7 +73,7 @@ class Editor:
         while(True):
             event = self.screen.getch()
             #if event!=curses.KEY_MOUSE:
-            #    print("event="+str(event))
+            #   print("event="+str(event))
             if event!=curses.KEY_MOUSE:
                 #print("Got event="+str(event)+" nListeners="+str(len(self.keyListeners)))
                 handled = False
@@ -80,16 +83,20 @@ class Editor:
                             handled = True
 
                 if not handled:
-                    if event == 27: # ESC key
-                        self.screen.nodelay(True)
-                        nextKey = self.screen.getch()
-                        self.screen.nodelay(False)
-                        if nextKey==-1:
-                            break;
-                    elif event == ord('s'):
+                    if event == ord('q') or event == 27: # q or ESC key
+                        print("About to call equals")
+                        if not diagram.element.isEqual(self.lastSavedDiagram):
+                            print("was not equal")
+                            options = ["save changes","exit anyway"]
+                            w,h = self.context.getMaxXy()
+                            self.diagramComponent.showMenu(Menu(diagram,options,Point(int(w/2),int(h/2)),self.menuResult))
+                        else:
+                            print("was equal")
+                            self.exit()
+                    elif event == ord('s'): # just S
+                        print("saved")
+                        self.lastSavedDiagram = copy.deepcopy(diagram.element)
                         self.saveCallback()
-                    elif event == ord('q'):
-                        break
                     elif event == curses.KEY_PPAGE:
                         diagram.moveSelectedForward()
                     elif event == curses.KEY_NPAGE:
@@ -128,4 +135,17 @@ class Editor:
                 self.context.validateAll()
                 self.screen.refresh()
 
+        self.exit()
+
+    def menuResult(self,menu):
+        option = menu.getSelectedOption()
+        if option=="save changes":
+            self.saveCallback()
+        self.exit()
+
+    def exit(self):
+        self.screen.nodelay(True)
+        nextKey = self.screen.getch()
+        self.screen.nodelay(False)
         curses.endwin()
+        sys.exit(0)
