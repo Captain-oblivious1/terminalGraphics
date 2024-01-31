@@ -84,7 +84,7 @@ class Editor:
 
                 if not handled:
                     if event == ord('q') or event == 27: # q or ESC key
-                        if not diagram.element.isEqual(self.lastSavedDiagram):
+                        if not diagram.element._isEqual(self.lastSavedDiagram):
                             options = ["save changes","exit and discard changes","keep editing"]
                             w,h = self.context.getMaxXy()
                             self.diagramComponent.showMenu(Menu(diagram,options,Point(int(w/2),int(h/2)),self.menuResult))

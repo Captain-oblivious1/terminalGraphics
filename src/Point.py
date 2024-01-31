@@ -37,7 +37,3 @@ class Point:
 
     def __str__(self):
         return "Point("+str(self.x)+","+str(self.y)+")"
-
-    #def isEqual(self,x,y):
-    #    return self.x==x and self.y==y
-

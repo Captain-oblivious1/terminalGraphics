@@ -91,6 +91,13 @@ class SequenceComponent(Component):
             tx += 2
 
         context.drawHorizontalLine(y,fx,tx,Thickness.THIN,Style.SOLID,selected)
+        lines = numberOfLines(line.text)
+        textLoc = Point(int((fx+tx)/2),y-lines+1)
+        context.writeJustifiedText(textLoc.x,textLoc.y,line.text,Justification.CENTER)
+        if line==self.selectedLine and self.textEditor is not None:
+            cursor = self.textEditor.cursorOffset() + textLoc
+            ch = context.readChar(cursor.x,cursor.y)
+            context.writeString(cursor.x,cursor.y,ch,False,True)
 
     def _rectForBox(self,actor):
         width,height = longestLineAndNumberLines(actor.label)
@@ -222,11 +229,17 @@ class SequenceComponent(Component):
 
     def showContextMenu(self,point,context):
         actor = self._actorAt(point)
-        if actor != None:
+        if actor is not None:
             self.selectedActor = actor
             options = ["edit text","add line from"]
         else:
-            options = ["add actor"]
+            options = []
+            line = self._lineAt(point)
+            if line is not None:
+                self.selectedLine = line
+                options += ["edit text"]
+            options += ["add actor"]
+
         self.getDiagramComponent().showMenu(Menu(self,options,point,self.menuResult))
 
     def menuResult(self,menu):
@@ -248,12 +261,21 @@ class SequenceComponent(Component):
             self.getEditor().addMouseListener(self)
         elif option=="edit text":
             self.invalidate()
-            self.textEditor = TextEditor(self.selectedActor.label,Justification.CENTER,self)
+            if self.selectedActor is not None:
+                text = self.selectedActor.label
+            elif self.selectedLine is not None:
+                text = self.selectedLine.text
+            else:
+                raise Exception("Internal error: editing text for non selected object")
+            self.textEditor = TextEditor(text,Justification.CENTER,self)
             self.getEditor().addKeyListener(self.textEditor)
 
     def changeText(self,text):
         self.invalidate()
-        self.selectedActor.label= text
+        if self.selectedActor is not None:
+            self.selectedActor.label= text
+        elif self.selectedLine is not None:
+            self.selectedLine.text = text
         self.invalidate()
 
     def stopEditing(self):

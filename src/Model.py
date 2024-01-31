@@ -27,7 +27,7 @@ class Element:
         return self.__class__.__name__ + ":{" + self._attrToStr(attributeNames) + "}"
 
     def __str__(self):
-        return self._genString(list(filter(lambda x: not x.startswith("_") and x!="isEqual", self.__dir__())))
+        return self._genString(list(filter(lambda x: not x.startswith("_") and x!="_isEqual", self.__dir__())))
 
 class Diagram(Element):
     def __init__(self,name):
@@ -35,10 +35,10 @@ class Diagram(Element):
         self.name = name
         self.elements = [] # front to back
         
-    def isEqual(self,other):
+    def _isEqual(self,other):
         return \
-            isEqual(self.name,other.name) and \
-            isEqual(self.elements,other.elements)
+            _isEqual(self.name,other.name) and \
+            _isEqual(self.elements,other.elements)
 
 class TextElement(Element):
     def __init__(self):
@@ -47,11 +47,11 @@ class TextElement(Element):
         self.location = None
         self.justification = Justification.CENTER
 
-    def isEqual(self,other):
+    def _isEqual(self,other):
         return \
-            isEqual(self.text,other.text) and \
-            isEqual(self.location,other.location) and \
-            isEqual(self.justification,other.justification)
+            _isEqual(self.text,other.text) and \
+            _isEqual(self.location,other.location) and \
+            _isEqual(self.justification,other.justification)
 
 class Justification(Enum):
     LEFT = 0
@@ -81,23 +81,23 @@ class PathElement(Element):
         self.style = Style.SOLID
         self.thickness = Thickness.THIN
 
-    def isEqual(self,other):
+    def _isEqual(self,other):
         return isinstance(other,PathElement) and \
-            isEqual(self.startOrientation,other.startOrientation) and \
-            isEqual(self.turns,other.turns) and \
-            isEqual(self.corners,other.corners) and \
-            isEqual(self.pathType,other.pathType) and \
-            isEqual(self.fill,other.fill) and \
-            isEqual(self.style,other.style) and \
-            isEqual(self.thickness,other.thickness)
+            _isEqual(self.startOrientation,other.startOrientation) and \
+            _isEqual(self.turns,other.turns) and \
+            _isEqual(self.corners,other.corners) and \
+            _isEqual(self.pathType,other.pathType) and \
+            _isEqual(self.fill,other.fill) and \
+            _isEqual(self.style,other.style) and \
+            _isEqual(self.thickness,other.thickness)
 
 class ShapeElement(PathElement):
     def __init__(self):
         PathElement.__init__(self)
 
-    def isEqual(self,other):
+    def _isEqual(self,other):
         return isinstance(other,ShapeElement) and \
-            super().isEqual(other)
+            super()._isEqual(other)
 
 class Direction(Enum):
     NONE = 0
@@ -118,22 +118,22 @@ class TableElement(Element):
         self.rowHeights = []
         self.dataRows = []
 
-    def isEqual(self,other):
+    def _isEqual(self,other):
         return isinstance(other,TableElement) and \
-            isEqual(self.location,other.location) and \
-            isEqual(self.columnWidths,other.columnWidths) and \
-            isEqual(self.rowHeights,other.rowHeights) and \
-            isEqual(self.dataRows,other.dataRows) 
+            _isEqual(self.location,other.location) and \
+            _isEqual(self.columnWidths,other.columnWidths) and \
+            _isEqual(self.rowHeights,other.rowHeights) and \
+            _isEqual(self.dataRows,other.dataRows) 
 
 class TableField:
     def __init__(self):
         self.justification = Justification.LEFT
         self.text = ''
 
-    def isEqual(self,other):
+    def _isEqual(self,other):
         return isinstance(other,TableField) and \
-            isEqual(self.justification,other.justification) and \
-            isEqual(self.text,other.text)
+            _isEqual(self.justification,other.justification) and \
+            _isEqual(self.text,other.text)
 
 class SequenceElement(Element):
     def __init__(self):
@@ -141,21 +141,21 @@ class SequenceElement(Element):
         self.actors = []
         self.lines = []
 
-    def isEqual(self,other):
+    def _isEqual(self,other):
         return isinstance(other,SequenceElement) and \
-            isEqual(self.top,other.top) and \
-            isEqual(self.actors,other.actors) and \
-            isEqual(self.lines,other.lines)
+            _isEqual(self.top,other.top) and \
+            _isEqual(self.actors,other.actors) and \
+            _isEqual(self.lines,other.lines)
 
 class Actor:
     def __init__(self):
         self.x = None
         self.label = None
 
-    def isEqual(self,other):
+    def _isEqual(self,other):
         return isinstance(other,Actor) and \
-            isEqual(self.x,other.x) and \
-            isEqual(self.label,other.label)
+            _isEqual(self.x,other.x) and \
+            _isEqual(self.label,other.label)
 
 class Line:
     def __init__(self):
@@ -163,15 +163,17 @@ class Line:
         self.dashed = False
         self.fro = None
         self.to = None
+        self.text = "text"
 
-    def isEqual(self,other):
+    def _isEqual(self,other):
         return isinstance(other,Line) and \
-            isEqual(self.y,other.y) and \
-            isEqual(self.dashed,other.dashed) and \
-            isEqual(self.fro,other.fro) and \
-            isEqual(self.to,other.to)
+            _isEqual(self.y,other.y) and \
+            _isEqual(self.dashed,other.dashed) and \
+            _isEqual(self.fro,other.fro) and \
+            _isEqual(self.to,other.to) and \
+            _isEqual(self.text,other.text) 
 
-def isEqual(left,right):
+def _isEqual(left,right):
     lType = type(left)
     if not lType is type(right):
         return False
@@ -182,11 +184,11 @@ def isEqual(left,right):
             return False
 
         for i in range(l):
-            if not isEqual(left[i],right[i]):
+            if not _isEqual(left[i],right[i]):
                 return False
 
-    elif hasattr(left,"isEqual"):
-        if not left.isEqual(right):
+    elif hasattr(left,"_isEqual"):
+        if not left._isEqual(right):
             return False
 
     elif left!=right:

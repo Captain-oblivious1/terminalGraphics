@@ -103,7 +103,7 @@ class JsonPorter:
             raise Exception("Unrecognized element type '"+dataType+"'")
 
         for key,value in jsonData.items():
-            if key!="_type" and key!="isEqual":
+            if key!="_type":
                 setattr(element,key, JsonPorter.nameToTypes[key](value))
 
         return element
@@ -155,6 +155,7 @@ class JsonPorter:
             line.dashed = bool(jsonStruct["dashed"])
             line.fro = int(jsonStruct["from"])
             line.to = int(jsonStruct["to"])
+            line.text = jsonStruct["text"]
             lineList.append(line)
         return lineList
 

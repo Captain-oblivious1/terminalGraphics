@@ -11,6 +11,10 @@ def vectorToDirection(vector):
     offset = normed + Point(1,1)
     return  _vToDArray[offset.y][offset.x]
 
+def numberOfLines(text):
+    _,lines = longestLineAndNumberLines(text)
+    return lines
+
 def longestLineFor(text):
     longest,_ = longestLineAndNumberLines(text)
     return longest
