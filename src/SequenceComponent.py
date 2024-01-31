@@ -217,19 +217,16 @@ class SequenceComponent(Component):
             self.selectedLine = None
         if self.selectedActor is not None:
             index = element.actors.index(self.selectedActor)
-            print("index="+str(index))
             for line in element.lines.copy():
                 if line.fro==index or line.to==index:
-                    print("deleting line="+str(index))
                     element.lines.remove(line)
                 else:
                     if line.fro>index:
                         line.fro -= 1
                     if line.to>index:
                         line.to -= 1
-            self.selectedActor = None
-
             self.element.actors.remove(self.selectedActor)
+            self.selectedActor = None
         self.invalidate()
 
     def showContextMenu(self,point,context):
