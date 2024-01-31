@@ -87,7 +87,7 @@ class Editor:
                         if not diagram.element._isEqual(self.lastSavedDiagram):
                             options = ["save changes","exit and discard changes","keep editing"]
                             w,h = self.context.getMaxXy()
-                            self.diagramComponent.showMenu(Menu(diagram,options,Point(int(w/2),int(h/2)),self.menuResult))
+                            self.diagramComponent.showMenu(Menu(diagram,options,Point(int(w/2)-12,int(h/2)-1),self.menuResult))
                         else:
                             self.exit()
                     elif event == ord('s'): # just S
