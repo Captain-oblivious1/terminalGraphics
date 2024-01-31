@@ -33,9 +33,12 @@ class SequenceComponent(Component):
             rect.unionWith(self._rectForBox(actor))
 
         for line in element.lines:
+            nLines = numberOfLines(line.text)
+            rect.t = min(rect.t,line.y-nLines)
             rect.b = max(rect.b,line.y)
 
         if self.drawingLine!=None:
+            rect.t = min(rect.t,self.drawingLine.y)
             rect.b = max(rect.b,self.drawingLine.y)
 
         rect.r += 1
@@ -200,7 +203,7 @@ class SequenceComponent(Component):
             return False
 
     def keyEvent(self,event):
-        if event == 330 and self.textEditor is not None:  # del key
+        if event == 330: # and self.textEditor is not None:  # del key
             self._delete()
             return True
         else:
@@ -211,6 +214,7 @@ class SequenceComponent(Component):
         element = self.element
         if self.selectedLine is not None:
             element.lines.remove(self.selectedLine)
+            self.selectedLine = None
         if self.selectedActor is not None:
             index = element.actors.index(self.selectedActor)
             print("index="+str(index))
@@ -223,6 +227,7 @@ class SequenceComponent(Component):
                         line.fro -= 1
                     if line.to>index:
                         line.to -= 1
+            self.selectedActor = None
 
             self.element.actors.remove(self.selectedActor)
         self.invalidate()
@@ -268,7 +273,9 @@ class SequenceComponent(Component):
             else:
                 raise Exception("Internal error: editing text for non selected object")
             self.textEditor = TextEditor(text,Justification.CENTER,self)
-            self.getEditor().addKeyListener(self.textEditor)
+            editor = self.getEditor()
+            editor.addKeyListener(self.textEditor)
+            editor.removeKeyListener(self)
 
     def changeText(self,text):
         self.invalidate()
@@ -279,5 +286,7 @@ class SequenceComponent(Component):
         self.invalidate()
 
     def stopEditing(self):
-        self.getEditor().removeKeyListener(self.textEditor)
+        editor = self.getEditor()
+        editor.addKeyListener(self)
+        editor.removeKeyListener(self.textEditor)
         self.textEditor = None
