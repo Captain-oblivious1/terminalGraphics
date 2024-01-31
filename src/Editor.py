@@ -84,17 +84,13 @@ class Editor:
 
                 if not handled:
                     if event == ord('q') or event == 27: # q or ESC key
-                        print("About to call equals")
                         if not diagram.element.isEqual(self.lastSavedDiagram):
-                            print("was not equal")
-                            options = ["save changes","exit anyway"]
+                            options = ["save changes","exit and discard changes","keep editing"]
                             w,h = self.context.getMaxXy()
                             self.diagramComponent.showMenu(Menu(diagram,options,Point(int(w/2),int(h/2)),self.menuResult))
                         else:
-                            print("was equal")
                             self.exit()
                     elif event == ord('s'): # just S
-                        print("saved")
                         self.lastSavedDiagram = copy.deepcopy(diagram.element)
                         self.saveCallback()
                     elif event == curses.KEY_PPAGE:
@@ -141,7 +137,11 @@ class Editor:
         option = menu.getSelectedOption()
         if option=="save changes":
             self.saveCallback()
-        self.exit()
+            self.exit()
+        elif option=="exit and discard changes":
+            self.exit()
+        else:
+            pass
 
     def exit(self):
         self.screen.nodelay(True)

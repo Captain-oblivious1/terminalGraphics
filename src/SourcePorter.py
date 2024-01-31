@@ -33,12 +33,10 @@ class SourcePorter:
             openTag = self.openRe.search(line)
 
             if formatTag!=None:
-                print("Is formatTag")
                 currentDiagName = formatTag.group(1)
                 if currentDiagName is None:
                     currentDiagName = ''
 
-                print("currentDiagName="+currentDiagName)
                 if currentDiagName!=diagramName:
                     tempFile.write(line)
                 else:
@@ -72,14 +70,6 @@ class SourcePorter:
             else:
                 tempFile.write(line)
 
-
-                #line = line[diagramTag.span()[1]:]
-                #print("dia start="+str(diagramTag.start))
-
-                #openCurly = re.search('{',line[diagramTag.end:])
-
-
-
         file.close()
         tempFile.close()
         shutil.move(tempFileName,fileName)
@@ -88,7 +78,6 @@ class SourcePorter:
     def _writeDiagramToFile(diagram,file,prefix):
         diagramComponent = DiagramComponent(None,diagram)
         childrenRect = diagramComponent.rectOfAllChildren()
-        print("childrenRect="+str(childrenRect))
         memContext = MemoryContext(childrenRect.r,childrenRect.b)
         memContext.invalidateRect(childrenRect)
         diagramComponent.draw(memContext)

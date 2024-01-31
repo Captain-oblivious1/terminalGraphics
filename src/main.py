@@ -64,18 +64,12 @@ def myMain(stdscr,args):
         os.mkdir(dotDir)
         dotDir = pathlib.Path(dotDir)
 
-        print("Found gitDir="+str(gitDir))
-        print("create "+sourceDiagramDirName+" at "+str())
 
-    print("dotDir='"+str(dotDir)+"'")
     projRoot = dotDir.parent
-    print("projRoot="+str(projRoot))
     relPathOfSource = os.path.relpath(sourceFile,projRoot)
-    print("relPathOfSource="+str(relPathOfSource))
 
     jsonFile = os.path.join(dotDir,relPathOfSource + ".json")
 
-    print("diagram from jsonFile="+jsonFile)
     if os.path.exists(jsonFile):
         diagram = JsonPorter.importDiagram(jsonFile,diagram)
     else:
@@ -94,13 +88,12 @@ def findDirParent(file,dirName):
         lastParent = parent
 
         for file in parent.iterdir():
-            #print("testing file="+str(file)+" name="+str(file.name)) 
             if file.is_dir():
                 if file.name==dirName:
                     return file
 
 def save(sourceFile,jsonFile,diagram):
-    print("saving file '"+sourceFile+"' diagram='"+diagram.name+"'")
+    print("Writing diagram to file '"+sourceFile+"' diagram='"+diagram.name+"' ...",end="")
     os.makedirs(os.path.dirname(jsonFile),exist_ok=True)
     JsonPorter.exportDiagram(jsonFile,diagram)
     sourcePorter = SourcePorter()
